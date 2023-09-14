@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display JSON</title>
+</head>
+<body>
+    <h1>JSON Data:</h1>
+    <pre id="jsonData"></pre>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchJSONData();
+        });
+
+        function fetchJSONData() {
+            // replace the "demo" apikey below with your own key
+            var functionName = "TIME_SERIES_WEEKLY"; //variables can change at will.
+            var key = "demo";
+            var symbol = "IBM";
+            
+            var url = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}&apikey=${key}`;
+            
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayData(data);
+                })
+                .catch(error => {
+                    console.log("There was a problem with the fetch operation:", error.message);
+                });
+        }
+
+        function displayData(data) {
+            var jsonDataElement = document.getElementById("jsonData");
+            jsonDataElement.textContent = JSON.stringify(data, null, 4);
+        }
+    </script>
+</body>
+</html>

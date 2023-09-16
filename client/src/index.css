@@ -8,11 +8,12 @@ body,
   height: 100%;
   width: 100%;
   font-family: "Source Sans 3", sans-serif;
+  overflow-y: auto;
 }
 
 .app {
   display: flex;
-  position: relative;
+  overflow-y: hidden;
 }
 
 ::-webkit-scrollbar {

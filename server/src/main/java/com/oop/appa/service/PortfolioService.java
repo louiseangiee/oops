@@ -27,7 +27,7 @@ public class PortfolioService {
         return portfolioRepository.findAll();
     }
 
-    public Page<Portfolio> findAllPaged(org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable pageable) {
+    public Page<Portfolio> findAllPaged(Pageable pageable) {
         return portfolioRepository.findAll(pageable);
     }
 

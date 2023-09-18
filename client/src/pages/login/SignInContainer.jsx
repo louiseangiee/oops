@@ -13,8 +13,8 @@ const SignInContainer = (props) => {
     const colors = tokens(theme.palette.mode);
     return (
         <>
-            <Grid
-                xs={6}
+            <Grid item
+                xs={12} md={8}
                 id="signInContainer"
                 sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
             >
@@ -28,7 +28,7 @@ const SignInContainer = (props) => {
                         <LockIcon />
                         <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Password" type={showPassword ? 'text' : 'password'} />
                         <Button
-                            sx={{ color: colors.primary[300] }}
+                            sx={{ color: colors.grey[100] }}
                             id="seePasswordBtn"
                             onClick={() => setShowPassword(!showPassword)}
                         >
@@ -42,13 +42,13 @@ const SignInContainer = (props) => {
                         Register with us {" "}
                         <Link
                             onClick={props.handleSignIn}
-                            sx={{ color: colors.primary[300], cursor: 'pointer' }}
+                            sx={{ color: colors.grey[100], cursor: 'pointer' }}
                         >
                             here!
                         </Link>
                     </Typography>
                 </Box>
-                <Button sx={{ color: colors.primary[300], width: '100%' }}>Sign In</Button>
+                <Button sx={{ color: colors.grey[100], width: '100%' }}>Sign In</Button>
             </Grid >
         </>
     );

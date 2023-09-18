@@ -15,8 +15,8 @@ const Login = () => {
 
     return (
         <>
-            <Grid container sx={{ height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Grid xs={6}>
+            <Grid container sx={{ height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} spacing={2}>
+                <Grid item md={4} id="welcomeGoldman">
                     <img
                         alt="goldman-logo"
                         width="100px"

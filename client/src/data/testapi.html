@@ -19,8 +19,10 @@
             var functionName = "TIME_SERIES_DAILY"; //variables can change at will.
             var key = "AIHSU9GJP3BGASNA";
             var symbol = "IBM";
+            var interval = "5min" 
             
-            var url = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}&apikey=${key}`;
+            var urlStatic = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}&apikey=${key}`; //for daily/weekly
+            //const urlDynamic = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}&interval=${interval}&apikey=${key}`;  for livedata
             
 
             fetch(url)

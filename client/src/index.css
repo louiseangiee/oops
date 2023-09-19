@@ -5,32 +5,32 @@ body,
 #root,
 .app,
 .content {
-  height: 100%;
-  width: 100%;
-  font-family: "Source Sans 3", sans-serif;
+	height: 100%;
+	width: 100%;
+	font-family: 'Source Sans 3', sans-serif;
+	overflow-y: auto;
 }
 
 .app {
-  display: flex;
-  position: relative;
+	display: flex;
+	overflow-y: hidden;
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+	width: 10px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #e0e0e0;
+	background: #e0e0e0;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+	background: #888;
 }
 
 /* Handle on  Hover */
 ::-webkit-scrollbar-track:hover {
-  background: #555;
+	background: #555;
 }
-

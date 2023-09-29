@@ -1,86 +1,61 @@
 package com.oop.appa.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
-import java.security.Timestamp;
-import java.util.Date;
+import java.util.Collection;
+import java.util.List;
 
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "Users")
-public class User {
+public class User implements UserDetails {
+
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private int id;
 
+    @Getter
     @Column(name = "email")
     private String email;
 
-    @Column(name = "password_hash")
-    private String passwordHash;
+    @Getter
+    @Column(name = "fullName")
+    private String fullName;
 
-    @Column(name = "date_registered")
-    private Date dateRegistered;
+    @Column(name = "password")
+    private String password;
 
-    @Column(name = "last_login_timestamp")
-    private Timestamp lastLoginTimestamp;
-
-    // constructors
-    public User() {
-    }
-
-    public User(int id, String email, String passwordHash, Date dateRegistered, Timestamp lastLoginTimestamp) {
+    public User(int id, String email, String fullName, String password) {
         this.id = id;
         this.email = email;
-        this.passwordHash = passwordHash;
-        this.dateRegistered = dateRegistered;
-        this.lastLoginTimestamp = lastLoginTimestamp;
-    }
-
-    // getters and setters
-    public int getId() {
-        return id;
+        this.fullName = fullName;
+        this.password = password;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public Date getDateRegistered() {
-        return dateRegistered;
-    }
-
-    public void setDateRegistered(Date dateRegistered) {
-        this.dateRegistered = dateRegistered;
-    }
-
-    public Timestamp getLastLoginTimestamp() {
-        return lastLoginTimestamp;
-    }
-
-    public void setLastLoginTimestamp(Timestamp lastLoginTimestamp) {
-        this.lastLoginTimestamp = lastLoginTimestamp;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     // override toString
@@ -89,10 +64,46 @@ public class User {
         return "User{" +
                 "id=" + id +
                 ", email='" + email +
-                ", passwordHash='" + passwordHash +
-                ", dateRegistered=" + dateRegistered +
-                ", lastLoginTimestamp=" + lastLoginTimestamp +
+                ", fullName='" + fullName +
+                ", password='" + password +
                 '}';
     }
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

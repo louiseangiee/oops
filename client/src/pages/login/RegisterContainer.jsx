@@ -14,6 +14,8 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 const RegisterContainer = (props) => {
     const pattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$!%^&*()_+{}\]:;<>,.?~\\-]).{8,}$/;
     let navigate = useNavigate();
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [password, setPassword] = useState('');
@@ -27,6 +29,25 @@ const RegisterContainer = (props) => {
     // var mm = String(today.getMonth() + 1).padStart(2, '0');
     // var yyyy = today.getFullYear();
     // var maxDate = yyyy + '-' + mm + '-' + dd;
+
+
+    async function handleRegister() {
+        const response = await fetch('http://localhost:8080/api/v1/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "fullName": fullName,
+                "email": email,
+                "password": password,
+            })
+        })
+        const data = await response.json();
+        console.log(data.token);
+        localStorage.setItem('token', data.token);
+        navigate('/')
+    }
 
     function checkPassword() {
         setPasswordError('');
@@ -50,7 +71,7 @@ const RegisterContainer = (props) => {
 
         }
 
-        setIsDisabled(passwordError.length > 0 || !(confirmPassword.length > 0) || !(password.length > 0))
+        setIsDisabled(!passwordError.length > 0 || !(confirmPassword.length > 0) || !(password.length > 0))
 
     }
 
@@ -69,11 +90,11 @@ const RegisterContainer = (props) => {
                 <div>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <AccountCircleIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Full Name" required />
+                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Full Name" required onChange={(e) => setFullName(e.target.value)} />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <AlternateEmailIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Email" type='email' required />
+                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Email" type='email' required onChange={(e) => setEmail(e.target.value)} />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <LockIcon />
@@ -113,7 +134,7 @@ const RegisterContainer = (props) => {
                 </Box>
                 <Button
                     sx={{ color: colors.grey[100], width: '100%' }}
-                    onClick={() => navigate('/')}
+                    onClick={handleRegister}
                     disabled={isDisabled}
                 >
                     Sign Up!

@@ -48,8 +48,9 @@ public class StockController {
     }
 
     // POST endpoint for creating a new stock
-    @PostMapping
+    @PostMapping()
     public void createStock(@RequestBody Stock stock) {
+        System.out.println(stock);
         stockService.save(stock);
     }
 

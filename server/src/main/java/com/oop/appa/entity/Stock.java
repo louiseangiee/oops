@@ -1,11 +1,6 @@
 package com.oop.appa.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Stocks")
@@ -84,6 +79,7 @@ public class Stock {
     // toString method
     @Override
     public String toString() {
-        return String.format("Stock [stockSymbol=%s, name=%s, industry=%s, sector=%s, country=%s]", stockSymbol, name, industry, sector, country);
+        return "Stock [stockSymbol=" + stockSymbol + ", name=" + name + ", industry=" + industry + ", sector=" + sector
+                + ", country=" + country + "]";
     }
 }

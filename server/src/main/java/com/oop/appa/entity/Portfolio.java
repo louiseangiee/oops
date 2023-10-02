@@ -1,5 +1,8 @@
 package com.oop.appa.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -22,6 +25,9 @@ public class Portfolio {
 
     @Column(name="total_capital")
     private double totalCapital;
+
+    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
+    private List<PortfolioStock> portfolioStocks;
 
     // constructors
     public Portfolio(){
@@ -72,6 +78,24 @@ public class Portfolio {
 
     public void setTotalCapital(double totalCapital) {
         this.totalCapital = totalCapital;
+    }
+
+     public List<PortfolioStock> getPortfolioStocks() {
+        return portfolioStocks;
+    }
+
+    public void setPortfolioStocks(List<PortfolioStock> portfolioStocks) {
+        this.portfolioStocks = portfolioStocks;
+    }
+
+    // add a convenience method
+    public void addPortfolioStock(PortfolioStock portfolioStock) {
+
+        if (portfolioStocks == null) {
+            portfolioStocks = new ArrayList<>();
+        }
+
+        portfolioStocks.add(portfolioStock);
     }
 
     @Override

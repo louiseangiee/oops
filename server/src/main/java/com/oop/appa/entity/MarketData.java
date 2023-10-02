@@ -13,9 +13,6 @@ public class MarketData {
     @Column(name = "market_data_id")
     private int marketDataId;
 
-    @Column(name = "stock_id")
-    private String stockId;
-
     @Column(name = "date")
     private Date date;
 

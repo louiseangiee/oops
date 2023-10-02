@@ -15,6 +15,7 @@ import com.oop.appa.entity.AccessLog;
 
 @Service
 public class AccessLogService {
+    
     private AccessLogRepository accessLogRepository;
 
     @Autowired

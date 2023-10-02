@@ -80,12 +80,9 @@ public class Portfolio {
     }
 
     //define toString
-
     @Override
     public String toString(){
         return String.format("Portfolio [id=%d, user_id=%d, name=%s, description=%s, totalCapital=%.2f]", id, user_id, name, description, total_capital);
     }
-
-    
 
 }

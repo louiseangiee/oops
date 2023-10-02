@@ -31,6 +31,10 @@ public class PortfolioService {
         return portfolioRepository.findAll(pageable);
     }
 
+    public List<Portfolio> findByUserId(Integer user_id) {
+        return portfolioRepository.findByUserId(user_id);
+    }
+
     // POST and UPDATE
     public void save(Portfolio portfolio) {
         portfolioRepository.save(portfolio);

@@ -12,5 +12,7 @@ import com.oop.appa.entity.Portfolio;
 public interface PortfolioRepository extends JpaRepository<Portfolio, Integer> {
 
     Page<Portfolio> findAll(Pageable pageable);
+
+    List<Portfolio> findByUserId(Integer user_id);
     
 }

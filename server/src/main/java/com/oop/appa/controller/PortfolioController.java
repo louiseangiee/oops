@@ -47,6 +47,11 @@ public class PortfolioController {
         return portfolioService.findAllPaged(pageable);
     }
 
+    @GetMapping("/user/{user_id}")
+    public List<Portfolio> findByUserId(@PathVariable Integer user_id) {
+        return portfolioService.findByUserId(user_id);
+    }
+
     // POST endpoint for creating a new portfolio
     @PostMapping
     public void createPortfolio(@RequestBody Portfolio portfolio) {

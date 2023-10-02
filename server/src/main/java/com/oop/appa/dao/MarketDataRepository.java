@@ -9,5 +9,5 @@ import com.oop.appa.entity.MarketData;
 
 public interface MarketDataRepository extends JpaRepository<MarketData, Integer> {
     Page<MarketData> findAll(Pageable pageable);
-    Page<MarketData> findByStockId(Integer stock_id, Pageable pageable);
+    Page<MarketData> findByStockId(String stock_id, Pageable pageable);
 }

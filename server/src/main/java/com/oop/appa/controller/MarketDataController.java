@@ -50,11 +50,11 @@ public class MarketDataController {
     }
 
     @GetMapping("/stock/{stock_id}")
-    public Page<MarketData> findByUserId(@PathVariable Integer user_id,
+    public Page<MarketData> findByUserId(@PathVariable String stock_id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return marketDataService.findByStockId(user_id, pageable);
+        return marketDataService.findByStockId(stock_id, pageable);
     }
     // POST endpoint for creating a new MarketData
     @PostMapping

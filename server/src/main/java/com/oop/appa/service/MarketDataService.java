@@ -32,7 +32,7 @@ public class MarketDataService {
         return marketDataRepository.findAll(pageable);
     }
 
-    public Page<MarketData> findByStockId(Integer stock_id, Pageable pageable) {
+    public Page<MarketData> findByStockId(String stock_id, Pageable pageable) {
         return marketDataRepository.findByStockId(stock_id, pageable);
     }
 

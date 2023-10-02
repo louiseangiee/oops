@@ -14,7 +14,7 @@ public class MarketData {
     private int marketDataId;
 
     @Column(name = "stock_id")
-    private int stockId;
+    private String stockId;
 
     @Column(name = "date")
     private Date date;
@@ -30,11 +30,11 @@ public class MarketData {
         this.marketDataId = marketDataId;
     }
 
-    public int getStockId() {
+    public String getStockId() {
         return stockId;
     }
 
-    public void setStockId(int stockId) {
+    public void setStockId(String stockId) {
         this.stockId = stockId;
     }
 

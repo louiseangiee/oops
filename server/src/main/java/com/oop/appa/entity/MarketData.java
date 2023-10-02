@@ -13,9 +13,6 @@ public class MarketData {
     @Column(name = "market_data_id")
     private int marketDataId;
 
-    @Column(name = "stock_id")
-    private int stockId;
-
     @Column(name = "date")
     private Date date;
 
@@ -28,14 +25,6 @@ public class MarketData {
 
     public void setMarketDataId(int marketDataId) {
         this.marketDataId = marketDataId;
-    }
-
-    public int getStockId() {
-        return stockId;
-    }
-
-    public void setStockId(int stockId) {
-        this.stockId = stockId;
     }
 
     public Date getDate() {

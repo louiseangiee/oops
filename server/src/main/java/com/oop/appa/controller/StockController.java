@@ -50,7 +50,7 @@ public class StockController {
     // POST endpoint for creating a new stock
     @PostMapping()
     public void createStock(@RequestBody Stock stock) {
-        System.out.println(stock);
+        System.out.println(stock); // NOTE: post and put here does the same thing --> if i post a stock with the same symbol, it will update the existing stock instead of giving an error
         stockService.save(stock);
     }
 

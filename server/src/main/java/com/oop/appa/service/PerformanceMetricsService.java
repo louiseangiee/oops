@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.oop.appa.dao.PerformanceMetricsRepository;
 import com.oop.appa.entity.PerformanceMetrics;
@@ -28,9 +29,9 @@ public class PerformanceMetricsService {
     }
 
     public Page<PerformanceMetrics> findAllPaged(Pageable pageable) {
-        return performanceMetricsRepository.findAll(pageable);
+        return performanceMetricsRepository.findAll(pageable); 
     }
-
+    
     public List<PerformanceMetrics> findByPortfolioId(Integer portfolio_id) {
         return performanceMetricsRepository.findByPortfolioId(portfolio_id);
     }

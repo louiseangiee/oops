@@ -31,6 +31,7 @@ public class PerformanceMetricsController {
     public Page<PerformanceMetrics> findAllPaged(Pageable pageable) {
         return performanceMetricsService.findAllPaged(pageable);
     }
+    
 
     @GetMapping("/portfolio/{portfolio_id}")
     public List<PerformanceMetrics> findByPortfolioId(@PathVariable Integer portfolio_id) {

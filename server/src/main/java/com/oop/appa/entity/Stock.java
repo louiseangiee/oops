@@ -1,5 +1,8 @@
 package com.oop.appa.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -21,6 +24,14 @@ public class Stock {
 
     @Column(name = "country")
     private String country;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "market_data_id")
+    private MarketData marketData;
+
+    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL)
+    private List<PortfolioStock> portfolioStocks;
+
 
     // Default constructor
     public Stock() {
@@ -74,6 +85,32 @@ public class Stock {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public MarketData getMarketData() {
+        return marketData;
+    }
+
+    public void setMarketData(MarketData marketData) {
+        this.marketData = marketData;
+    }
+
+    public List<PortfolioStock> getPortfolioStocks() {
+        return portfolioStocks;
+    }
+
+    public void setPortfolioStocks(List<PortfolioStock> portfolioStocks) {
+        this.portfolioStocks = portfolioStocks;
+    }
+
+    // add a convenience method
+    public void addPortfolioStock(PortfolioStock portfolioStock) {
+
+        if (portfolioStocks == null) {
+            portfolioStocks = new ArrayList<>();
+        }
+
+        portfolioStocks.add(portfolioStock);
     }
 
     // toString method

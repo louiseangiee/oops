@@ -1,22 +1,18 @@
 package com.oop.appa.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name="Portfolios")
 public class Portfolio {
+
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="portfolio_id")
-    private int id;
+    private int portfolioId;
 
     @Column(name="user_id")
-    private int user_id;
+    private int userId;
 
     @Column(name="name")
     private String name;
@@ -25,34 +21,33 @@ public class Portfolio {
     private String description;
 
     @Column(name="total_capital")
-    private double total_capital;
+    private double totalCapital;
 
     // constructors
     public Portfolio(){
     }
 
-    public Portfolio(int id, int user_id, String name, String description, double total_capital) {
-        this.id = id;
-        this.user_id = user_id;
+    public Portfolio(int userId, String name, String description, double totalCapital) {
+        this.userId = userId;
         this.name = name;
         this.description = description;
-        this.total_capital = total_capital;
+        this.totalCapital = totalCapital;
     }
 
-    public int getId() {
-        return id;
+    public int getPortfolioId() {
+        return portfolioId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setPortfolioId(int portfolioId) {
+        this.portfolioId = portfolioId;
     }
 
     public int getUserId() {
-        return user_id;
+        return userId;
     }
 
-    public void setUserId(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getName() {
@@ -72,17 +67,17 @@ public class Portfolio {
     }
 
     public double getTotalCapital() {
-        return total_capital;
+        return totalCapital;
     }
 
-    public void setTotalCapital(double total_capital) {
-        this.total_capital = total_capital;
+    public void setTotalCapital(double totalCapital) {
+        this.totalCapital = totalCapital;
     }
 
-    //define toString
     @Override
-    public String toString(){
-        return String.format("Portfolio [id=%d, user_id=%d, name=%s, description=%s, totalCapital=%.2f]", id, user_id, name, description, total_capital);
+    public String toString() {
+        return "Portfolio [portfolioId=" + portfolioId + ", userId=" + userId + ", name=" + name + ", description="
+                + description + ", totalCapital=" + totalCapital + "]";
     }
 
 }

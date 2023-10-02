@@ -37,7 +37,7 @@ public class PortfolioController {
     }
 
     // GET endpoints
-    @GetMapping()
+    @GetMapping("/")
     public List<Portfolio> findAll() {
         return portfolioService.findAll();
     }

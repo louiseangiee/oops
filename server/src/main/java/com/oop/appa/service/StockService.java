@@ -41,8 +41,8 @@ public class StockService {
         stockRepository.delete(stock);
     }
 
-    public void deleteById(String id) {
-        stockRepository.deleteById(id);
+    public void deleteByStockSymbol(String stockSymbol) {
+        stockRepository.deleteById(stockSymbol); // ID is the stock symbol
     }
 
 }

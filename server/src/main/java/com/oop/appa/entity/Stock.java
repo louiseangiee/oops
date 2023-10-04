@@ -3,6 +3,8 @@ package com.oop.appa.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -25,11 +27,12 @@ public class Stock {
     @Column(name = "country")
     private String country;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "market_data_id")
-    private MarketData marketData;
+    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL)
+    private List<MarketData> marketDatas;
+
 
     @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<PortfolioStock> portfolioStocks;
 
 
@@ -87,12 +90,12 @@ public class Stock {
         this.country = country;
     }
 
-    public MarketData getMarketData() {
-        return marketData;
+    public List<MarketData> getMarketDatas() {
+        return marketDatas;
     }
 
-    public void setMarketData(MarketData marketData) {
-        this.marketData = marketData;
+    public void setMarketDatas(List<MarketData> marketDatas) {
+        this.marketDatas = marketDatas;
     }
 
     public List<PortfolioStock> getPortfolioStocks() {
@@ -103,7 +106,7 @@ public class Stock {
         this.portfolioStocks = portfolioStocks;
     }
 
-    // add a convenience method
+    // add convenience methods
     public void addPortfolioStock(PortfolioStock portfolioStock) {
 
         if (portfolioStocks == null) {
@@ -111,12 +114,20 @@ public class Stock {
         }
 
         portfolioStocks.add(portfolioStock);
+        portfolioStock.setStock(this);
     }
 
-    // toString method
+    public void addMarketData(MarketData marketData) {
+        if(marketDatas == null) {
+            marketDatas = new ArrayList<>();
+        }
+        marketDatas.add(marketData);
+        marketData.setStock(this);
+    }
+
     @Override
     public String toString() {
         return "Stock [stockSymbol=" + stockSymbol + ", name=" + name + ", industry=" + industry + ", sector=" + sector
-                + ", country=" + country + "]";
+                + ", country=" + country + ", marketDatas=" + marketDatas + "]";
     }
 }

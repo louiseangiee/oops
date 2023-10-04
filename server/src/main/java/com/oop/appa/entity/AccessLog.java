@@ -3,6 +3,8 @@ package com.oop.appa.entity;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -14,8 +16,10 @@ public class AccessLog {
     @Column(name="log_id")
     private int logId;
 
-    @Column(name="user_id")
-    private int userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    @JsonIgnore
+    private User user;
 
     @Column(name="action")
     private String action;
@@ -27,27 +31,27 @@ public class AccessLog {
     public AccessLog(){
     }
 
-    public AccessLog(int userId, String action, Timestamp timestamp) {
-        this.userId = userId;
+    public AccessLog(User user, String action, Timestamp timestamp) {
+        this.user = user;
         this.action = action;
         this.timestamp = timestamp;
     }
 
     // getters and setters
-    public int getId() {
+    public int getLogId() {
         return logId;
     }
 
-    public void setId(int id) {
-        this.logId = id;
+    public void setLogId(int logId) {
+        this.logId = logId;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getAction() {
@@ -69,6 +73,6 @@ public class AccessLog {
     // toString method
     @Override
     public String toString() {
-        return "AccessLog [id=" + logId + ", userId=" + userId + ", action=" + action + ", timestamp=" + timestamp + "]";
+        return "AccessLog [logId=" + logId + ", user=" + user.getId() + ", action=" + action + ", timestamp=" + timestamp + "]";
     }
 }

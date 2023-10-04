@@ -1,9 +1,11 @@
 package com.oop.appa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="PortfolioStocks")
+@Table(name="Portfolio_Stocks")
 public class PortfolioStock {
     
     @Id
@@ -13,10 +15,12 @@ public class PortfolioStock {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "portfolio_id", nullable = false)
+    @JsonIgnore
     private Portfolio portfolio;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "stock_symbol", nullable = false)
+    @JsonIgnore
     private Stock stock;
 
     @Column(name = "buy_price")
@@ -74,6 +78,12 @@ public class PortfolioStock {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "PortfolioStock [id=" + id + ", portfolio=" + portfolio.getPortfolioId() + ", stock=" + stock.getStockSymbol() + ", buyPrice=" + buyPrice
+                + ", quantity=" + quantity + "]";
     }
 
 }

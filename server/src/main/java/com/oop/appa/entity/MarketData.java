@@ -2,10 +2,12 @@ package com.oop.appa.entity;
 
 import java.sql.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "MarketData")
+@Table(name = "Market_Data")
 public class MarketData {
 
     @Id
@@ -18,6 +20,12 @@ public class MarketData {
 
     @Column(name = "adjusted_close_price")
     private Float adjustedClosePrice;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stock_symbol")
+    @JsonIgnore
+    private Stock stock;
+
 
     public int getMarketDataId() {
         return marketDataId;
@@ -43,10 +51,18 @@ public class MarketData {
         this.adjustedClosePrice = adjustedClosePrice;
     }
 
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
+
     @Override
     public String toString() {
-        return "MarketData [marketDataId=" + marketDataId + ", stockId=" + stockId + ", date=" + date
-                + ", adjustedClosePrice=" + adjustedClosePrice + "]";
+        return "MarketData [marketDataId=" + marketDataId + ", date=" + date + ", adjustedClosePrice="
+                + adjustedClosePrice + ", stock=" + stock.getStockSymbol() + "]";
     }
 
 }

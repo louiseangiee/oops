@@ -3,6 +3,8 @@ package com.oop.appa.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -14,8 +16,10 @@ public class Portfolio {
     @Column(name="portfolio_id")
     private int portfolioId;
 
-    @Column(name="user_id")
-    private int userId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name="user_id")
+    @JsonIgnore // modify later if we decide to implement admin can see everyone's portfolio and the posters or if certain portfolios can be public
+    private User user;
 
     @Column(name="name")
     private String name;
@@ -29,12 +33,16 @@ public class Portfolio {
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
     private List<PortfolioStock> portfolioStocks;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "portfolio_performance_id")
+    private PerformanceMetrics performanceMetrics;
+
     // constructors
     public Portfolio(){
     }
 
-    public Portfolio(int userId, String name, String description, double totalCapital) {
-        this.userId = userId;
+    public Portfolio(User user, String name, String description, double totalCapital) {
+        this.user = user;
         this.name = name;
         this.description = description;
         this.totalCapital = totalCapital;
@@ -48,12 +56,12 @@ public class Portfolio {
         this.portfolioId = portfolioId;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getName() {
@@ -88,6 +96,18 @@ public class Portfolio {
         this.portfolioStocks = portfolioStocks;
     }
 
+    public PerformanceMetrics getPerformanceMetrics() {
+        return performanceMetrics;
+    }
+
+    public void setPerformanceMetrics(PerformanceMetrics performanceMetrics) {
+        this.performanceMetrics = performanceMetrics;
+
+        if (performanceMetrics != null) {
+            performanceMetrics.setPortfolio(this);
+        }
+    }
+
     // add a convenience method
     public void addPortfolioStock(PortfolioStock portfolioStock) {
 
@@ -96,11 +116,12 @@ public class Portfolio {
         }
 
         portfolioStocks.add(portfolioStock);
+        portfolioStock.setPortfolio(this);
     }
 
     @Override
     public String toString() {
-        return "Portfolio [portfolioId=" + portfolioId + ", userId=" + userId + ", name=" + name + ", description="
+        return "Portfolio [portfolioId=" + portfolioId + ", name=" + name + ", description="
                 + description + ", totalCapital=" + totalCapital + "]";
     }
 

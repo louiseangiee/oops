@@ -4,25 +4,23 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 import java.text.SimpleDateFormat;
 
 
 @Entity
-@Table(name="Performance_metrics")
+@Table(name="Portfolio_Performance_Metric")
 public class PerformanceMetrics {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "analytics_id")
-    private Integer analyticsId;
+    @Column(name = "performance_metric_id")
+    private Integer performanceMetricId;
 
-    @Column(name = "portfolio_id", nullable = false)
-    private Integer portfolioId;
+    @OneToOne(mappedBy = "performanceMetrics", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Portfolio portfolio;
 
     @Column(name = "overall_returns")
     private Float overallReturns;
@@ -48,12 +46,12 @@ public class PerformanceMetrics {
 
 // All the Getters 
 
-    public Integer getAnalyticsId() {
-        return analyticsId;
+    public Integer getPerformanceMetricId() {
+        return performanceMetricId;
     }
 
-    public Integer getPortfolioId() {
-        return portfolioId;
+    public Portfolio getPortfolio() {
+        return portfolio;
     }
 
     public Float getOverallReturns() {
@@ -86,12 +84,12 @@ public class PerformanceMetrics {
 
 // All the Setter
 
-    public void setAnalyticsId(Integer analyticsId) {
-        this.analyticsId = analyticsId;
+    public void setPerformanceMetricId(Integer performanceMetricId) {
+        this.performanceMetricId = performanceMetricId;
     }
 
-    public void setPortfolioId(Integer portfolioId) {
-        this.portfolioId = portfolioId;
+    public void setPortfolio(Portfolio portfolio) {
+        this.portfolio = portfolio;
     }
 
     public void setOverallReturns(Float overallReturns) {
@@ -122,15 +120,14 @@ public class PerformanceMetrics {
         this.dateCalculated = dateCalculated;
     }
 
-
-// the to string 
- @Override
+    @Override
     public String toString() {
-        return "PerformanceMetrics [analyticsId=" + analyticsId + ", portfolioId=" + portfolioId + ", overallReturns="
-                + overallReturns + ", marketExposureByIndustry=" + marketExposureByIndustry
+        return "PerformanceMetrics [performanceMetricId=" + performanceMetricId + ", portfolio=" + portfolio.getPortfolioId()
+                + ", overallReturns=" + overallReturns + ", marketExposureByIndustry=" + marketExposureByIndustry
                 + ", marketExposureByGeography=" + marketExposureByGeography + ", marketExposureByCurrency="
                 + marketExposureByCurrency + ", quarterlyReturns=" + quarterlyReturns + ", annualizedReturns="
                 + annualizedReturns + ", dateCalculated=" + dateCalculated + "]";
     }
+ 
 }
 

@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="Portfolio_Stocks")
+@Table(name="portfolio_stocks")
 public class PortfolioStock {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "portfolio_stock_id")
-    private int id;
+    private Integer id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "portfolio_id", nullable = false)
@@ -27,24 +27,24 @@ public class PortfolioStock {
     private float buyPrice;
 
     @Column(name = "quantity")
-    private int quantity;
+    private Integer quantity;
 
     public PortfolioStock() {
 
     }
 
-    public PortfolioStock(Portfolio portfolio, Stock stock, float buyPrice, int quantity) {
+    public PortfolioStock(Portfolio portfolio, Stock stock, float buyPrice, Integer quantity) {
         this.portfolio = portfolio;
         this.stock = stock;
         this.buyPrice = buyPrice;
         this.quantity = quantity;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -72,11 +72,11 @@ public class PortfolioStock {
         this.buyPrice = buyPrice;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

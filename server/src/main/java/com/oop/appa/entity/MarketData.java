@@ -7,13 +7,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Market_Data")
+@Table(name = "market_data")
 public class MarketData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "market_data_id")
-    private int marketDataId;
+    private Integer marketDataId;
 
     @Column(name = "date")
     private Date date;
@@ -27,11 +27,11 @@ public class MarketData {
     private Stock stock;
 
 
-    public int getMarketDataId() {
+    public Integer getMarketDataId() {
         return marketDataId;
     }
 
-    public void setMarketDataId(int marketDataId) {
+    public void setMarketDataId(Integer marketDataId) {
         this.marketDataId = marketDataId;
     }
 

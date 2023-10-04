@@ -3,22 +3,20 @@ package com.oop.appa.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="Portfolios")
+@Table(name="portfolios")
 public class Portfolio {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="portfolio_id")
-    private int portfolioId;
+    private Integer portfolioId;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name="user_id")
-    @JsonIgnore // modify later if we decide to implement admin can see everyone's portfolio and the posters or if certain portfolios can be public
+    //@JsonIgnore 
     private User user;
 
     @Column(name="name")
@@ -33,7 +31,7 @@ public class Portfolio {
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
     private List<PortfolioStock> portfolioStocks;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "portfolio_performance_id")
     private PerformanceMetrics performanceMetrics;
 
@@ -48,11 +46,11 @@ public class Portfolio {
         this.totalCapital = totalCapital;
     }
 
-    public int getPortfolioId() {
+    public Integer getPortfolioId() {
         return portfolioId;
     }
 
-    public void setPortfolioId(int portfolioId) {
+    public void setPortfolioId(Integer portfolioId) {
         this.portfolioId = portfolioId;
     }
 

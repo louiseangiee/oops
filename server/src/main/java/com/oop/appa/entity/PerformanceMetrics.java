@@ -1,17 +1,14 @@
 package com.oop.appa.entity;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
-import java.text.SimpleDateFormat;
 
 
 @Entity
-@Table(name="Portfolio_Performance_Metric")
+@Table(name="portfolio_performance_metrics")
 public class PerformanceMetrics {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

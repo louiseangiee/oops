@@ -2,18 +2,18 @@ package com.oop.appa.entity;
 
 import jakarta.persistence.*;
 
-import java.security.Timestamp;
+import java.sql.Timestamp; // gw ganti dr java.security.Timestamp jadi sql soalnya katany security udh g commonly used
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private int id;
+    private Integer id;
 
     @Column(name = "email")
     private String email;
@@ -37,7 +37,7 @@ public class User {
     public User() {
     }
 
-    public User(int id, String email, String passwordHash, Date dateRegistered, Timestamp lastLoginTimestamp) {
+    public User(Integer id, String email, String passwordHash, Date dateRegistered, Timestamp lastLoginTimestamp) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -46,11 +46,11 @@ public class User {
     }
 
     // getters and setters
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

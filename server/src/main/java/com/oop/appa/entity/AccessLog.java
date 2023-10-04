@@ -1,20 +1,19 @@
 package com.oop.appa.entity;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="Access_Log")
+@Table(name="access_log")
 public class AccessLog {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="log_id")
-    private int logId;
+    private Integer logId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
@@ -38,14 +37,13 @@ public class AccessLog {
     }
 
     // getters and setters
-    public int getLogId() {
+    public Integer getLogId() {
         return logId;
     }
 
-    public void setLogId(int logId) {
+    public void setLogId(Integer logId) {
         this.logId = logId;
     }
-
     public User getUser() {
         return user;
     }
@@ -75,4 +73,5 @@ public class AccessLog {
     public String toString() {
         return "AccessLog [logId=" + logId + ", user=" + user.getId() + ", action=" + action + ", timestamp=" + timestamp + "]";
     }
+    
 }

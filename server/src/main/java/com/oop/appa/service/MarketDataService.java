@@ -51,8 +51,8 @@ public class MarketDataService {
     }
 
     public String fetchMonthAdjustedData(String symbol) {
-        //String apiUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=" + symbol + "&apikey=GMCEZPHAOKJIOLS5";
-        String apiUrl = "https://spm-g5t3-17g8qbzj2-vittotedja.vercel.app/api/get_role?roleid=2";
+        String apiUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=" + symbol + "&apikey=demo";
+        
         return webClient.get()
                         .uri(apiUrl)
                         .retrieve()

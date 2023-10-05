@@ -12,8 +12,3 @@ public class WebClientConfig {
         return WebClient.create();
     }
 }
-
-
-
-
-

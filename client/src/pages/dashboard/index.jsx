@@ -12,37 +12,26 @@ import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { getAsync } from "../../utils/utils";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [users, setUsers] = useState([]);
 
-  function getUsers() {
-    fetch('http://localhost:8080/api/users', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setUsers(data);
-      })
-  }
-
-  useEffect(() => {
-    getUsers();
-  }, [])
+  //BOILERPLATE CODE to fetch data from backend
+  // async function getUsers() {
+  //   const response = await getAsync("api/users", localStorage.getItem("token"));
+  //   const data = await response.json();
+  //   console.log(data);
+  //   setUsers(data);
+  // }
 
   return (
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
-        <Box>
-          {users.map((user) => (<p>{user.fullName}</p>))}
-        </Box>
         <Box>
           <Button
             sx={{

@@ -24,12 +24,6 @@ const RegisterContainer = (props) => {
     const [isDisabled, setIsDisabled] = useState(true);
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    // var today = new Date();
-    // var dd = today.getDate();
-    // var mm = String(today.getMonth() + 1).padStart(2, '0');
-    // var yyyy = today.getFullYear();
-    // var maxDate = yyyy + '-' + mm + '-' + dd;
-
 
     async function handleRegister() {
         const response = await fetch('http://localhost:8080/api/v1/auth/register', {

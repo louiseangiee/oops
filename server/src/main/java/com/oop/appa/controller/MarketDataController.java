@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,5 +73,22 @@ public class MarketDataController {
             return ResponseEntity.status(500).body("Error fetching month adjusted data: " + e.getMessage());
         }
     }
+
+    // http://localhost:8080/MarketData/stock-candles/AAPL?resolution=D&from=1572651390&to=1575243390
+    @GetMapping("/stock-candles/{symbol}")
+    public ResponseEntity<String> fetchStockCandles(
+        @PathVariable String symbol,
+        @RequestParam String resolution,
+        @RequestParam long from,
+        @RequestParam long to) {
+        
+        try {
+            String candlesData = marketDataService.fetchStockCandles(symbol, resolution, from, to);
+            return new ResponseEntity<>(candlesData, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }

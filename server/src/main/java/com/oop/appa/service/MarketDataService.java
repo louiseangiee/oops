@@ -60,5 +60,15 @@ public class MarketDataService {
                         .block();  // This will make the call synchronous
     }
 
+    public String fetchStockCandles(String symbol, String resolution, long from, long to) {
+         String apiUrl = "https://finnhub.io/api/v1/stock/candle?symbol="+ symbol + "&resolution=" + resolution + "&from=" + from + "&to=" + to + "&token=" + "ckf71cpr01qvl18vphvgckf71cpr01qvl18vpi00";
+        
+        return webClient.get()
+                        .uri(apiUrl)
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block();  // This will make the call synchronous
+    }
+
 }
 

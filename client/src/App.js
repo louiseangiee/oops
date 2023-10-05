@@ -4,6 +4,7 @@ import {CssBaseline, ThemeProvider} from '@mui/material';
 import {Routes, Route} from 'react-router-dom';
 import Topbar from './pages/global/Topbar';
 import Dashboard from './pages/dashboard';
+import Home from './pages/home';
 import Sidebar from './pages/global/Sidebar';
 import Team from './pages/team';
 import Invoices from './pages/invoices';
@@ -31,7 +32,7 @@ function App() {
 					<main className="content">
 						<Topbar setIsSidebar={setIsSidebar} />
 						<Routes>
-							<Route path="/" element={<Dashboard />} />
+							<Route path="/" element={<Home />} />
 							<Route path="/login" element={<Login />} />
 							<Route path="/team" element={<Team />} />
 							<Route path="/contacts" element={<Contacts />} />

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.oop.appa.dao.MarketDataRepository;
 import com.oop.appa.entity.MarketData;
@@ -14,10 +15,12 @@ import com.oop.appa.entity.MarketData;
 public class MarketDataService {
     
     private MarketDataRepository marketDataRepository;
+    private final WebClient webClient;
 
     @Autowired
-    public MarketDataService(MarketDataRepository marketDataRepository) {
+    public MarketDataService(MarketDataRepository marketDataRepository, WebClient webClient) {
         this.marketDataRepository = marketDataRepository;
+        this.webClient = webClient;
     }
 
     // GET
@@ -45,6 +48,16 @@ public class MarketDataService {
 
     public void deleteById(Integer id) {
         marketDataRepository.deleteById(id);
+    }
+
+    public String fetchMonthAdjustedData(String symbol) {
+        //String apiUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=" + symbol + "&apikey=GMCEZPHAOKJIOLS5";
+        String apiUrl = "https://spm-g5t3-17g8qbzj2-vittotedja.vercel.app/api/get_role?roleid=2";
+        return webClient.get()
+                        .uri(apiUrl)
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block();  // This will make the call synchronous
     }
 
 }

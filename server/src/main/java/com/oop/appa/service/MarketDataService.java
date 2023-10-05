@@ -7,12 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import com.oop.appa.dao.MarketDataRepository;
 import com.oop.appa.entity.MarketData;
 
 @Service
 public class MarketDataService {
+
+    private static final Dotenv dotenv = Dotenv.load();
     
     private MarketDataRepository marketDataRepository;
     private final WebClient webClient;
@@ -51,7 +54,8 @@ public class MarketDataService {
     }
 
     public String fetchMonthAdjustedData(String symbol) {
-        String apiUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=" + symbol + "&apikey=demo";
+        String apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
+        String apiUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=" + symbol + "&apikey=" + apiKey;
         
         return webClient.get()
                         .uri(apiUrl)

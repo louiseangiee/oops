@@ -6,12 +6,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import io.github.cdimascio.dotenv.Dotenv;
 
 @Service
 public class AlphaVantageService {
 
     private static final String ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co";
-    private static final String API_KEY = "demo";  // Replace with your real API key if you have one
+      // Load the .env file
+    private static final Dotenv dotenv = Dotenv.load();
+   
 
     private final WebClient webClient;
 
@@ -36,7 +39,8 @@ public class AlphaVantageService {
 
     // http://localhost:8080/api/search/symbol/tesco
     public String searchSymbolByKeyword(String keyword) {
-        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=SYMBOL_SEARCH&keywords=" + keyword + "&apikey=" + API_KEY;
+        String apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
+        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=SYMBOL_SEARCH&keywords=" + keyword + "&apikey=" + apiKey;
 
         return webClient.get()
                         .uri(apiUrl)

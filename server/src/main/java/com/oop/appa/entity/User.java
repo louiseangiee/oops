@@ -2,13 +2,18 @@ package com.oop.appa.entity;
 
 import jakarta.persistence.*;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import java.util.Collection;
 
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 
 @Data
 @Builder
@@ -22,7 +27,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private int id;
+    private Integer id;
 
     @Getter
     @Column(name = "email")
@@ -35,14 +40,21 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    public User(int id, String email, String fullName, String password) {
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, mappedBy="user")
+    private List<AccessLog> accessLogs;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Portfolio> portfolios;
+
+    public User(Integer id, String email, String fullName, String password) {
         this.id = id;
         this.email = email;
         this.fullName = fullName;
         this.password = password;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -56,6 +68,33 @@ public class User implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setAccessLogs(List<AccessLog> accessLogs) {
+        this.accessLogs = accessLogs;
+    }
+
+    public void setPortfolios(List<Portfolio> portfolios) {
+        this.portfolios = portfolios;
+    }
+
+    // add a convenience method
+    public void addAccessLog(AccessLog accessLog) {
+
+        if (accessLogs == null) {
+            accessLogs = new ArrayList<>();
+        }
+
+        accessLogs.add(accessLog);
+        accessLog.setUser(this);
+    }
+
+    public void addPortfolio(Portfolio portfolio) {
+        if (portfolios == null) {
+            portfolios = new ArrayList<>();
+        }
+        portfolios.add(portfolio);
+        portfolio.setUser(this);
     }
 
     // override toString

@@ -6,13 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.oop.appa.service.UserService;
-// import com.oop.appa.dao.UserRepository;
 import com.oop.appa.entity.User;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin
 @RequestMapping("/api/users")
 public class UserController {
     private UserService userService;

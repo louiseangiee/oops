@@ -17,20 +17,20 @@ public class AlphaVantageController {
     private final AlphaVantageService alphaVantageService;
 
     @Autowired
-public AlphaVantageController(AlphaVantageService alphaVantageService) {
-    this.alphaVantageService = alphaVantageService;
-}
-
-
-@GetMapping("/symbol/{keyword}")
-public ResponseEntity<String> searchSymbolByKeyword(@PathVariable String keyword) {
-    try {
-        String result = alphaVantageService.searchSymbolByKeyword(keyword);
-        return ResponseEntity.ok(result);
-    } catch (Exception e) {
-        return ResponseEntity.status(500).body("Error searching symbol by keyword: " + e.getMessage());
+    public AlphaVantageController(AlphaVantageService alphaVantageService) {
+        this.alphaVantageService = alphaVantageService;
     }
-}
+
+
+    @GetMapping("/symbol/{keyword}")
+    public ResponseEntity<String> searchSymbolByKeyword(@PathVariable String keyword) {
+        try {
+            String result = alphaVantageService.searchSymbolByKeyword(keyword);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error searching symbol by keyword: " + e.getMessage());
+        }
+    }
 
 }
 

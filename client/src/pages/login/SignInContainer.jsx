@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { tokens } from '../../theme.js';
 import { Grid, Box, Button, useTheme, Typography, Link } from '@mui/material';
 import InputBase from '@mui/material/InputBase';
@@ -8,9 +9,31 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const SignInContainer = (props) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+
+
+    async function handleSignIn() {
+        const response = await fetch('http://localhost:8080/api/v1/auth/authenticate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "email": email,
+                "password": password,
+            })
+        })
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        navigate('/')
+    }
+
+
     return (
         <>
             <Grid item
@@ -22,11 +45,11 @@ const SignInContainer = (props) => {
                 <div>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <AlternateEmailIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Email" type='email' required />
+                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Email" type='email' required onChange={(e) => { setEmail(e.target.value) }} />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <LockIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Password" type={showPassword ? 'text' : 'password'} />
+                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Password" type={showPassword ? 'text' : 'password'} onChange={(e) => setPassword(e.target.value)} />
                         <Button
                             sx={{ color: colors.grey[100] }}
                             id="seePasswordBtn"
@@ -48,7 +71,7 @@ const SignInContainer = (props) => {
                         </Link>
                     </Typography>
                 </Box>
-                <Button sx={{ color: colors.grey[100], width: '100%' }}>Sign In</Button>
+                <Button sx={{ color: colors.grey[100], width: '100%' }} onClick={handleSignIn}>Sign In</Button>
             </Grid >
         </>
     );

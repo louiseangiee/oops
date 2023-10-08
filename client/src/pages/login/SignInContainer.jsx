@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { tokens } from '../../theme.js';
 import { Grid, Box, Button, useTheme, Typography, Link } from '@mui/material';
 import InputBase from '@mui/material/InputBase';
@@ -7,32 +7,22 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import LockIcon from '@mui/icons-material/Lock';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router-dom';
 
 const SignInContainer = (props) => {
+    const { signIn, userEmail } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const navigate = useNavigate();
 
-
-    async function handleSignIn() {
-        const response = await fetch('http://localhost:8080/api/v1/auth/authenticate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "email": email,
-                "password": password,
-            })
-        })
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
+    const handleSignIn = (e) => {
+        e.preventDefault()
+        signIn(email, password)
         navigate('/')
     }
-
 
     return (
         <>

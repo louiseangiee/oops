@@ -8,6 +8,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 
 
@@ -23,23 +24,12 @@ const RegisterContainer = (props) => {
     const [passwordError, setPasswordError] = useState('');
     const [isDisabled, setIsDisabled] = useState(true);
     const theme = useTheme();
+    const { register } = useAuth();
     const colors = tokens(theme.palette.mode);
 
-    async function handleRegister() {
-        const response = await fetch('http://localhost:8080/api/v1/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                "fullName": fullName,
-                "email": email,
-                "password": password,
-            })
-        })
-        const data = await response.json();
-        console.log(data.token);
-        localStorage.setItem('token', data.token);
+    async function handleRegister(e) {
+        e.preventdefault();
+        register(fullName, email, password)
         navigate('/')
     }
 

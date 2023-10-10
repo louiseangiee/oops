@@ -28,10 +28,6 @@ public class Stock {
     private String country;
 
     @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL)
-    private List<MarketData> marketDatas;
-
-
-    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<PortfolioStock> portfolioStocks;
 
@@ -90,14 +86,6 @@ public class Stock {
         this.country = country;
     }
 
-    public List<MarketData> getMarketDatas() {
-        return marketDatas;
-    }
-
-    public void setMarketDatas(List<MarketData> marketDatas) {
-        this.marketDatas = marketDatas;
-    }
-
     public List<PortfolioStock> getPortfolioStocks() {
         return portfolioStocks;
     }
@@ -117,17 +105,9 @@ public class Stock {
         portfolioStock.setStock(this);
     }
 
-    public void addMarketData(MarketData marketData) {
-        if(marketDatas == null) {
-            marketDatas = new ArrayList<>();
-        }
-        marketDatas.add(marketData);
-        marketData.setStock(this);
-    }
-
     @Override
     public String toString() {
         return "Stock [stockSymbol=" + stockSymbol + ", name=" + name + ", industry=" + industry + ", sector=" + sector
-                + ", country=" + country + ", marketDatas=" + marketDatas + "]";
+                + ", country=" + country + "]";
     }
 }

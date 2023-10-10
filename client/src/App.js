@@ -17,6 +17,7 @@ import Pie from './pages/pie';
 import FAQ from './pages/faq';
 import Geography from './pages/geography';
 import Login from './pages/login';
+import Analytics from './pages/analytics_dashboard';
 // import Calendar from "./pages/calendar/calendar";
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
 							<Route path="/faq" element={<FAQ />} />
 							{/* <Route path="/calendar" element={<Calendar />} /> */}
 							<Route path="/geography" element={<Geography />} />
+							<Route pat="/analytics" element = {<Analytics/>} />
 						</Routes>
 					</main>
 				</div>

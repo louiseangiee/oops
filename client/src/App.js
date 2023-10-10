@@ -35,6 +35,7 @@ function App() {
 						<Topbar setIsSidebar={setIsSidebar} />
 						<Routes>
 							<Route path="/" element={<Home />} />
+							<Route path="/analytics" element={<Analytics />} />
 							<Route path="/portfolio" element={<Portfolio />} />
 							<Route path="/login" element={<Login />} />
 							<Route path="/team" element={<Team />} />
@@ -47,7 +48,7 @@ function App() {
 							<Route path="/faq" element={<FAQ />} />
 							{/* <Route path="/calendar" element={<Calendar />} /> */}
 							<Route path="/geography" element={<Geography />} />
-							<Route pat="/analytics" element = {<Analytics/>} />
+							
 						</Routes>
 					</main>
 				</div>

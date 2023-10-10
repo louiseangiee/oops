@@ -162,6 +162,12 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Item 
+              title="Analytics"
+              to="/analytics"
+              selected={selected}
+              setSelected={setSelected}
+            />
 
             {/* <Typography
               variant="h6"

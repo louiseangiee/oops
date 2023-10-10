@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, Chip, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
@@ -16,16 +16,19 @@ import StatBox from "../../components/StatBox";
 import PortfolioCard from "../../components/PortfolioCard";
 import ProgressCircle from "../../components/ProgressCircle";
 import CreatePortfolio from "../../components/CreatePortfolioForm";
+import AnalyticsButtons from "../../components/AnalyticsToolsButton";
+
 
 const Analytics = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   return (
+    
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="PORTFOLIOS" subtitle="Welcome to your portfolios page" />
+        <Header title="Analytics" subtitle="Overview of your Account" />
 
         <Box>
           <CreatePortfolio />
@@ -36,71 +39,95 @@ const Analytics = () => {
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="450px"
+        gridAutoRows="120px"
         gap="20px"
       >
-        {/* ROW 1 */}
+        {/* TOTAL PORTFOLIO VALUE */}
         <Box
           gridColumn="span 3"
+          gridRow="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
-          alignItems="center"
-          justifyContent="center"
+          alignItems="left"
+          flexDirection="column"
+          justifyContent="left"
+          p ={5}
+
         >
-          <PortfolioCard
-            title="Technology Stocks"
-            subtitle="All the technological stocks"
-            capital="23456"
-            returns="-1234"
+          <Typography variant="h4"
+                    fontStyle="italic" fontWeight="bold" 
+                    color={colors.greenAccent[400]}
+                   >Total Portfolio Value</Typography>
+          <Box height="15px" />
+
+          <Typography variant="h1"
+                     fontWeight="bold"
+                   >S$ 20000</Typography>
+
+          <Box height="10px" />
+
+          <Chip 
+            label="+ 13.4%" 
+            fontWeight="bold"
+            p={2} 
+            sx={{
+                backgroundColor: colors.greenAccent[600], 
+                color: '#fff', // Assuming you want white text
+                fontSize: '1.1rem', // Increase font size as required
+                padding: '0.7rem',
+                textAlign: 'left', // Align text to the left
+                width: '35%', // Set width to 1/4 of the container width
+                }} 
           />
+
+          <Box height="20px" />
+
+          <Typography variant="h4"
+                     fontWeight="bold"
+                   >Yesterday: S$ 19348</Typography>
+
+          
+
         </Box>
+        
+        {/* YOUR TOOLS */}
         <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <PortfolioCard
-            title="Technology Stocks"
-            subtitle="All the technological stocks"
-            progress="0.75"
-            increase="+14%"
-          />
+        gridColumn="span 9"
+        gridRow="span 1"
+        backgroundColor={colors.primary[400]}
+        display="flex"
+        alignItems="left"
+        flexDirection="column"
+        justifyContent="left"
+        p ={5}>
+
+          <AnalyticsButtons
+          route="/analytics"
+          title="Compare Portfolio"></AnalyticsButtons>
+          
+
         </Box>
+
+        {/* YOUR PORTFOLIOS */}
+
         <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <PortfolioCard
-            title="Technology Stocks"
-            subtitle="All the technological stocks"
-            progress="0.75"
-            increase="+14%"
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <PortfolioCard
-            title="Technology Stocks"
-            subtitle="All the technological stocks"
-            progress="0.75"
-            increase="+14%"
-          />
+        gridColumn="span 9"
+        gridRow="span 2"
+        backgroundColor={colors.primary[400]}
+        display="flex"
+        alignItems="left"
+        flexDirection="column"
+        justifyContent="left"
+        p ={5}>
+        
         </Box>
 
         
       </Box>
     </Box>
+    
   );
+
 };
 
 export default Analytics;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
@@ -28,7 +29,7 @@ public class Stock {
     private String country;
 
     @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonManagedReference(value = "stock-portfoliostock")
     private List<PortfolioStock> portfolioStocks;
 
 

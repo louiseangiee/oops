@@ -1,6 +1,7 @@
 package com.oop.appa.controller;
 
 import com.oop.appa.entity.Portfolio;
+import com.oop.appa.entity.PortfolioStock;
 import com.oop.appa.service.PortfolioService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,12 @@ public class PortfolioController {
     public void updatePortfolio(@RequestBody Portfolio portfolio) {
         portfolioService.save(portfolio);
     }
+
+    @PutMapping("/{portfolioId}/stocks")
+    public void addStockPortfolio(@PathVariable Integer portfolioId, @RequestBody PortfolioStock stock) {
+        portfolioService.addStockToPortfolio(portfolioId, stock);
+    }
+
 
     // DELETE endpoints
     @DeleteMapping("/{id}")

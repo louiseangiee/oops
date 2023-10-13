@@ -1,5 +1,6 @@
 package com.oop.appa.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -15,12 +16,12 @@ public class PortfolioStock {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "portfolio_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference(value = "portfolio-portfoliostock")
     private Portfolio portfolio;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "stock_symbol", nullable = false)
-    @JsonIgnore
+    @JsonBackReference(value = "stock-portfoliostock")
     private Stock stock;
 
     @Column(name = "buy_price")

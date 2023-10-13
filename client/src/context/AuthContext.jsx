@@ -1,10 +1,14 @@
 import { createContext, useState, useContext } from 'react';
+import { CookiesProvider, useCookies } from "react-cookie";
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
 	const [token, setToken] = useState("");
+	const navigate = useNavigate();
 	const [userEmail, setUserEmail] = useState("");
+	const [cookies, setCookie] = useCookies(["accessToken"]);
 
 	const signIn = async (email, password) => {
 		const response = await fetch(
@@ -21,10 +25,9 @@ export const AuthProvider = ({ children }) => {
 			}
 		);
 		const data = await response.json();
-		localStorage.setItem('accessToken', data.token);
+		setCookie("accessToken", data.token, { path: "/", maxAge: 86400 });
 		setToken(data.token);
 		setUserEmail(email);
-		console.log(data.token);
 	}
 
 	const register = async (fullName, email, password) => {

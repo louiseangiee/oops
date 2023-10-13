@@ -12,14 +12,15 @@ import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
-import { useEffect } from "react";
 import { getAsync } from "../../utils/utils";
 import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
+  const [cookie, removeCookie] = useCookies(["accessToken"]);
 
   //BOILERPLATE CODE to fetch data from backend
   // async function getUsers() {
@@ -54,7 +55,7 @@ const Dashboard = () => {
             fontSize: "14px",
             fontWeight: "bold",
             padding: "10px 20px",
-          }} onClick={() => { localStorage.removeItem("accessToken"); navigate('/login') }}>Log Out</Button>
+          }} onClick={() => { removeCookie("accessToken", { path: '/' }); navigate('/login') }}>Log Out</Button>
         </Box>
       </Box>
 

@@ -18,9 +18,9 @@ const SignInContainer = (props) => {
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
 
-    const handleSignIn = (e) => {
+    const handleSignIn = async (e) => {
         e.preventDefault()
-        signIn(email, password)
+        await signIn(email, password)
         navigate('/')
     }
 

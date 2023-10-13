@@ -22,7 +22,6 @@ import Layout from './Layout';
 
 function App() {
 	// access to the theme and the color mode
-	// const [cookie, setCookie] = useCookies(['accessToken']);
 	const [theme, colorMode] = useMode();
 	const [isSidebar, setIsSidebar] = useState(true);
 
@@ -37,9 +36,6 @@ function App() {
 						<Routes>
 							<Route path="login" element={<Login />} />
 							<Route path="/" element={<Layout />}>
-								{/* unprotected routes */}
-
-								{/* protected routes */}
 								<Route element={<RequireAuth />}>
 									<Route path="/" element={<Dashboard />} />
 									<Route path="team" element={<Team />} />

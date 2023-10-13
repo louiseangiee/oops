@@ -1,12 +1,12 @@
 import { useLocation, Navigate, Outlet } from "react-router-dom";
-// import { useAuth } from "../context/AuthContext";
+import { useCookies } from "react-cookie";
+import { useEffect } from "react";
 
 const RequireAuth = () => {
-    // const { token } = useAuth();
+    const [cookie] = useCookies(["accessToken"]);
     const location = useLocation();
-    const token = localStorage.getItem("accessToken");
     return (
-        token
+        cookie.accessToken
             ? <Outlet />
             : <Navigate to="/login" state={{ from: location }} replace />
     )

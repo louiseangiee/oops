@@ -47,7 +47,7 @@ function App() {
 							<Route path="/faq" element={<FAQ />} />
 							{/* <Route path="/calendar" element={<Calendar />} /> */}
 							<Route path="/geography" element={<Geography />} />
-							<Route pat="/analytics" element = {<Analytics/>} />
+							<Route path="/analytics" element = {<Analytics/>} />
 						</Routes>
 					</main>
 				</div>

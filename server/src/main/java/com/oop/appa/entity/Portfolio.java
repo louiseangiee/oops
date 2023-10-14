@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
@@ -32,6 +33,7 @@ public class Portfolio {
     private double totalCapital;
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
+    @JsonManagedReference(value = "portfolio-portfoliostock")
     private List<PortfolioStock> portfolioStocks;
 
     @OneToOne(cascade = CascadeType.ALL)

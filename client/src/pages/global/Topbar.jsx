@@ -8,9 +8,9 @@ import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import SearchIcon from '@mui/icons-material/Search';
+import { Link } from 'react-router-dom';
 
-
-const Topbar = () => {
+const Topbar = ({ visible }) => {
     // grabs the theme, allow you to have access to the theme
     const theme = useTheme();
     // anytime we want to use the color mode from MUI, we can grab it from useTheme and pass it to tokens
@@ -25,6 +25,7 @@ const Topbar = () => {
                 display="flex"
                 backgroundColor={colors.primary[400]}
                 borderRadius="3px"
+                visibility={visible ? "visible" : "hidden"}
             >
                 <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
                 <IconButton type="button" sx={{ p: 1 }}>
@@ -47,9 +48,12 @@ const Topbar = () => {
                 <IconButton>
                     <SettingsOutlinedIcon />
                 </IconButton>
-                <IconButton>
-                    <PersonOutlinedIcon />
-                </IconButton>
+                <Link to="/profile">
+                    <IconButton>
+                        <PersonOutlinedIcon />
+                    </IconButton>
+                </Link>
+
             </Box>
         </Box>);
 }

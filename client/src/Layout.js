@@ -10,7 +10,7 @@ const Layout = () => {
 		<>
 			<Sidebar isSidebar={isSidebar} />
 			<main className="content">
-				<Topbar setIsSidebar={setIsSidebar} />
+				<Topbar setIsSidebar={setIsSidebar} visible={true}/>
 				<Outlet />
 			</main>
 		</>

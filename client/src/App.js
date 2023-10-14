@@ -7,6 +7,8 @@ import {Routes, Route} from 'react-router-dom';
 
 import Topbar from './pages/global/Topbar';
 import Dashboard from './pages/dashboard';
+import Home from './pages/home';
+import Portfolio from './pages/portfolio';
 import Sidebar from './pages/global/Sidebar';
 import Team from './pages/team';
 import Invoices from './pages/invoices';
@@ -19,6 +21,8 @@ import FAQ from './pages/faq';
 import Geography from './pages/geography';
 import Login from './pages/login';
 import Layout from './Layout';
+import Analytics from './pages/analytics_dashboard';
+// import Calendar from "./pages/calendar/calendar";
 
 function App() {
 	// access to the theme and the color mode
@@ -37,7 +41,9 @@ function App() {
 							<Route path="login" element={<Login />} />
 							<Route path="/" element={<Layout />}>
 								<Route element={<RequireAuth />}>
-									<Route path="/" element={<Dashboard />} />
+									<Route path="/dashboard" element={<Dashboard />} />
+							<Route path="/portfolio" element={<Portfolio />} />
+							<Route path="/" element={<Home />} />
 									<Route path="team" element={<Team />} />
 									<Route
 										path="contacts"

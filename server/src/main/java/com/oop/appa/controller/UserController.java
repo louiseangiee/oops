@@ -33,6 +33,19 @@ import java.util.List;
             return userService.findAllPaged(pageable);
         }
 
+        @GetMapping("/email/send")
+        public void sendEmail(){
+            String otp = userService.generateOtp();
+            String body = String.format("This is your otp: %s", otp);
+            userService.sendSimpleMessage(
+                    "vitto.tedja2332@gmail.com",
+                    "Testing 123",
+                    body
+            );
+        }
+
+
+
         // POST endpoint
         @PostMapping
         public void save(User user) {

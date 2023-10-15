@@ -17,11 +17,25 @@ import PortfolioCard from "../../components/PortfolioCard";
 import ProgressCircle from "../../components/ProgressCircle";
 import CreatePortfolio from "../../components/CreatePortfolioForm";
 import AnalyticsButtons from "../../components/AnalyticsToolsButton";
+import StockChart from "../../components/StockChart";
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import React from "react";
+import StockSelector from "../../components/StockSelectorDropdown";
+import StockDetailsTable from "../../components/StockDetailsTable";
+
 
 
 const Analytics = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  
+  // We will store the entire stock object instead of just the code
+  const [chosenStock, setChosenStock] = React.useState({ code: 'AAPL', name: 'Apple Inc. (AAPL)' });
+  
+  const handleStockChange = (newValue) => {
+    setChosenStock(newValue ? newValue : null);
+  };
+
 
   return (
     
@@ -90,7 +104,7 @@ const Analytics = () => {
 
         </Box>
         
-        {/* YOUR TOOLS */}
+        {/* YOUR TOOLS
         <Box
         gridColumn="span 9"
         gridRow="span 1"
@@ -103,26 +117,58 @@ const Analytics = () => {
 
           <AnalyticsButtons
           route="/analytics"
-          title="Compare Portfolio"></AnalyticsButtons>
+          title="Compare Portfolio">
+            
+          </AnalyticsButtons>
           
 
-        </Box>
+        </Box> */}
 
         {/* YOUR PORTFOLIOS */}
 
         <Box
         gridColumn="span 9"
-        gridRow="span 2"
+        gridRow="span 7"
         backgroundColor={colors.primary[400]}
         display="flex"
         alignItems="left"
-        flexDirection="column"
-        justifyContent="left"
+        flexDirection="column"  // Adjusted from "column"
+        justifyContent="flex-start" 
         p ={5}>
+        
+        
+        
+        
+        <div className="stock-page">
+          <Typography variant="h2"
+                     fontWeight="bold" mb={5}
+                   >Stocks Today</Typography>
+            {/* Dropdown to choose the stock using MUI */}
+            <StockSelector 
+            chosenStock={chosenStock}
+            handleStockChange={handleStockChange}
+            />
+           <Box display="flex" justifyContent="space-between">
+              {/* StockDetailstable */}
+              <Box flex="1" paddingRight="10px"> 
+                <StockDetailsTable data={chosenStock} />
+              </Box>
+                
+              {/* Line chart for the chosen stock */}
+              <Box flex="2">
+                  <StockChart chosenStock={chosenStock} />
+              </Box>
+            </Box>
+            
+            
+            
+        </div>
+
+        
         
         </Box>
 
-        
+       
       </Box>
     </Box>
     

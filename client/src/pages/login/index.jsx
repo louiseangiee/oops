@@ -14,8 +14,8 @@ const Login = () => {
     };
 
     return (
-        <>
-            <Grid container sx={{ height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} spacing={2}>
+        <main className="content">
+            <Grid container sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} spacing={2}>
                 <Grid item md={4} id="welcomeGoldman">
                     <img
                         alt="goldman-logo"
@@ -34,8 +34,8 @@ const Login = () => {
                 ) : (
                     <RegisterContainer handleSignIn={handleSignIn} />
                 )}
-            </Grid>
-        </>
+            </Grid >
+        </main>
     )
 };
 export default Login;

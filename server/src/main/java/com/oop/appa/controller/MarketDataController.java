@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/MarketData")
+@RequestMapping("/api/marketData")
 public class MarketDataController {
     private MarketDataService marketDataService;
 
@@ -40,6 +40,7 @@ public class MarketDataController {
         Pageable pageable = PageRequest.of(page, size);
         return marketDataService.findByStockId(stock_id, pageable);
     }
+
     // POST endpoint for creating a new MarketData
     @PostMapping
     public void createMarketData(@RequestBody MarketData MarketData) {
@@ -63,13 +64,33 @@ public class MarketDataController {
         marketDataService.delete(MarketData);
     }
 
-    @GetMapping("/monthAdjustedData/{symbol}")
-    public ResponseEntity<String> fetchMonthAdjustedData(@PathVariable String symbol) {
+    @GetMapping("/monthData")
+    public ResponseEntity<String> fetchMonthData(@RequestParam String symbol) {
         try {
-            String data = marketDataService.fetchMonthAdjustedData(symbol);
+            String data = marketDataService.fetchMonthData(symbol).toString();
             return ResponseEntity.ok(data);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error fetching month adjusted data: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/dailyData")
+    public ResponseEntity<String> fetchDailyData(@RequestParam String symbol, @RequestParam String outputSize) {
+        try {
+            String data = marketDataService.fetchDailyData(symbol, outputSize).toString();
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error fetching daily adjusted data: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/currentData")
+    public ResponseEntity<String> fetchCurrentData(@RequestParam String symbol) {
+        try {
+            String data = marketDataService.fetchCurrentData(symbol).toString();
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error fetching daily adjusted data: " + e.getMessage());
         }
     }
 

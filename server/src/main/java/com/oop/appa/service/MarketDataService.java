@@ -7,15 +7,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import io.github.cdimascio.dotenv.Dotenv;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import com.oop.appa.dao.MarketDataRepository;
 import com.oop.appa.entity.MarketData;
 
 @Service
 public class MarketDataService {
-    
+
     private MarketDataRepository marketDataRepository;
     private final WebClient webClient;
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co";
 
     @Autowired
     public MarketDataService(MarketDataRepository marketDataRepository, WebClient webClient) {
@@ -50,15 +54,42 @@ public class MarketDataService {
         marketDataRepository.deleteById(id);
     }
 
-    public String fetchMonthAdjustedData(String symbol) {
-        String apiUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=" + symbol + "&apikey=demo";
-        
+    public JsonNode fetchMonthData(String symbol) {
+        String apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
+        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=TIME_SERIES_MONTHLY&symbol=" + symbol + "&apikey="
+                + apiKey;
+
         return webClient.get()
-                        .uri(apiUrl)
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .block();  // This will make the call synchronous
+                .uri(apiUrl)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .onErrorMap(e -> new Exception("Error fetching monthly data.", e))
+                .block();
+    }
+
+    public JsonNode fetchDailyData(String symbol, String outputSize) {
+        String apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
+        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=TIME_SERIES_DAILY&symbol=" + symbol + "&outputsize="
+                + outputSize + "&apikey=" + apiKey;
+
+        return webClient.get()
+                .uri(apiUrl)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .onErrorMap(e -> new Exception("Error fetching monthly data.", e))
+                .block();
+    }
+
+    public JsonNode fetchCurrentData(String symbol) {
+        String apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
+        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=GLOBAL_QUOTE&symbol=" + symbol + "&apikey=" + apiKey;
+
+        return webClient.get()
+                .uri(apiUrl)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .onErrorMap(e -> new Exception("Error fetching monthly data.", e))
+                .block();
     }
 
 }
-

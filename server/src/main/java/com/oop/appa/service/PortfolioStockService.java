@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 import com.oop.appa.dao.PortfolioStockRepository;
 import com.oop.appa.entity.PortfolioStock;
 
+import jakarta.persistence.criteria.CriteriaBuilder.In;
+
 @Service
 public class PortfolioStockService {
     private PortfolioStockRepository portfolioStockRepository;
+    private MarketDataService marketDataService;
 
     @Autowired
     public PortfolioStockService(PortfolioStockRepository portfolioStockRepository) {
@@ -40,5 +43,14 @@ public class PortfolioStockService {
 
     public void deleteById(int portfolioStockId) {
         portfolioStockRepository.deleteById(portfolioStockId);
+    }
+
+    public double calculatePortfolioStockReturn(Integer portfolioStockId) {
+        PortfolioStock stock = portfolioStockRepository.findById(portfolioStockId).orElse(null);
+        double currentPrice = marketDataService.fetchCurrentData(stock.getStock().getStockSymbol()).path("Global Quote")
+                .path("5. close price").asDouble();
+        double buyPrice = stock.getBuyPrice();
+
+        return ((currentPrice - buyPrice) / buyPrice) * 100;
     }
 }

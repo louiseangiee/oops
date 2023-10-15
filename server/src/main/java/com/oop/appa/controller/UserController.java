@@ -7,9 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.oop.appa.service.UserService;
+import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -31,6 +33,11 @@ import java.util.List;
         @GetMapping("/paged")
         public Page<User> findAllPaged(Pageable pageable) {
             return userService.findAllPaged(pageable);
+        }
+
+        @GetMapping("/{user_id}")
+        public Optional<User> findByUserId(@PathVariable Integer user_id) {
+            return userService.findByUserId(user_id);
         }
 
         @GetMapping("/email/send")
@@ -57,9 +64,9 @@ import java.util.List;
             userService.save(user);
         }
 
-        @DeleteMapping("/{id}")
-        public void deleteById(@PathVariable int id) {
-            userService.deleteById(id);
+        @DeleteMapping("/{user_id}")
+        public void deleteById(@PathVariable int user_id) {
+            userService.deleteById(user_id);
         }
 
         @DeleteMapping

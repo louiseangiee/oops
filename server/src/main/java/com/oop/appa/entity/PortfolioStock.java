@@ -1,7 +1,8 @@
 package com.oop.appa.entity;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -29,6 +30,9 @@ public class PortfolioStock {
 
     @Column(name = "quantity")
     private Integer quantity;
+
+    @Column(name = "buy_date")
+    private LocalDate buyDate;
 
     public PortfolioStock() {
 
@@ -79,6 +83,14 @@ public class PortfolioStock {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public LocalDate getBuyDate() {
+        return buyDate;
+    }
+
+    public void setBuyDate(LocalDate buyDate) {
+        this.buyDate = buyDate;
     }
 
     @Override

@@ -47,6 +47,9 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<Portfolio> portfolios;
 
+    @Column(name = "otp")
+    private String otp;
+
     public User(Integer id, String email, String fullName, String password) {
         this.id = id;
         this.email = email;
@@ -76,6 +79,10 @@ public class User implements UserDetails {
 
     public void setPortfolios(List<Portfolio> portfolios) {
         this.portfolios = portfolios;
+    }
+    
+    public void setOtp(String otp) {
+        this.otp = otp;
     }
 
     // add a convenience method

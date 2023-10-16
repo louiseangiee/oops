@@ -25,7 +25,7 @@ public class SecurityConfiguration {
                 .disable()
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/authenticate", "/api/v1/auth/register")
+                .requestMatchers("/api/v1/auth/authenticate", "/api/v1/auth/register", "/api/users/{email}")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

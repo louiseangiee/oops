@@ -9,6 +9,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
+import java.util.Optional;
 
 import com.oop.appa.dao.UserRepository;
 import com.oop.appa.entity.User;
@@ -32,6 +33,10 @@ public class UserService {
 
     public Page<User> findAllPaged(Pageable pageable) {
         return userRepository.findAll(pageable);
+    }
+
+    public Optional<User> findUserByEmail(String email){
+        return userRepository.findByEmail(email);
     }
 
     // POST and UPDATE

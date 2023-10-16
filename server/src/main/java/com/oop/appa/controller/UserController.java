@@ -1,7 +1,6 @@
 package com.oop.appa.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +9,7 @@ import com.oop.appa.service.UserService;
 import com.oop.appa.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -27,6 +27,12 @@ import java.util.List;
         public List<User> findAll() {
             return userService.findAll();
         }
+
+        @GetMapping("/{email}")
+        public Optional<User> getUserByEmail(@PathVariable String email){
+            return userService.findUserByEmail(email);
+        }
+
 
         @GetMapping("/paged")
         public Page<User> findAllPaged(Pageable pageable) {

@@ -27,7 +27,7 @@ import Analytics from './pages/analytics_dashboard';
 function App() {
 	// access to the theme and the color mode
 	const [theme, colorMode] = useMode();
-	const [isSidebar, setIsSidebar] = useState(true);
+	// const [isSidebar, setIsSidebar] = useState(true);
 
 	return (
 		<CookiesProvider>
@@ -41,9 +41,15 @@ function App() {
 							<Route path="login" element={<Login />} />
 							<Route path="/" element={<Layout />}>
 								<Route element={<RequireAuth />}>
-									<Route path="/dashboard" element={<Dashboard />} />
-							<Route path="/portfolio" element={<Portfolio />} />
-							<Route path="/" element={<Home />} />
+									<Route
+										path="/dashboard"
+										element={<Dashboard />}
+									/>
+									<Route
+										path="/portfolio"
+										element={<Portfolio />}
+									/>
+									<Route path="/" element={<Home />} />
 									<Route path="team" element={<Team />} />
 									<Route
 										path="contacts"

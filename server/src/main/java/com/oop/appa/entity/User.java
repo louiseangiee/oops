@@ -20,7 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 public class User implements UserDetails {
 
     @Getter
@@ -46,6 +46,9 @@ public class User implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Portfolio> portfolios;
+
+    @Column(name = "otp")
+    private String otp;
 
     public User(Integer id, String email, String fullName, String password) {
         this.id = id;
@@ -76,6 +79,10 @@ public class User implements UserDetails {
 
     public void setPortfolios(List<Portfolio> portfolios) {
         this.portfolios = portfolios;
+    }
+    
+    public void setOtp(String otp) {
+        this.otp = otp;
     }
 
     // add a convenience method

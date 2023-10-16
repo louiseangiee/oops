@@ -1,6 +1,8 @@
 package com.oop.appa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 
@@ -15,12 +17,12 @@ public class PortfolioStock {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "portfolio_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference(value = "portfolio-portfoliostock")
     private Portfolio portfolio;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "stock_symbol", nullable = false)
-    @JsonIgnore
+    @JsonBackReference(value = "stock-portfoliostock")
     private Stock stock;
 
     @Column(name = "buy_price")
@@ -28,6 +30,9 @@ public class PortfolioStock {
 
     @Column(name = "quantity")
     private Integer quantity;
+
+    @Column(name = "buy_date")
+    private LocalDate buyDate;
 
     public PortfolioStock() {
 
@@ -78,6 +83,14 @@ public class PortfolioStock {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public LocalDate getBuyDate() {
+        return buyDate;
+    }
+
+    public void setBuyDate(LocalDate buyDate) {
+        this.buyDate = buyDate;
     }
 
     @Override

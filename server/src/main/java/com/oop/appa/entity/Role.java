@@ -1,6 +1,7 @@
 package com.oop.appa.entity;
 
 public enum Role {
-    USER,
-    ADMIN
+    ROLE_USER,
+    ROLE_ADMIN,
+    ROLE_GUEST
 }

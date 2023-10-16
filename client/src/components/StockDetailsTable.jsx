@@ -24,10 +24,10 @@ function StockDetailsTable({ chosenStock }) {
         }, [chosenStock]);
 
     const computeDetails = (data) => {
-        console.log(data);
+        // console.log(data);
         const today = data["Time Series (Daily)"]["2023-10-12"]; //dynamically Update later
-
         console.log(data["Time Series (Daily)"]["2023-10-12"]);
+
         const yesterday = data["Time Series (Daily)"]["2023-10-11"];
         
         const computedDetails = {
@@ -40,8 +40,9 @@ function StockDetailsTable({ chosenStock }) {
             "Avg. volume": "For now, static. Calculate based on historical data."
         };
         console.log(computedDetails)
+        setDetails(computedDetails);
 
-        return computedDetails;
+        // return computedDetails;
         
     }
 

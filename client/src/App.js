@@ -22,12 +22,13 @@ import Geography from './pages/geography';
 import Login from './pages/login';
 import Layout from './Layout';
 import Analytics from './pages/analytics_dashboard';
+import Profile from './pages/profile';
 // import Calendar from "./pages/calendar/calendar";
 
 function App() {
 	// access to the theme and the color mode
 	const [theme, colorMode] = useMode();
-	// const [isSidebar, setIsSidebar] = useState(true);
+	const [isSidebar, setIsSidebar] = useState(true);
 
 	return (
 		<CookiesProvider>
@@ -38,7 +39,8 @@ function App() {
 						{/* <Sidebar isSidebar={isSidebar} /> */}
 						{/* <Topbar setIsSidebar={setIsSidebar} /> */}
 						<Routes>
-							<Route path="login" element={<Login />} />
+							<Route path="/login" element={<Login />} />
+							<Route path="/profile" element={<Profile />} />
 							<Route path="/" element={<Layout />}>
 								<Route element={<RequireAuth />}>
 									<Route

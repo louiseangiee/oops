@@ -17,6 +17,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+    private static final String[] AUTH_WHITELIST = {
+            "/api/v1/auth/authenticate",
+            "/api/v1/auth/register",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/api/users/{email}"
+    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -25,7 +34,7 @@ public class SecurityConfiguration {
                 .disable()
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/authenticate", "/api/v1/auth/register", "/api/users/{email}")
+                .requestMatchers(AUTH_WHITELIST)
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -39,6 +48,4 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-
 }
-

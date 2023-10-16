@@ -1,6 +1,7 @@
 package com.oop.appa.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import java.security.SecureRandom;
 import java.util.Optional;
 
 import com.oop.appa.dao.UserRepository;
+import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.User;
 
 @Service
@@ -29,6 +31,10 @@ public class UserService {
     // get all users
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public Optional<User> findByUserId(Integer user_id) {
+        return userRepository.findById(user_id);
     }
 
     public Page<User> findAllPaged(Pageable pageable) {

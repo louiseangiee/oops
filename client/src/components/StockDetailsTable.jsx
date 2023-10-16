@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { tokens } from "../theme";
 
 function StockDetailsTable({ chosenStock }) {
+    console.log("chosenStock prop in StockDetailsTable:", chosenStock);
     const [details, setDetails] = useState({});
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -13,6 +14,7 @@ function StockDetailsTable({ chosenStock }) {
         
         if (!chosenStock || !chosenStock.code) return;
     
+            console.log("Fetching data for stock:", chosenStock.code);
             import(`../data/${chosenStock.code}Data.json`)
             .then(module => {
                 computeDetails(module.default);
@@ -24,8 +26,11 @@ function StockDetailsTable({ chosenStock }) {
 
 
     const computeDetails = (data) => {
-        const today = data["2023-10-12"]; //dynamically Update later
-        const yesterday = data["2023-10-11"];
+        console.log(data);
+        const today = data["Time Series (Daily)"]["2023-10-12"]; //dynamically Update later
+
+        console.log(data["Time Series (Daily)"]["2023-10-12"]);
+        const yesterday = data["Time Series (Daily)"]["2023-10-11"];
         
         const details = {
             "Previous close": yesterday["4. close"],

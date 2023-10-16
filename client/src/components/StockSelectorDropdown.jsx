@@ -12,6 +12,9 @@ const StockSelector = (props) => {
         // You can dynamically fetch and add more stocks from your DB
     ];
 
+    console.log("Chosen Stock:", chosenStock);
+    console.log("Stock Options:", stocks);
+
     return (
         <Autocomplete
             value={chosenStock}

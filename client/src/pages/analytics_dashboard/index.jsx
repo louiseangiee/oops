@@ -76,7 +76,7 @@ const Analytics = () => {
 
           <Typography variant="h1"
                      fontWeight="bold"
-                   >S$ 20000</Typography>
+                   >S$ 10000</Typography>
 
           <Box height="10px" />
 
@@ -150,8 +150,9 @@ const Analytics = () => {
             />
            <Box display="flex" justifyContent="space-between">
               {/* StockDetailstable */}
+
               <Box flex="1" paddingRight="10px"> 
-                <StockDetailsTable data={chosenStock} />
+                <StockDetailsTable chosenStock={chosenStock} />
               </Box>
                 
               {/* Line chart for the chosen stock */}

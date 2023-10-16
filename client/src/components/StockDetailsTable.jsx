@@ -23,16 +23,6 @@ function StockDetailsTable({ chosenStock }) {
             });
         }, [chosenStock]);
 
-        import(`../data/${chosenStock.code}Data.json`)
-        .then(module => {
-            const computedDetails = computeDetails(module.default);
-            setDetails(computedDetails);
-        })
-        .catch(err => {
-            console.error("Failed to load stock data:", err);
-        });
-    }, [chosenStock]);
-
     const computeDetails = (data) => {
         console.log(data);
         const today = data["Time Series (Daily)"]["2023-10-12"]; //dynamically Update later

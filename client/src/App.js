@@ -5,11 +5,11 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import RequireAuth from "./components/RequireAuth";
 import { Routes, Route } from "react-router-dom";
 
-import Topbar from "./pages/global/Topbar";
+// import Topbar from "./pages/global/Topbar";
 import Dashboard from "./pages/dashboard";
 import Home from "./pages/home";
 import Portfolio from "./pages/portfolio";
-import Sidebar from "./pages/global/Sidebar";
+// import Sidebar from "./pages/global/Sidebar";
 import Team from "./pages/team";
 import Invoices from "./pages/invoices";
 import Contacts from "./pages/contacts";
@@ -23,7 +23,6 @@ import Login from "./pages/login";
 import Layout from "./Layout";
 import Analytics from "./pages/analytics_dashboard";
 import Profile from "./pages/profile";
-// import Calendar from "./pages/calendar/calendar";
 
 function App() {
   // access to the theme and the color mode
@@ -44,11 +43,12 @@ function App() {
               <Route path="/" element={<Layout />}>
                 <Route element={<RequireAuth />}>
                   <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/portfolio" element={<Portfolio />} />
+                  <Route path="/portfolio/:portfolioId" element={<Portfolio />} />
                   <Route path="/" element={<Home />} />
                   <Route path="team" element={<Team />} />
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="invoices" element={<Invoices />} />
+                  <Route path="/analytics" element={<Analytics/>} />
                 </Route>
                 <Route path="form" element={<Form />} />
                 <Route path="bar" element={<Bar />} />

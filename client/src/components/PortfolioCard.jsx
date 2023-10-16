@@ -3,8 +3,9 @@ import { tokens } from "../theme";
 import EditIcon from '@mui/icons-material/Edit';
 import { useCookies } from "react-cookie";
 import { getAsync, putAsync } from "../utils/utils";
+import { Link } from 'react-router-dom';
 
-const PortfolioCard = ({ title, subtitle, capital, returns, stocks }) => {
+const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [cookie, removeCookie] = useCookies(["accessToken"]);
@@ -27,13 +28,15 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks }) => {
         <Box width="100%" maxHeight="300px" overflowY="auto">
             <Box display="flex" justifyContent="space-between">
                 <Box>
-                    <Typography
-                        variant="h4"
-                        fontWeight="bold"
-                        sx={{ color: colors.grey[100] }}
-                    >
-                        {title}
-                    </Typography>
+                    <Link to={`/portfolio/${portfolioId}`} sx={{textDecoration: 'none'}}>
+                        <Typography
+                            variant="h4"
+                            fontWeight="bold"
+                            sx={{ color: colors.grey[100] }}
+                        >
+                            {title}
+                        </Typography>
+                    </Link>
                 </Box>
                 <Box>
                     <a href="">

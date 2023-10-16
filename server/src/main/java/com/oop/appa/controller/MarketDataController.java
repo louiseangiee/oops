@@ -32,7 +32,7 @@ public class MarketDataController {
     }
 
     @GetMapping("/dailyData")
-    public ResponseEntity<String> fetchDailyData(@RequestParam String symbol, @RequestParam String outputSize) {
+    public ResponseEntity<String> fetchDailyData(@RequestParam String symbol, @RequestParam(defaultValue = "compact") String outputSize) {
         try {
             String data = marketDataService.fetchDailyData(symbol, outputSize).toString();
             return ResponseEntity.ok(data);

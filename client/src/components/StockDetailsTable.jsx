@@ -9,25 +9,25 @@ function StockDetailsTable({ chosenStock }) {
     const colors = tokens(theme.palette.mode);
 
     useEffect(() => {
-        
-        
+        console.log(chosenStock)
         if (!chosenStock || !chosenStock.code) return;
-    
-            import(`../data/${chosenStock.code}Data.json`)
-            .then(module => {
-                computeDetails(module.default);
-            })
-            .catch(err => {
-                console.error("Failed to load stock data:", err);
-            });
-        }, [chosenStock]);
 
+        import(`../data/${chosenStock.code}Data.json`)
+        .then(module => {
+            const computedDetails = computeDetails(module.default);
+            setDetails(computedDetails);
+        })
+        .catch(err => {
+            console.error("Failed to load stock data:", err);
+        });
+    }, [chosenStock]);
 
-    const computeDetails = (data) => {
-        const today = data["2023-10-12"]; //dynamically Update later
-        const yesterday = data["2023-10-11"];
+    const computeDetails = (chosenStockData) => {
+        console.log(chosenStockData)
+        const today = chosenStockData["2023-10-12"]; // Dynamically update later
+        const yesterday = chosenStockData["2023-10-11"];
         
-        const details = {
+        const computedDetails = {
             "Previous close": yesterday["4. close"],
             "Day's range": `${today["3. low"]} - ${today["2. high"]}`,
             "Open": today["1. open"],
@@ -36,8 +36,10 @@ function StockDetailsTable({ chosenStock }) {
             "Volume": today["5. volume"],
             "Avg. volume": "For now, static. Calculate based on historical data."
         };
+        console.log(computedDetails)
 
-        setDetails(details);
+        return computedDetails;
+        
     }
 
     return (
@@ -57,3 +59,4 @@ function StockDetailsTable({ chosenStock }) {
 }
 
 export default StockDetailsTable;
+

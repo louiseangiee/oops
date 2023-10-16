@@ -39,10 +39,10 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                     </Link>
                 </Box>
                 <Box>
-                    <a href="">
+                    {/* <a href="">
                         <EditIcon
                             sx={{ color: colors.greenAccent[600], fontSize: "22px" }}
-                        /></a>
+                        /></a> */}
 
                 </Box>
             </Box>

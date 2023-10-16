@@ -1,5 +1,7 @@
 package com.oop.appa.service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,4 +55,25 @@ public class PortfolioStockService {
 
         return ((currentPrice - buyPrice) / buyPrice) * 100;
     }
+
+    public double calculateAnnualisedReturn(Integer portfolioStockId) {
+        PortfolioStock stock = portfolioStockRepository.findById(portfolioStockId).orElse(null);
+        double currentPrice = marketDataService.fetchCurrentData(stock.getStock().getStockSymbol()).path("Global Quote")
+                .path("5. close price").asDouble();
+        double buyPrice = stock.getBuyPrice();
+        long days = getDaysHeld(portfolioStockId);
+
+        return ((Math.pow((currentPrice / buyPrice), (365 / days))) - 1) * 100;
+    }
+
+    public Long getDaysHeld(Integer portfolioStockId) {
+        PortfolioStock stock = portfolioStockRepository.findById(portfolioStockId).orElse(null);
+        if (stock == null || stock.getBuyDate() == null) {
+            return null; // or throw an exception or return a default value
+        }
+        LocalDate buyDate = stock.getBuyDate();
+        LocalDate currentDate = LocalDate.now();
+        return ChronoUnit.DAYS.between(buyDate, currentDate);
+    }
+
 }

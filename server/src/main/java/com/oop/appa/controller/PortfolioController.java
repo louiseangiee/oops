@@ -78,9 +78,9 @@ public class PortfolioController {
     }
 
     // PUT endpoint for updating an existing portfolio
-    @PutMapping
-    public void updatePortfolio(@RequestBody Portfolio portfolio) {
-        portfolioService.save(portfolio);
+    @PutMapping("/{portfolioId}")
+    public void updatePortfolio(@PathVariable Integer portfolioId, @RequestBody Portfolio portfolio) {
+        portfolioService.updatePortfolio(portfolioId, portfolio);
     }
 
     @PutMapping("/{portfolioId}/stocks")

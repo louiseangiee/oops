@@ -19,6 +19,7 @@ import com.oop.appa.entity.PortfolioStock;
 import com.oop.appa.entity.Stock;
 import com.oop.appa.entity.User;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -106,6 +107,21 @@ public class PortfolioService {
         stockToAdd.setPortfolio(portfolio);
 
         portfolioStockRepository.save(stockToAdd);
+    }
+
+    public void updatePortfolio(Integer portfolioId, Portfolio portfolio) {
+        Portfolio existingPortfolio = portfolioRepository.findById(portfolioId).orElse(null);
+        // validations
+        if(existingPortfolio == null) {
+            System.out.println("No portoflio found with ID: " + portfolioId);
+            return;
+        }
+
+        existingPortfolio.setName(portfolio.getName());
+        existingPortfolio.setDescription(portfolio.getDescription());
+        existingPortfolio.setTotalCapital(portfolio.getTotalCapital());
+
+        portfolioRepository.save(existingPortfolio);
     }
 
     // DELETE

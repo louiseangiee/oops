@@ -44,6 +44,11 @@ public class PortfolioController {
         return portfolioService.findByUserId(user_id);
     }
 
+    @GetMapping("/{id}")
+    public Optional<Portfolio> findById(@PathVariable Integer id) {
+        return portfolioService.findById(id);
+    }
+
     // POST endpoint for creating a new portfolio
     // POST endpoint for creating a new portfolio
     @PostMapping

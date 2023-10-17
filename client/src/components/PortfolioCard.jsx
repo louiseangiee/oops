@@ -1,32 +1,48 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import EditIcon from '@mui/icons-material/Edit';
+import { useCookies } from "react-cookie";
+import { getAsync, putAsync } from "../utils/utils";
+import { Link } from 'react-router-dom';
 
-const PortfolioCard = ({ title, subtitle, capital, returns }) => {
+const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const [cookie, removeCookie] = useCookies(["accessToken"]);
     const capitalColor = (capital >= 0 || capital == null) ? colors.greenAccent[500] : colors.redAccent[500];
     const returnsColor = (returns >= 0 || returns == null) ? colors.greenAccent[500] : colors.redAccent[500];
     capital = capital > 0 ? ("+$" + capital) : (capital == 0 || capital == null) ? "$-" : ("-$" + capital * -1);
     returns = returns > 0 ? ("+$" + returns) : (returns == 0 || returns == null) ? "$-" : ("-$" + returns * -1);
 
+    async function fetchStockDetails(stockSymbol) {
+        const response = await getAsync("stocks/"+stockSymbol, cookie.accessToken);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch stock details for ID ${stockSymbol}`);
+        }
+        const stockDetails = await response.json();
+        console.log(stockDetails);
+        return stockDetails;
+    }
+
     return (
-        <Box width="100%" m="0 30px">
+        <Box width="100%" maxHeight="300px" overflowY="auto">
             <Box display="flex" justifyContent="space-between">
                 <Box>
-                    <Typography
-                        variant="h4"
-                        fontWeight="bold"
-                        sx={{ color: colors.grey[100] }}
-                    >
-                        {title}
-                    </Typography>
+                    <Link to={`/portfolio/${portfolioId}`} sx={{textDecoration: 'none'}}>
+                        <Typography
+                            variant="h4"
+                            fontWeight="bold"
+                            sx={{ color: colors.grey[100] }}
+                        >
+                            {title}
+                        </Typography>
+                    </Link>
                 </Box>
                 <Box>
-                    <a href="">
+                    {/* <a href="">
                         <EditIcon
                             sx={{ color: colors.greenAccent[600], fontSize: "22px" }}
-                        /></a>
+                        /></a> */}
 
                 </Box>
             </Box>
@@ -91,134 +107,33 @@ const PortfolioCard = ({ title, subtitle, capital, returns }) => {
                     fontStyle="italic"
                     sx={{ color: colors.grey[300] }}
                 >
-                    Price & Changes
+                    Price & Quantity
                 </Typography>
             </Box>
             {/* The list of stocks */}
-            <Box display="flex" justifyContent="space-between" my="10px">
-                <Box display="flex" gap="10px">
-                    <img
-                        src={"../../stocks_logos/apple.png"}
-                        width="50px"
-                        height="50px"
-                        sx={{ borderRadius: "50%" }}
-                        // borderRadius="50%"
-                        alt="appleLogo"
-                    />
-                    <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">
-                        <Typography
-                            variant="h4"
-                            fontWeight="bold"
-                            sx={{ color: colors.grey[100] }}
-                        >
-                            AAPL
+            {Array.isArray(stocks) && stocks.map((stock, index) => (
+                <Box key={index} display="flex" justifyContent="space-between" my="10px">
+                    <Box display="flex" gap="10px">
+                        <img src={`../../stocks_logos/apple.png`} width="50px" height="50px" sx={{ borderRadius: '50%' }} />
+                        <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">
+                            <Typography variant="h4" fontWeight="bold" sx={{ color: colors.grey[100] }}>
+                                {/* {fetchStockDetails(stock.stock_symbol)} */}
+                            </Typography>
+                            <Typography variant="h6" sx={{ color: colors.grey[100] }}>
+                                {stock.name}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px" alignItems="flex-end">
+                        <Typography variant="h4" fontWeight="bold" sx={{ color: colors.grey[100] }}>
+                            ${stock.buyPrice}
                         </Typography>
-                        <Typography
-                            variant="h6"
-                            sx={{ color: colors.grey[100] }}
-                        >
-                            Apple Inc.
+                        <Typography variant="h6" sx={{ color: colors.greenAccent[600] }}>
+                            Qty: {stock.quantity}
                         </Typography>
                     </Box>
                 </Box>
-                <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px" alignItems="flex-end">
-                    <Typography
-                        variant="h4"
-                        fontWeight="bold"
-                        sx={{ color: colors.grey[100] }}
-                    >
-                        $145.86
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{ color: colors.greenAccent[600] }}
-                    >
-                        +$0.86
-                    </Typography>
-                </Box>
-            </Box>
-            <Box display="flex" justifyContent="space-between" my="10px">
-                <Box display="flex" gap="10px">
-                    <img
-                        src={"../../stocks_logos/nvidia.png"}
-                        width="50px"
-                        height="50px"
-                        sx={{ borderRadius: "50%" }}
-                        borderRadius="50%"
-                    />
-                    <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">
-                        <Typography
-                            variant="h4"
-                            fontWeight="bold"
-                            sx={{ color: colors.grey[100] }}
-                        >
-                            NVDA
-                        </Typography>
-                        <Typography
-                            variant="h6"
-                            sx={{ color: colors.grey[100] }}
-                        >
-                            NVIDIA Corp
-                        </Typography>
-                    </Box>
-                </Box>
-                <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px" alignItems="flex-end">
-                    <Typography
-                        variant="h4"
-                        fontWeight="bold"
-                        sx={{ color: colors.grey[100] }}
-                    >
-                        $145.86
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{ color: colors.greenAccent[600] }}
-                    >
-                        +$0.86
-                    </Typography>
-                </Box>
-            </Box>
-            <Box display="flex" justifyContent="space-between" my="10px">
-                <Box display="flex" gap="10px">
-                    <img
-                        src={"../../stocks_logos/microsoft.png"}
-                        width="50px"
-                        height="50px"
-                        sx={{ borderRadius: "50%" }}
-                        borderRadius="50%"
-                    />
-                    <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">
-                        <Typography
-                            variant="h4"
-                            fontWeight="bold"
-                            sx={{ color: colors.grey[100] }}
-                        >
-                            MSFT
-                        </Typography>
-                        <Typography
-                            variant="h6"
-                            sx={{ color: colors.grey[100] }}
-                        >
-                            Microsoft Corp
-                        </Typography>
-                    </Box>
-                </Box>
-                <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px" alignItems="flex-end">
-                    <Typography
-                        variant="h4"
-                        fontWeight="bold"
-                        sx={{ color: colors.grey[100] }}
-                    >
-                        $145.86
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{ color: colors.greenAccent[600] }}
-                    >
-                        +$0.86
-                    </Typography>
-                </Box>
-            </Box>
+            ))}
         </Box>
     );
 };

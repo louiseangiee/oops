@@ -6,9 +6,8 @@ import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import Button from '@mui/material/Button';
 import Lottie from 'lottie-react';
-import noDataDark from './lotties/no_data_dark.json';
 import AddStocks from './AddStocks';
-// import noDataLight from './lotties/no_data_light.json';
+import noDataDark from './lotties/no_data_dark.json';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -49,71 +48,71 @@ export default function StocksTabs() {
     const [value, setValue] = React.useState(0);
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const mockData = {
-        "AAPL": {
-            "1. open": "140.3700",
-            "2. high": "141.2004",
-            "3. low": "139.9900",
-            "4. close": "141.0700",
-            "5. volume": "2637779"
-        },
-        "TSLA": {
-            "1. open": "140.8700",
-            "2. high": "141.6400",
-            "3. low": "140.0000",
-            "4. close": "140.3900",
-            "5. volume": "3284421"
-        }, "AMZN": {
-            "1. open": "145.5100",
-            "2. high": "146.1700",
-            "3. low": "143.0201",
-            "4. close": "143.2400",
-            "5. volume": "4824654"
-        }, "GOOG": {
-            "1. open": "145.9500",
-            "2. high": "146.9800",
-            "3. low": "145.9200",
-            "4. close": "146.5500",
-            "5. volume": "2627999"
-        }, "FB": {
-            "1. open": "146.9400",
-            "2. high": "147.7275",
-            "3. low": "146.5400",
-            "4. close": "146.8300",
-            "5. volume": "3885949"
-        }, "MSFT": {
-            "1. open": "141.7000",
-            "2. high": "142.0900",
-            "3. low": "140.5600",
-            "4. close": "140.6400",
-            "5. volume": "3285347"
-        }, "NVDA": {
-            "1. open": "143.7800",
-            "2. high": "145.2200",
-            "3. low": "143.3116",
-            "4. close": "144.4500",
-            "5. volume": "3952640"
-        }, "PYPL": {
-            "1. open": "135.5300",
-            "2. high": "136.4500",
-            "3. low": "135.1900",
-            "4. close": "135.4800",
-            "5. volume": "5519992"
-        }, "ABDE": {
-            "1. open": "131.7800",
-            "2. high": "133.8550",
-            "3. low": "131.7500",
-            "4. close": "132.0800",
-            "5. volume": "2982738"
-        }, "NFLX": {
-            "1. open": "129.3900",
-            "2. high": "131.4100",
-            "3. low": "129.3100",
-            "4. close": "131.3400",
-            "5. volume": "4845649"
-        }
-    };
-    // const mockData = {};
+    // const mockData = {
+    //     "AAPL": {
+    //         "1. open": "140.3700",
+    //         "2. high": "141.2004",
+    //         "3. low": "139.9900",
+    //         "4. close": "141.0700",
+    //         "5. volume": "2637779"
+    //     },
+    //     "TSLA": {
+    //         "1. open": "140.8700",
+    //         "2. high": "141.6400",
+    //         "3. low": "140.0000",
+    //         "4. close": "140.3900",
+    //         "5. volume": "3284421"
+    //     }, "AMZN": {
+    //         "1. open": "145.5100",
+    //         "2. high": "146.1700",
+    //         "3. low": "143.0201",
+    //         "4. close": "143.2400",
+    //         "5. volume": "4824654"
+    //     }, "GOOG": {
+    //         "1. open": "145.9500",
+    //         "2. high": "146.9800",
+    //         "3. low": "145.9200",
+    //         "4. close": "146.5500",
+    //         "5. volume": "2627999"
+    //     }, "FB": {
+    //         "1. open": "146.9400",
+    //         "2. high": "147.7275",
+    //         "3. low": "146.5400",
+    //         "4. close": "146.8300",
+    //         "5. volume": "3885949"
+    //     }, "MSFT": {
+    //         "1. open": "141.7000",
+    //         "2. high": "142.0900",
+    //         "3. low": "140.5600",
+    //         "4. close": "140.6400",
+    //         "5. volume": "3285347"
+    //     }, "NVDA": {
+    //         "1. open": "143.7800",
+    //         "2. high": "145.2200",
+    //         "3. low": "143.3116",
+    //         "4. close": "144.4500",
+    //         "5. volume": "3952640"
+    //     }, "PYPL": {
+    //         "1. open": "135.5300",
+    //         "2. high": "136.4500",
+    //         "3. low": "135.1900",
+    //         "4. close": "135.4800",
+    //         "5. volume": "5519992"
+    //     }, "ABDE": {
+    //         "1. open": "131.7800",
+    //         "2. high": "133.8550",
+    //         "3. low": "131.7500",
+    //         "4. close": "132.0800",
+    //         "5. volume": "2982738"
+    //     }, "NFLX": {
+    //         "1. open": "129.3900",
+    //         "2. high": "131.4100",
+    //         "3. low": "129.3100",
+    //         "4. close": "131.3400",
+    //         "5. volume": "4845649"
+    //     }
+    // };
+    const mockData = {};
 
     const handleChange = (event, newValue) => {
         setValue(newValue);

@@ -15,8 +15,8 @@ export default function Profile() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("Fetching email...");
+    const [fullName, setFullName] = useState("Fetching name...");
     const [isFullNameEmpty, setIsFullNameEmpty] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
@@ -36,6 +36,7 @@ export default function Profile() {
         setFullName(userData.fullName);
         setDataFetched(userData);
     }, [userData]);
+
 
     // useEffect(() => {
     //     async function fetchData() {

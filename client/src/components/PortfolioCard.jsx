@@ -4,6 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useCookies } from "react-cookie";
 import { getAsync, putAsync } from "../utils/utils";
 import { Link } from 'react-router-dom';
+import EditPortfolio from "./EditPortfolio";
 
 const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId }) => {
     const theme = useTheme();
@@ -15,7 +16,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
     returns = returns > 0 ? ("+$" + returns) : (returns == 0 || returns == null) ? "$-" : ("-$" + returns * -1);
 
     async function fetchStockDetails(stockSymbol) {
-        const response = await getAsync("stocks/"+stockSymbol, cookie.accessToken);
+        const response = await getAsync("stocks/" + stockSymbol, cookie.accessToken);
         if (!response.ok) {
             throw new Error(`Failed to fetch stock details for ID ${stockSymbol}`);
         }
@@ -28,7 +29,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
         <Box width="100%" maxHeight="300px" overflowY="auto">
             <Box display="flex" justifyContent="space-between">
                 <Box>
-                    <Link to={`/portfolio/${portfolioId}`} sx={{textDecoration: 'none'}}>
+                    <Link to={`/portfolio/${portfolioId}`} sx={{ textDecoration: 'none' }}>
                         <Typography
                             variant="h4"
                             fontWeight="bold"
@@ -43,7 +44,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                         <EditIcon
                             sx={{ color: colors.greenAccent[600], fontSize: "22px" }}
                         /></a> */}
-
+                    <EditPortfolio small/>
                 </Box>
             </Box>
             <Box display="flex" justifyContent="space-between" mt="2px">

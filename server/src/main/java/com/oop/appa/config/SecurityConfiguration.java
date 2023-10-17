@@ -23,8 +23,7 @@ public class SecurityConfiguration {
             "/v3/api-docs/**",
             "/v3/api-docs.yaml",
             "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/api/users/{email}"
+            "/swagger-ui.html"
     };
 
     @Bean

@@ -1,9 +1,10 @@
-import {useState} from 'react';
-import {CookiesProvider, useCookies} from 'react-cookie';
-import {ColorModeContext, useMode} from './theme';
-import {CssBaseline, ThemeProvider} from '@mui/material';
-import RequireAuth from './components/RequireAuth';
-import {Routes, Route} from 'react-router-dom';
+import { useState } from "react";
+import { CookiesProvider, useCookies } from "react-cookie";
+import { ColorModeContext, useMode } from "./theme";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import RequireAuth from "./components/RequireAuth";
+import { Routes, Route } from "react-router-dom";
+
 // import Topbar from "./pages/global/Topbar";
 import Dashboard from "./pages/dashboard";
 import Home from "./pages/home";
@@ -24,9 +25,10 @@ import Analytics from "./pages/analytics_dashboard";
 import Profile from "./pages/profile";
 
 function App() {
-	// access to the theme and the color mode
-	const [theme, colorMode] = useMode();
-	const [isSidebar, setIsSidebar] = useState(true);
+  // access to the theme and the color mode
+  const [theme, colorMode] = useMode();
+  const [isSidebar, setIsSidebar] = useState(true);
+
   return (
     <CookiesProvider>
       <ColorModeContext.Provider value={colorMode}>

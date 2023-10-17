@@ -15,25 +15,20 @@ import ProgressCircle from "../../components/ProgressCircle";
 import { getAsync } from "../../utils/utils";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { useAuth } from "../../context/AuthContext";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  const { userData } = useAuth();
-  // console.log('userEmail:', userEmail);
-  // console.log(useAuth());
-  const [cookies, setCookie, removeCookie] = useCookies(['accessToken']);
+  const [cookie, removeCookie] = useCookies(["accessToken"]);
 
-  // BOILERPLATE CODE to fetch data from backend
+  //BOILERPLATE CODE to fetch data from backend
   // async function getUsers() {
-  //   const response = await getAsync("api/users", cookie.accessToken);
+  //   const response = await getAsync("api/users", localStorage.getItem("token"));
   //   const data = await response.json();
   //   console.log(data);
   //   setUsers(data);
   // }
-
 
 
   return (
@@ -60,7 +55,7 @@ const Dashboard = () => {
             fontSize: "14px",
             fontWeight: "bold",
             padding: "10px 20px",
-          }} onClick={() => { removeCookie("accessToken"); navigate('/login') }}>{userData.id}</Button>
+          }} onClick={() => { removeCookie("accessToken", { path: '/' }); navigate('/login') }}>Log Out</Button>
         </Box>
       </Box>
 

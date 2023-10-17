@@ -7,6 +7,7 @@ import com.oop.appa.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -129,6 +130,18 @@ public class StockController {
         }
     }
 
+    @GetMapping("/fullDailyData")
+    public ResponseEntity<List<Map<String, Object>>> fetchFullDailyData(@RequestParam String symbol) {
+        try {
+            List<Map<String, Object>> data = stockService.fetchFullDailyData(symbol);
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+
     @GetMapping("/OneWeekData")
     public ResponseEntity <List<Map<String, Object>>> fetchOneWeekData(@RequestParam String symbol) {
         try {
@@ -138,5 +151,32 @@ public class StockController {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @GetMapping("/calculateMonthlyVolatility")
+    public ResponseEntity<Double> calculateMonthlyVolatility(@RequestParam String symbol) {
+        try {
+            double volatility = stockService.calculateMonthlyVolatility(symbol);
+            return ResponseEntity.ok(volatility);
+        } catch (Exception e) {
+            // It's a good practice to log the exception for debugging purposes.
+            // e.g., logger.error("Error calculating volatility for symbol: " + symbol, e);
+        return ResponseEntity.status(500).body(0.0);
+        }
+    }
+
+    @GetMapping("/calculateAnnualizedVolatility")
+    public ResponseEntity<Double> calculateAnnualizedVolatility(@RequestParam String symbol) {
+        try {
+            double annualizedVolatility = stockService.calculateAnnualizedVolatility(symbol);
+            return ResponseEntity.ok(annualizedVolatility);
+        } catch (Exception e) {
+            // Log the exception for debugging purposes
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(0.0);
+        }
+    }
+
+
+
 
 }

@@ -70,7 +70,7 @@ const Portfolio = () => {
         {/* <Header title={"Portfolio > "+formData['portfolioName']} subtitle={formData['portfolioDescription']} /> */}
 
         <Box>
-          <EditPortfolio />
+          <EditPortfolio portfolioId={portfolioId}/>
         </Box>
       </Box>
 

@@ -10,11 +10,12 @@ import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.User;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/users")
+@RequestMapping("/users")
     public class UserController {
         private UserService userService;
 
@@ -29,9 +30,20 @@ import java.util.Optional;
             return userService.findAll();
         }
 
-        @GetMapping("/{email}")
-        public Optional<User> getUserByEmail(@PathVariable String email){
-            return userService.findUserByEmail(email);
+//        @GetMapping("/{email}")
+//        public Optional<User> getUserByEmail(@PathVariable String email){
+//            return userService.findUserByEmail(email);
+//        }
+
+        @GetMapping("/user")
+        public Optional<User> getUser(@RequestParam Optional<String> email, Optional<Integer> userid){
+            if(email.isPresent()){
+                return userService.findUserByEmail(email.get());
+            }
+            if(userid.isPresent()) {
+                return userService.findByUserId(userid.get());
+            }
+            return Optional.empty();
         }
 
 
@@ -40,23 +52,32 @@ import java.util.Optional;
             return userService.findAllPaged(pageable);
         }
 
-        @GetMapping("/{user_id}")
-        public Optional<User> findByUserId(@PathVariable Integer user_id) {
-            return userService.findByUserId(user_id);
-        }
-
-        @GetMapping("/email/send")
-        public void sendEmail(){
+        @GetMapping("/sendOTP")
+        public void sendEmail(@RequestParam int user_id){
             String otp = userService.generateOtp();
+            Optional<User> user = userService.findByUserId(user_id);
+            String userEmail = "vitto.tedja2332@gmail.com";
+            if(user.isPresent()) {
+                userEmail = user.get().getEmail();
+            }
+            userService.updateOTP(user_id, otp);
             String body = String.format("This is your otp: %s", otp);
             userService.sendSimpleMessage(
-                    "vitto.tedja2332@gmail.com",
-                    "Testing 123",
+                    userEmail,
+                    "This is your OTP for OOP",
                     body
             );
         }
 
-
+        @GetMapping("/verifyOTP")
+        public boolean verifyOTP(@RequestParam int user_id, String otp){
+            Optional<User> user = userService.findByUserId(user_id);
+            if(user.isPresent()){
+                User confirmedUser = user.get();
+                 return otp.equals(confirmedUser.getOtp());
+            }
+            return false;
+        }
 
         // POST endpoint
         @PostMapping

@@ -9,6 +9,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Profile() {
     const theme = useTheme();
@@ -19,22 +20,34 @@ export default function Profile() {
     const [isFullNameEmpty, setIsFullNameEmpty] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
-    const [cookie, removeCookie] = useCookies(["accessToken"]);
+    const [cookie, setCookie, removeCookie] = useCookies(["accessToken"]);
     const [dataFetched, setDataFetched] = useState({});
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
+    const [otp, setOtp] = useState("");
+    const [otpCorrect, setOtpCorrect] = useState(false);
+    const [emailState, setEmailState] = useState("email not sent");
+
+
+    const { userData } = useAuth();
 
     useEffect(() => {
-        async function fetchData() {
-            const response = await getAsync('api/users/1', cookie.accessToken);
-            const data = await response.json();
-            setFullName(data['fullName']);
-            setEmail(data['email']);
-            setDataFetched(data);
-        }
+        setEmail(userData.email);
+        setFullName(userData.fullName);
+        setDataFetched(userData);
+    }, [userData]);
 
-        fetchData();
-    }, [email, cookie.accessToken]);
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         const response = await getAsync('api/users/1', cookie.accessToken);
+    //         const data = await response.json();
+    //         setFullName(data['fullName']);
+    //         setEmail(data['email']);
+    //         setDataFetched(data);
+    //     }
+
+    //     fetchData();
+    // }, [email, cookie.accessToken]);
 
     const handleCloseErrorAlert = () => {
         setIsErrorAlertOpen(false);
@@ -64,10 +77,7 @@ export default function Profile() {
         }
 
         const updatedData = {
-            id: dataFetched.id,
-            email: dataFetched.email,
-            password: dataFetched.password,
-            role: dataFetched.role,
+            ...dataFetched,
             fullName: trimmedFullName, // Assuming fullName is defined in your component state
         };
         console.log(updatedData);
@@ -133,6 +143,24 @@ export default function Profile() {
             console.error('Error:', error);
         }
     };
+
+    const generateOTP = async () => {
+        const response = await getAsync('users/sendOTP?user_id=' + userData.id, cookie.accessToken);
+        if (response.ok) {
+            setEmailState("email sent");
+        }
+    }
+
+    const verifyOTP = async () => {
+        const response = await getAsync('users/verifyOTP?user_id=' + userData.id + '&otp=' + otp, cookie.accessToken);
+        if (response.ok) {
+            const data = await response.json();
+            data ? setOtpCorrect(true) : alert('wrong code');
+        }
+        else {
+            alert('error verifying')
+        }
+    }
 
     return (
         <>
@@ -345,12 +373,23 @@ export default function Profile() {
                                     backgroundColor: colors.redAccent[700],
                                 },
                                 width: "30%"
-                            }} onClick={() => { removeCookie("accessToken", { path: '/' }); navigate('/login') }}>
+                            }} onClick={() => { removeCookie("accessToken"); removeCookie("email"); navigate('/login') }}>
                                 Log Out
                             </Button>
                         </Box>
                     </Box>
+
                 </div>
+                {/* testing OTP */}
+                <Box width="60%" m="100px">
+                    <button onClick={generateOTP}>Generate OTP</button>
+                    <input type='text' placeholder='otp here' onChange={(e) => setOtp(e.target.value)} />
+                    <button onClick={verifyOTP}>Verify OTP</button>
+                </Box>
+                <Box width="60%" m="100px">
+                    {emailState}
+                    {otpCorrect ? <p>OTP is correct</p> : <p>OTP is wrong</p>}
+                </Box>
 
             </main>
         </>

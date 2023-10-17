@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 	useEffect(() => {
 		const initializeUser = async () => {
 			if (emailCookie.email) {
-				const response = await fetch(`http://localhost:8080/api/users/` + emailCookie.email, {
+				const response = await fetch(`http://localhost:8080/users/user?email=` + emailCookie.email, {
 					headers: {
 						Authorization: `Bearer ${cookie.accessToken}`,
 					}
@@ -65,8 +65,6 @@ export const AuthProvider = ({ children }) => {
 					setUserEmail("User Email")
 				}
 			}
-
-			removeCookie("email", { path: '/' })
 		}
 		initializeUser();
 	}, []);

@@ -102,7 +102,8 @@ const PortfolioCard = ({ title, subtitle, capital, returns }) => {
                         width="50px"
                         height="50px"
                         sx={{ borderRadius: "50%" }}
-                        borderRadius="50%"
+                        // borderRadius="50%"
+                        alt="appleLogo"
                     />
                     <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">
                         <Typography

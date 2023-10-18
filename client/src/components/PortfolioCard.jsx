@@ -26,7 +26,8 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
     }
 
     return (
-        <Box width="100%" maxHeight="300px" overflowY="auto">
+        <Box width="100%" maxHeight="300px" sx={{overflow: "hidden",
+          overflowY: "auto"}}>
             <Box display="flex" justifyContent="space-between">
                 <Box>
                     <Link to={`/portfolio/${portfolioId}`} sx={{ textDecoration: 'none' }}>
@@ -48,7 +49,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                 </Box>
             </Box>
             <Box display="flex" justifyContent="space-between" mt="2px">
-                <Typography variant="h5" sx={{ color: colors.greenAccent[500] }}>
+                <Typography variant="h6" sx={{ color: colors.greenAccent[500] }}>
                     {subtitle}
                 </Typography>
                 {/* <Typography
@@ -64,14 +65,14 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                 <Typography
                     variant="h6"
                     fontStyle="italic"
-                    sx={{ color: colors.grey[300] }}
+                    sx={{ color: colors.grey[300], fontSize: "10px"}}
                 >
                     Capital
                 </Typography>
                 <Typography
                     variant="h6"
                     fontStyle="italic"
-                    sx={{ color: colors.grey[300] }}
+                    sx={{ color: colors.grey[300], fontSize: "10px" }}
                 >
                     Returns
                 </Typography>
@@ -99,14 +100,14 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                 <Typography
                     variant="h6"
                     fontStyle="italic"
-                    sx={{ color: colors.grey[300] }}
+                    sx={{ color: colors.grey[300], fontSize: "10px" }}
                 >
                     Code
                 </Typography>
                 <Typography
                     variant="h6"
                     fontStyle="italic"
-                    sx={{ color: colors.grey[300] }}
+                    sx={{ color: colors.grey[300], fontSize: "10px" }}
                 >
                     Price & Quantity
                 </Typography>

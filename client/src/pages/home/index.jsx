@@ -5,32 +5,32 @@ import PortfolioCard from "../../components/PortfolioCard";
 import CreatePortfolio from "../../components/CreatePortfolioForm";
 import { useCookies } from "react-cookie";
 import { useState, useEffect } from "react";
-import { getAsync, putAsync } from "../../utils/utils";
 import Lottie from 'lottie-react';
 import loading from './fetching_data.json';
+import noData from './no_data.json';
+import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [cookie, removeCookie] = useCookies(["accessToken"]);
   const [dataFetched, setDataFetched] = useState(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      const response = await getAsync('portfolios/user/1', cookie.accessToken);
-      const data = await response.json();
-      setDataFetched(data);
-      console.log(data);
-    }
+  const { userData } = useAuth();
 
-    fetchData();
-  }, [cookie.accessToken]);
+  useEffect(() => {
+    console.log(userData);
+    if (!userData.portfolios) {
+      setDataFetched(null);
+    } else {
+      setDataFetched(userData.portfolios);
+    }
+  }, [userData]);
 
   return (
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="PORTFOLIOS" subtitle="Welcome to your portfolios page" />
+        <Header title="PORTFOLIOS" subtitle="Welcome to your portfolios page!" />
 
         <Box>
           <CreatePortfolio />
@@ -38,7 +38,32 @@ const Home = () => {
       </Box>
 
       {/* GRID & CHARTS */}
-      {dataFetched ? (
+      {!dataFetched ? (
+        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+          <Lottie
+            animationData={loading}
+            loop={true} // Set to true for looping
+            autoplay={true} // Set to true to play the animation automatically
+            style={{ width: 300, height: 300 }}
+          />
+        </Box>
+
+      ) : dataFetched.length === 0 ? (
+
+        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
+
+          <Lottie
+            animationData={noData}
+            loop={true} // Set to true for looping
+            autoplay={true} // Set to true to play the animation automatically
+            style={{ width: 300, height: 300 }}
+          />
+          <Typography variant="h4" fontWeight="600" color={colors.grey[100]} mb="20px">
+            You have no portfolios yet. Create one now!
+          </Typography>
+        </Box>
+
+      ) : (
         <Box
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
@@ -68,19 +93,6 @@ const Home = () => {
               </Box>
             ))}
         </Box>
-
-
-      ) : (
-
-        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-          <Lottie
-            animationData={loading}
-            loop={true} // Set to true for looping
-            autoplay={true} // Set to true to play the animation automatically
-            style={{ width: 300, height: 300 }}
-          />
-        </Box>
-
       )
       }
     </Box>

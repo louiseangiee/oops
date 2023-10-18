@@ -24,7 +24,7 @@ const Home = () => {
     } else {
       setDataFetched(userData.portfolios);
     }
-  }, [userData]);
+  }, [userData, dataFetched]);
 
   return (
     <Box m="20px">

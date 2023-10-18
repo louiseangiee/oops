@@ -45,7 +45,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                         <EditIcon
                             sx={{ color: colors.greenAccent[600], fontSize: "22px" }}
                         /></a> */}
-                    <EditPortfolio small/>
+                    <EditPortfolio portfolioId={portfolioId} small/>
                 </Box>
             </Box>
             <Box display="flex" justifyContent="space-between" mt="2px">

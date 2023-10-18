@@ -1,9 +1,9 @@
-import {useState} from 'react';
-import {CookiesProvider, useCookies} from 'react-cookie';
-import {ColorModeContext, useMode} from './theme';
-import {CssBaseline, ThemeProvider} from '@mui/material';
-import RequireAuth from './components/RequireAuth';
-import {Routes, Route} from 'react-router-dom';
+import { useState } from "react";
+import { CookiesProvider, useCookies } from "react-cookie";
+import { ColorModeContext, useMode } from "./theme";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import RequireAuth from "./components/RequireAuth";
+import { Routes, Route } from "react-router-dom";
 // import Topbar from "./pages/global/Topbar";
 import Dashboard from "./pages/dashboard";
 import Home from "./pages/home";
@@ -22,11 +22,12 @@ import Login from "./pages/login";
 import Layout from "./Layout";
 import Analytics from "./pages/analytics_dashboard";
 import Profile from "./pages/profile";
+import AutoRefreshOnRouteChange from "./AutoRefreshOnRouteChange";
 
 function App() {
-	// access to the theme and the color mode
-	const [theme, colorMode] = useMode();
-	const [isSidebar, setIsSidebar] = useState(true);
+  // access to the theme and the color mode
+  const [theme, colorMode] = useMode();
+  const [isSidebar, setIsSidebar] = useState(true);
   return (
     <CookiesProvider>
       <ColorModeContext.Provider value={colorMode}>
@@ -36,17 +37,21 @@ function App() {
             {/* <Sidebar isSidebar={isSidebar} /> */}
             {/* <Topbar setIsSidebar={setIsSidebar} /> */}
             <Routes>
+              {/* <Route element={<AutoRefreshOnRouteChange />} /> */}
               <Route path="/login" element={<Login />} />
-			  <Route path="/profile" element={<Profile />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/" element={<Layout />}>
                 <Route element={<RequireAuth />}>
                   <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/portfolio/:portfolioId" element={<Portfolio />} />
+                  <Route
+                    path="/portfolio/:portfolioId"
+                    element={<Portfolio />}
+                  />
                   <Route path="/" element={<Home />} />
                   <Route path="team" element={<Team />} />
                   <Route path="contacts" element={<Contacts />} />
                   <Route path="invoices" element={<Invoices />} />
-                  <Route path="/analytics" element={<Analytics/>} />
+                  <Route path="/analytics" element={<Analytics />} />
                 </Route>
                 <Route path="form" element={<Form />} />
                 <Route path="bar" element={<Bar />} />

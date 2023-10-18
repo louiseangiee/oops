@@ -45,7 +45,7 @@ function DeletePortfolio() {
       console.log(data);
     }
     fetchData();
-  }, [portfolioId]);
+  }, [portfolioId, cookie.accessToken]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -55,18 +55,23 @@ function DeletePortfolio() {
     setOpen(false);
   };
 
+  // error alert handler
   const handleOpenErrorAlert = () => {
     setIsErrorAlertOpen(true);
+    setIsSuccessAlertOpen(false);
   };
   const handleCloseErrorAlert = () => {
     setIsErrorAlertOpen(false);
   };
 
+  // success alert handler
   const handleOpenSuccessAlert = () => {
-    setIsErrorAlertOpen(true);
+    setIsSuccessAlertOpen(true);
+    setIsErrorAlertOpen(false);
+
   };
   const handleCloseSuccessAlert = () => {
-    setIsErrorAlertOpen(false);
+    setIsSuccessAlertOpen(false);
   };
 
   const handleDelete = async () => {
@@ -89,7 +94,7 @@ function DeletePortfolio() {
       setOpen(false);
       return;
     }
-    
+
   }
 
   return (
@@ -112,7 +117,7 @@ function DeletePortfolio() {
         </Alert>
       </Snackbar>
 
-      {/* Snackbar for error message */}
+      {/* Snackbar for success message */}
       <Snackbar
         open={isSuccessAlertOpen}
         autoHideDuration={5000} // Adjust the duration as needed
@@ -124,7 +129,7 @@ function DeletePortfolio() {
           variant="filled"
           severity="success"
           onClose={handleCloseSuccessAlert}
-          sx={{ backgroundColor: colors.redAccent[600] }}
+          sx={{ backgroundColor: colors.greenAccent[600] }}
         >
           Portfolio deletion is successful!
         </Alert>
@@ -207,11 +212,11 @@ const Portfolio = () => {
           style={{ width: 300, height: 300 }}
         />
         <Typography variant="h4" fontWeight="600" color={colors.grey[100]} mb="20px">
-            Sorry, we couldn't find the portfolio you're looking for!
-          </Typography>
+          Sorry, we couldn't find the portfolio you're looking for!
+        </Typography>
       </Box>
     );
-    }
+  }
 
   return (
     <Box m="20px">

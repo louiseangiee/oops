@@ -1,0 +1,16 @@
+import * as React from 'react';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+function AutoRefreshOnRouteChange() {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Reload the page when the location (route) changes
+    window.location.reload();
+  }, [location.pathname]);
+
+  return null; // This component doesn't need to render anything
+}
+
+export default AutoRefreshOnRouteChange;

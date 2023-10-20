@@ -28,8 +28,8 @@ const RegisterContainer = (props) => {
     const colors = tokens(theme.palette.mode);
 
     async function handleRegister(e) {
-        e.preventdefault();
-        register(fullName, email, password)
+        e.preventDefault();
+        await register(fullName, email, password)
         navigate('/')
     }
 
@@ -118,7 +118,7 @@ const RegisterContainer = (props) => {
                 </Box>
                 <Button
                     sx={{ color: colors.grey[100], width: '100%' }}
-                    onClick={handleRegister}
+                    onClick={(e) => handleRegister(e)}
                     disabled={isDisabled}
                 >
                     Sign Up!

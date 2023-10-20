@@ -11,5 +11,8 @@ import com.oop.appa.entity.Stock;
 public interface StockRepository extends JpaRepository<Stock, String> {
 
     Page<Stock> findAll(Pageable pageable);
+
+    @Override
+    Stock save(Stock stock);
     
 }

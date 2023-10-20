@@ -1,10 +1,14 @@
 package com.oop.appa.controller;
 
 import com.oop.appa.dto.PortfolioCreationDTO;
+import com.oop.appa.dto.PortfolioStockCreationDTO;
 import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.PortfolioStock;
+import com.oop.appa.entity.Stock;
 import com.oop.appa.entity.User;
 import com.oop.appa.service.PortfolioService;
+import com.oop.appa.service.PortfolioStockService;
+import com.oop.appa.service.StockService;
 import com.oop.appa.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +25,16 @@ import java.util.Optional;
 public class PortfolioController {
     private PortfolioService portfolioService;
     private UserService userService;
+    private PortfolioStockService portfolioStockService;
+    private StockService stockService;
 
     @Autowired
-    public PortfolioController(PortfolioService portfolioService, UserService userService) {
+    public PortfolioController(PortfolioService portfolioService, UserService userService,
+            PortfolioStockService portfolioStockService, StockService stockService) {
         this.portfolioService = portfolioService;
         this.userService = userService;
+        this.portfolioStockService = portfolioStockService;
+        this.stockService = stockService;
     }
 
     // GET endpoints
@@ -50,27 +59,19 @@ public class PortfolioController {
     }
 
     // POST endpoint for creating a new portfolio
-    // POST endpoint for creating a new portfolio
     @PostMapping
     public ResponseEntity<?> createPortfolio(@RequestBody PortfolioCreationDTO portfolioDto) {
         try {
-            // Fetch the user based on userId from the DTO's nested UserReference
             Optional<User> userOptional = userService.findByUserId(portfolioDto.getUser().getId());
-
             if (!userOptional.isPresent()) {
                 return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
             }
-
-            // Create a new Portfolio entity and set its fields using the DTO
             Portfolio portfolio = new Portfolio();
             portfolio.setName(portfolioDto.getName());
             portfolio.setDescription(portfolioDto.getDescription());
             portfolio.setTotalCapital(portfolioDto.getTotalCapital());
-            portfolio.setUser(userOptional.get()); // Use .get() to retrieve the User from the Optional
-
-            // Save the new Portfolio entity
+            portfolio.setUser(userOptional.get());
             portfolioService.save(portfolio);
-
             return new ResponseEntity<>(portfolio, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -97,6 +98,37 @@ public class PortfolioController {
     @DeleteMapping
     public void delete(@RequestBody Portfolio portfolio) {
         portfolioService.delete(portfolio);
+    }
+
+    @GetMapping("/stocks")
+    public List<PortfolioStock> findAllPortfolioStocks() {
+        return portfolioStockService.findAll();
+    }
+
+    @GetMapping("/{portfolioId}/stocks/")
+    public List<PortfolioStock> findByPortfolioId(@PathVariable Integer portfolioId) {
+        return portfolioStockService.findByPortfolioId(portfolioId);
+    }
+
+    @PostMapping("/{portfolioId}/stocks")
+    public ResponseEntity<?> addStockToPortfolio(@PathVariable Integer portfolioId,
+            @RequestBody PortfolioStockCreationDTO stockDto) {
+        try {
+            Optional<Portfolio> portfolioOptional = portfolioService.findById(portfolioId);
+            if (!portfolioOptional.isPresent()) {
+                return new ResponseEntity<>("Portfolio not found", HttpStatus.BAD_REQUEST);
+            }
+            PortfolioStock portfolioStock = portfolioStockService.createPortfolioStock(portfolioOptional.get(),
+                    stockDto);
+            return new ResponseEntity<>(portfolioStock, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{portfolioId}/stocks/{portfolioStockId}/calculateReturn")
+    public void calculatePortfolioStockReturn(@PathVariable Integer portfolioStockId) {
+        portfolioStockService.calculatePortfolioStockReturn(portfolioStockId);
     }
 
 }

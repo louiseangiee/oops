@@ -30,11 +30,6 @@ import java.util.Optional;
             return userService.findAll();
         }
 
-//        @GetMapping("/{email}")
-//        public Optional<User> getUserByEmail(@PathVariable String email){
-//            return userService.findUserByEmail(email);
-//        }
-
         @GetMapping("/user")
         public Optional<User> getUser(@RequestParam Optional<String> email, Optional<Integer> userid){
             if(email.isPresent()){
@@ -53,25 +48,25 @@ import java.util.Optional;
         }
 
         @GetMapping("/sendOTP")
-        public void sendEmail(@RequestParam int user_id){
+        public void sendEmail(@RequestParam String email){
             String otp = userService.generateOtp();
-            Optional<User> user = userService.findByUserId(user_id);
-            String userEmail = "vitto.tedja2332@gmail.com";
-            if(user.isPresent()) {
-                userEmail = user.get().getEmail();
-            }
-            userService.updateOTP(user_id, otp);
+//            Optional<User> user = userService.findUserByEmail(email);
+//            String userEmail = "vitto.tedja2332@gmail.com";
+//            if(user.isPresent()) {
+//                userEmail = user.get().getEmail();
+//            }
+            userService.updateOTP(email, otp);
             String body = String.format("This is your otp: %s", otp);
             userService.sendSimpleMessage(
-                    userEmail,
+                    email,
                     "This is your OTP for OOP",
                     body
             );
         }
 
         @GetMapping("/verifyOTP")
-        public boolean verifyOTP(@RequestParam int user_id, String otp){
-            Optional<User> user = userService.findByUserId(user_id);
+        public boolean verifyOTP(@RequestParam String email, String otp){
+            Optional<User> user = userService.findUserByEmail(email);
             if(user.isPresent()){
                 User confirmedUser = user.get();
                  return otp.equals(confirmedUser.getOtp());

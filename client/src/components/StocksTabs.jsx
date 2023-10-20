@@ -154,6 +154,7 @@ export default function StocksTabs() {
                                             width="50px"
                                             height="50px"
                                             sx={{ borderRadius: "50%" }}
+                                            alt='apple'
                                         />
 
                                         <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">

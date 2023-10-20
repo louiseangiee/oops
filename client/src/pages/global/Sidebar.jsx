@@ -5,10 +5,9 @@ import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
+import EqualizerIcon from '@mui/icons-material/Equalizer';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
+import RestoreIcon from '@mui/icons-material/Restore';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -89,47 +88,43 @@ const Sidebar = () => {
             )}
           </MenuItem>
 
-          <Box 
-            paddingLeft={isCollapsed ? undefined : "15%"} 
-            display="flex" 
-            flexDirection="column"
-            justifyContent="space-between"
-            height="85vh"
-          >
-            {/* Top Elements */}
-            <div>
-              <Item
-                title="Home"
-                to="/"
-                icon={<HomeOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              <Item
-                title="Analytics"
-                to="/analytics"
-                icon={<TimelineOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              <Item
-                title="Access Log"
-                to="/accesslog"
-                icon={<WorkHistoryOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-            </div>
-            {/* Bottom Elements */}
-            <div>
-              <Item
-                title="FAQ Page"
-                to="/faq"
-                icon={<HelpOutlineOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-            </div>
+          <Box paddingLeft={isCollapsed ? undefined : "15%"}>
+            <Item
+              title="Home"
+              to="/"
+              icon={<HomeOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+
+            {/* <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px" }}
+            >
+              Data
+            </Typography> */}
+            <Item
+              title="Analytics"
+              to="/analytics"
+              icon={<EqualizerIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Access Logs"
+              to="/"
+              icon={<RestoreIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            {/* <Item
+              title="FAQ Page"
+              to="/faq"
+              icon={<HelpOutlineOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />  */}
           </Box>
         </Menu>
       </ProSidebar>

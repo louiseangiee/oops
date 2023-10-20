@@ -7,23 +7,42 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { Box, useTheme } from "@mui/material";
+import { Box, useTheme, InputAdornment, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../theme";
 import { useNavigate } from 'react-router-dom';
-import { useState } from "react";
-import { putAsync } from '../utils/utils';
+import { useState, useEffect } from "react";
+import { getAsync, putAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
+
 
 export default function EditPortfolio({ portfolioId, small }) {
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-
-    // Initialize state variables for form fields
-    const [portfolioName, setPortfolioName] = useState('');
-    const [portfolioDescription, setPortfolioDescription] = useState('');
-    const [portfolioCapital, setPortfolioCapital] = useState('');
     const [cookie, removeCookie] = useCookies(["accessToken"]);
+    const [portfolioData, setPortfolioData] = useState(null);
+    const [updatedName, setUpdatedName] = useState('');
+    const [updatedDescription, setUpdatedDescription] = useState('');
+    const [updatedCapital, setUpdatedCapital] = useState('');
+
+
+
+
+    useEffect(() => {
+        // Replace this with your actual data fetching logic
+        // Example: fetch portfolio data using portfolioId
+        // Fetch the portfolio data based on portfolioId
+        async function fetchData() {
+            const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
+            const data = await response.json();
+            setPortfolioData(data);
+            console.log(data);
+        }
+        fetchData();
+    }, [portfolioId, portfolioData, updatedCapital, updatedName, updatedDescription, cookie.accessToken]);
+
+    const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
+    const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
 
     const [open, setOpen] = React.useState(false);
 
@@ -35,26 +54,108 @@ export default function EditPortfolio({ portfolioId, small }) {
         setOpen(false);
     };
 
+    // error alert handler
+    const handleOpenErrorAlert = () => {
+        setIsErrorAlertOpen(true);
+        setIsSuccessAlertOpen(false);
+    };
+    const handleCloseErrorAlert = () => {
+        setIsErrorAlertOpen(false);
+    };
+
+    // success alert handler
+    const handleOpenSuccessAlert = () => {
+        setIsSuccessAlertOpen(true);
+        setIsErrorAlertOpen(false);
+        
+    };
+    const handleCloseSuccessAlert = () => {
+        setIsSuccessAlertOpen(false);
+    };
+
+
+
     const handleChanges = () => {
         // Gather the form data (e.g., portfolio name, description, capital)
         const formData = {
-            'user': { 'id': 1 }, // This is the user ID that we need to pass to the backend
-            'portfolioId': portfolioId, // This is the portfolio ID that we need to pass to the backend
-            "name": portfolioName,
-            "description": portfolioDescription,
-            "totalCapital": parseFloat(portfolioCapital), // Convert to a number
+            name: portfolioData.name,
+            description: portfolioData.description,
+            totalCapital: portfolioData.totalCapital
         };
-        console.log(formData);
-        // async function editPortfolio() {
-        //     const response = await putAsync('portfolios', formData, cookie.accessToken);
-        //     const data = await response.json();
-        //     console.log(data);
-        // }
 
+        // Check if the name field has been updated and add it to the formData
+        if (updatedName !== portfolioData.name && updatedName !== '') {
+            formData.name = updatedName;
+        }
+
+        // Check if the description field has been updated and add it to the formData
+        if (updatedDescription !== portfolioData.description && updatedDescription !== '') {
+            formData.description = updatedDescription;
+        }
+
+        // Check if the capital field has been updated and add it to the formData
+        if (updatedCapital !== portfolioData.totalCapital && updatedCapital !== '') {
+            formData.totalCapital = parseFloat(updatedCapital);
+        }
+
+        console.log(formData);
+
+        async function editPortfolio() {
+            const response = await putAsync('portfolios/' + portfolioId, formData, cookie.accessToken);
+            if (response.ok) {
+                handleOpenSuccessAlert();
+                setOpen(false);
+                setPortfolioData({ ...portfolioData, name: updatedName });
+                return;
+                // setTimeout(() => {
+                //     navigate("/portfolio/" + portfolioId);
+                // }, 1000);
+                // window.location.reload();
+                // fetchData();
+            } else {
+                handleOpenErrorAlert();
+            }
+        }
+        editPortfolio();
     };
 
     return (
         <div>
+            {/* Snackbar for error message */}
+            <Snackbar
+                open={isErrorAlertOpen}
+                autoHideDuration={5000} // Adjust the duration as needed
+                onClose={handleCloseErrorAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="error"
+                    onClose={handleCloseErrorAlert}
+                    sx={{ backgroundColor: colors.redAccent[600] }}
+                >
+                    Portfolio update failed!
+                </Alert>
+            </Snackbar>
+
+            {/* Snackbar for success message */}
+            <Snackbar
+                open={isSuccessAlertOpen}
+                autoHideDuration={5000} // Adjust the duration as needed
+                onClose={handleCloseSuccessAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="success"
+                    onClose={handleCloseSuccessAlert}
+                    sx={{ backgroundColor: colors.greenAccent[600] }}
+                >
+                    Portfolio updated successfully!
+                </Alert>
+            </Snackbar>
             <EditOutlinedIcon onClick={handleClickOpen} sx={{ color: colors.greenAccent[600], fontSize: (small ? "20px" : "35px") }} />
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle
@@ -73,17 +174,15 @@ export default function EditPortfolio({ portfolioId, small }) {
                         To create a new portfolio, please enter the portfolio name, description/strategy, and the capital.
                     </DialogContentText> */}
                     <TextField
-                        autoFocus
                         margin="dense"
                         id="name"
                         label="Portfolio Name"
-                        placeholder="e.g. Technology Stocks"
                         type="text"
                         fullWidth
                         variant="standard"
                         sx={{ color: colors.grey[100] }}
-                        value={portfolioName}
-                        onChange={(e) => setPortfolioName(e.target.value)}
+                        defaultValue={portfolioData?.name}
+                        onChange={(e) => setUpdatedName(e.target.value)}
                         InputProps={{
                             classes: {
                                 notchedOutline: 'portfolio-name-outline',
@@ -92,31 +191,29 @@ export default function EditPortfolio({ portfolioId, small }) {
                     />
 
                     <TextField
-                        autoFocus
                         margin="dense"
                         id="desc"
                         label="Portfolio Description (Strategy)"
-                        placeholder="e.g. All the technological stocks"
                         type="text"
                         fullWidth
                         variant="standard"
                         sx={{ color: colors.grey[100] }}
-                        value={portfolioDescription}
-                        onChange={(e) => setPortfolioDescription(e.target.value)}
+                        defaultValue={portfolioData?.description}
+                        onChange={(e) => setUpdatedDescription(e.target.value)}
                     />
                     <TextField
-                        autoFocus
                         margin="dense"
                         id="capital"
                         label="Portfolio Capital"
-                        placeholder="e.g. 1000"
-                        startAdornment="$"
                         type="number"
                         fullWidth
                         variant="standard"
                         sx={{ color: colors.grey[100] }}
-                        value={portfolioCapital}
-                        onChange={(e) => setPortfolioCapital(e.target.value)}
+                        defaultValue={portfolioData?.totalCapital}
+                        onChange={(e) => setUpdatedCapital(e.target.value)}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }}
                     />
                     <style jsx>{`
                         .portfolio-name-outline {

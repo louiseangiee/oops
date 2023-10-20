@@ -112,12 +112,36 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Access Logs"
-              to="/"
+              title="Access Log"
+              to="/access_log"
               icon={<RestoreIcon />}
               selected={selected}
               setSelected={setSelected}
             />
+            {/* <Typography variant="h6" color={colors.grey[300]} sx={{ m: "15px 0 5px 20px" }}>
+              Template (For Reference)
+            </Typography>
+            <Item
+              title="Contacts"
+              to="/contacts"
+              icon={<RestoreIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Invoices"
+              to="/invoices"
+              icon={<RestoreIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Team"
+              to="/team"
+              icon={<RestoreIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            /> */}
             {/* <Item
               title="FAQ Page"
               to="/faq"

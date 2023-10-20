@@ -148,6 +148,7 @@ const Sidebar = () => {
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+<<<<<<< HEAD
             />  */}
             />
             <Item 
@@ -192,6 +193,11 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             /> */}
+=======
+
+            />  */}
+
+>>>>>>> 2a36fc1a028222d801d190e43e85ff5f2f69a7ea
           </Box>
         </Menu>
       </ProSidebar>

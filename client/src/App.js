@@ -27,6 +27,8 @@ function App() {
   // access to the theme and the color mode
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
+
+
   return (
     <CookiesProvider>
       <ColorModeContext.Provider value={colorMode}>

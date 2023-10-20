@@ -50,11 +50,12 @@ public class User implements UserDetails {
     @Column(name = "otp")
     private String otp;
 
-    public User(Integer id, String email, String fullName, String password) {
+    public User(Integer id, String email, String fullName, String password, String otp) {
         this.id = id;
         this.email = email;
         this.fullName = fullName;
         this.password = password;
+        this.otp = otp;
     }
 
     public void setId(Integer id) {
@@ -108,10 +109,11 @@ public class User implements UserDetails {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", email='" + email +
-                ", fullName='" + fullName +
-                ", password='" + password +
+                "id= " + id +
+                ", email= " + email +
+                ", fullName= " + fullName +
+                ", password= " + password +
+                ", otp= " + otp +
                 '}';
     }
 

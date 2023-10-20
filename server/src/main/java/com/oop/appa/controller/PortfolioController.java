@@ -44,6 +44,11 @@ public class PortfolioController {
         return portfolioService.findByUserId(user_id);
     }
 
+    @GetMapping("/{id}")
+    public Optional<Portfolio> findById(@PathVariable Integer id) {
+        return portfolioService.findById(id);
+    }
+
     // POST endpoint for creating a new portfolio
     // POST endpoint for creating a new portfolio
     @PostMapping
@@ -73,9 +78,9 @@ public class PortfolioController {
     }
 
     // PUT endpoint for updating an existing portfolio
-    @PutMapping
-    public void updatePortfolio(@RequestBody Portfolio portfolio) {
-        portfolioService.save(portfolio);
+    @PutMapping("/{portfolioId}")
+    public void updatePortfolio(@PathVariable Integer portfolioId, @RequestBody Portfolio portfolio) {
+        portfolioService.updatePortfolio(portfolioId, portfolio);
     }
 
     @PutMapping("/{portfolioId}/stocks")

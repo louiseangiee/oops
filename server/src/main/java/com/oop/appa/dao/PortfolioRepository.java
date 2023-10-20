@@ -1,6 +1,7 @@
 package com.oop.appa.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -14,5 +15,7 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Integer> {
     Page<Portfolio> findAll(Pageable pageable);
 
     List<Portfolio> findByUserId(Integer user_id);
+
+    Optional<Portfolio> findById(Integer id);
     
 }

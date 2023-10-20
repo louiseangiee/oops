@@ -3,7 +3,7 @@ import Topbar from '../global/Topbar';
 import { Box, Typography, useTheme, TextField, Button, Tooltip, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../../theme";
 import { getAsync, putAsync } from "../../utils/utils";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import { useEffect } from 'react';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
@@ -16,21 +16,21 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
+
 export default function Profile() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
     const [email, setEmail] = useState("Fetching email...");
     const [fullName, setFullName] = useState("Fetching name...");
-    const [isFullNameEmpty, setIsFullNameEmpty] = useState(false);
+    // const [isFullNameEmpty, setIsFullNameEmpty] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
-    const [cookie, setCookie, removeCookie] = useCookies(["accessToken"]);
+    const [cookie, removeCookie] = useCookies();
     const [dataFetched, setDataFetched] = useState({});
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
     const [otp, setOtp] = useState("");
-    const [otpCorrect, setOtpCorrect] = useState(false);
     const [emailState, setEmailState] = useState("");
     const [open, setOpen] = useState(false);
 
@@ -41,6 +41,7 @@ export default function Profile() {
         setEmail(userData.email);
         setFullName(userData.fullName);
         setDataFetched(userData);
+        console.log()
     }, [userData]);
 
 
@@ -149,18 +150,17 @@ export default function Profile() {
     };
 
     const generateOTP = async () => {
-        const response = await getAsync('users/sendOTP?user_id=' + userData.id, cookie.accessToken);
+        const response = await getAsync('users/sendOTP?email=' + userData.email);
         if (response.ok) {
             setEmailState("Email has been sent");
         }
     }
 
     const verifyOTP = async () => {
-        const response = await getAsync('users/verifyOTP?user_id=' + userData.id + '&otp=' + otp, cookie.accessToken);
+        const response = await getAsync('users/verifyOTP?email=' + userData.email + '&otp=' + otp);
         if (response.ok) {
             const data = await response.json();
-            data ? setOtpCorrect(true) : alert('wrong code');
-            handleSaveName();
+            data ? handleSaveName() : alert('wrong code');
             handleClose();
         }
         else {
@@ -296,7 +296,7 @@ export default function Profile() {
                         </Box>
 
                         {/* Email --> needs confirmation to change email */}
-                        {/* <Box m="20px" display="flex" alignItems="center">
+                        <Box m="20px" display="flex" alignItems="center">
                             <Typography
                                 variant="h5"
                                 mr="10px"
@@ -307,27 +307,29 @@ export default function Profile() {
                                 }}>
                                 Email
                             </Typography>
-                            {isEditingEmail ? (
+                            <TextField
+                                id="email"
+                                style={{
+                                    flex: 1,
+                                    marginRight: '10px',
+                                    // borderColor: isEditingEmail ? colors.primary[400] : colors.grey[100],
+                                }}
+                                value={email}
+                                InputProps={{
+                                    readOnly: !isEditingEmail, // Make it read-only when not editing
+                                    classes: {
+                                        notchedOutline: 'editing-email-outline',
+                                    },
+                                }}
+                                onChange={(e) => setEmail(e.target.value)}
+                                size="small"
+                                fullWidth
+                                focused
+                            />
+                            {/* We only want to let user to be able to edit their emails*/}
+                            {/* {isEditingEmail ? (
                                 <>
-                                    <TextField
-                                        id="email"
-                                        style={{
-                                            flex: 1,
-                                            marginRight: '10px',
-                                            // borderColor: isEditingEmail ? colors.primary[400] : colors.grey[100],
-                                        }}
-                                        value={email}
-                                        InputProps={{
-                                            readOnly: !isEditingEmail, // Make it read-only when not editing
-                                            classes: {
-                                                notchedOutline: 'editing-email-outline',
-                                            },
-                                        }}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        size="small"
-                                        fullWidth
-                                        focused
-                                    />
+
                                     <SaveOutlinedIcon onClick={handleSaveEmail} />
                                     <style jsx>{`
                                         .editing-email-outline {
@@ -362,8 +364,38 @@ export default function Profile() {
                                         }
                                     `}</style>
                                 </>
-                            )}
-                        </Box> */}
+                            )} */}
+                        </Box>
+                        <Box m="20px" display="flex" alignItems="center">
+
+                            <Typography
+                                variant="h5"
+                                mr="10px"
+                                style={{
+                                    width: '100px', // Set a fixed width for the label
+                                    whiteSpace: 'nowrap', // Prevent label from wrapping
+                                    flexShrink: 0, // Prevent label from shrinking
+                                }}>
+                                Portfolio Count
+                            </Typography>
+                            <TextField
+                                id="email"
+                                style={{
+                                    flex: 1,
+                                    marginRight: '10px',
+                                }}
+                                value={dataFetched?.portfolios?.length}
+                                InputProps={{
+                                    readOnly: true,
+                                    classes: {
+                                        notchedOutline: 'editing-email-outline',
+                                    },
+                                }}
+                                size="small"
+                                fullWidth
+                                focused
+                            />
+                        </Box>
 
                         {/* Logout Button */}
                         <Box m="20px" mt="80px" display="flex" alignItems="center" justifyContent="center">
@@ -379,11 +411,13 @@ export default function Profile() {
                                     backgroundColor: colors.redAccent[700],
                                 },
                                 width: "30%"
-                            }} onClick={() => { removeCookie("accessToken"); removeCookie("email"); navigate('/login') }}>
+                            }} onClick={() => { removeCookie("accessToken", ''); removeCookie("email", ''); navigate('/login') }}>
                                 Log Out
                             </Button>
                         </Box>
                     </Box>
+
+                    {/* OTP modal */}
                     <Dialog open={open} onClose={handleClose}>
                         <DialogTitle
                             sx={{
@@ -426,7 +460,7 @@ export default function Profile() {
                         </DialogActions>
                     </Dialog>
                 </div>
-            </main>
+            </main >
         </>
     );
 }

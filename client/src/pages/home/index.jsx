@@ -8,21 +8,27 @@ import { useState, useEffect } from "react";
 import { getAsync, putAsync } from "../../utils/utils";
 import Lottie from 'lottie-react';
 import loading from './fetching_data.json';
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
-  const [cookie, removeCookie] = useCookies(["accessToken"]);
+  const [cookie] = useCookies(["accessToken"]);
   const [dataFetched, setDataFetched] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
-      const response = await getAsync('portfolios/user/1', cookie.accessToken);
-      const data = await response.json();
-      setDataFetched(data);
-      console.log(data);
+      if (cookie.accessToken.length === 0) {
+        console.log(cookie.accessToken === undefined)
+        navigate('/login')
+      }
+      else {
+        const response = await getAsync('portfolios/user/14', cookie.accessToken);
+        const data = await response.json();
+        setDataFetched(data);
+      }
     }
-
     fetchData();
   }, [cookie.accessToken]);
 

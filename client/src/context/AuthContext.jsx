@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
 	const [userEmail, setUserEmail] = useState("Log Out");
 	const [userData, setUserData] = useState({});
 	const [cookie, setCookie] = useCookies(["accessToken"]);
-	const [emailCookie, setEmailCookie, removeCookie] = useCookies(["email"]);
+	const [emailCookie, setEmailCookie] = useCookies(["email"]);
 
 	const signIn = async (email, password) => {
 		const response = await fetch(
@@ -26,7 +26,8 @@ export const AuthProvider = ({ children }) => {
 		const data = await response.json();
 		setUserEmail("another email");
 		setCookie("accessToken", data.token, { path: "/", maxAge: 86400 });
-		setEmailCookie("email", email, { path: "/" });
+		setEmailCookie("email", email, { path: "/", maxAge: 86400 });
+		return data;
 	}
 
 
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }) => {
 			}
 		}
 		initializeUser();
-	}, []);
+	}, [cookie.accessToken]);
 
 	const values = {
 		signIn,

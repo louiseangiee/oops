@@ -70,9 +70,9 @@ const Topbar = ({ visible }) => {
                 <IconButton>
                     <NotificationsOutlinedIcon />
                 </IconButton>
-                <IconButton>
+                {/* <IconButton>
                     <SettingsOutlinedIcon />
-                </IconButton>
+                </IconButton> */}
                 <Link to="/profile">
                     <IconButton>
                         <PersonOutlinedIcon />

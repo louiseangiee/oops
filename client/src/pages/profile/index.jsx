@@ -10,6 +10,11 @@ import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 export default function Profile() {
     const theme = useTheme();
@@ -26,7 +31,8 @@ export default function Profile() {
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
     const [otp, setOtp] = useState("");
     const [otpCorrect, setOtpCorrect] = useState(false);
-    const [emailState, setEmailState] = useState("email not sent");
+    const [emailState, setEmailState] = useState("");
+    const [open, setOpen] = useState(false);
 
 
     const { userData } = useAuth();
@@ -38,24 +44,21 @@ export default function Profile() {
     }, [userData]);
 
 
-    // useEffect(() => {
-    //     async function fetchData() {
-    //         const response = await getAsync('api/users/1', cookie.accessToken);
-    //         const data = await response.json();
-    //         setFullName(data['fullName']);
-    //         setEmail(data['email']);
-    //         setDataFetched(data);
-    //     }
-
-    //     fetchData();
-    // }, [email, cookie.accessToken]);
-
     const handleCloseErrorAlert = () => {
         setIsErrorAlertOpen(false);
     };
 
     const handleCloseSuccessAlert = () => {
         setIsSuccessAlertOpen(false);
+    };
+
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
     };
 
 
@@ -148,7 +151,7 @@ export default function Profile() {
     const generateOTP = async () => {
         const response = await getAsync('users/sendOTP?user_id=' + userData.id, cookie.accessToken);
         if (response.ok) {
-            setEmailState("email sent");
+            setEmailState("Email has been sent");
         }
     }
 
@@ -157,6 +160,8 @@ export default function Profile() {
         if (response.ok) {
             const data = await response.json();
             data ? setOtpCorrect(true) : alert('wrong code');
+            handleSaveName();
+            handleClose();
         }
         else {
             alert('error verifying')
@@ -248,7 +253,7 @@ export default function Profile() {
                                         <HighlightOffOutlinedIcon onClick={handleCancelName} sx={{ marginRight: "10px", color: colors.redAccent[600] }} />
                                     </Tooltip>
                                     <Tooltip title="Save Changes">
-                                        <SaveOutlinedIcon onClick={handleSaveName} sx={{ color: colors.greenAccent[600] }} />
+                                        <SaveOutlinedIcon onClick={handleClickOpen} sx={{ color: colors.greenAccent[600] }} />
                                     </Tooltip>
                                     <style jsx>{`
                                         .editing-name-outline {
@@ -379,19 +384,48 @@ export default function Profile() {
                             </Button>
                         </Box>
                     </Box>
-
+                    <Dialog open={open} onClose={handleClose}>
+                        <DialogTitle
+                            sx={{
+                                color: colors.greenAccent[600],
+                                backgroundColor: colors.primary[400],
+                                fontSize: "22px",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Confirm your Decision
+                        </DialogTitle>
+                        <DialogContent
+                            sx={{ backgroundColor: colors.primary[400] }}>
+                            <DialogContentText>
+                                To edit your profile, please verify that it's you through email!
+                            </DialogContentText>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="otp"
+                                label=""
+                                placeholder="Fill in OTP here"
+                                startAdornment="$"
+                                type="text"
+                                fullWidth
+                                variant="standard"
+                                sx={{ color: colors.grey[100] }}
+                                onChange={(e) => setOtp(e.target.value)}
+                            />
+                            <Typography sx={[{
+                                '&:hover': {
+                                    textDecoration: 'underline',
+                                },
+                            }, { marginTop: "10px", cursor: 'pointer' }]} onClick={generateOTP}>Generate OTP</Typography>
+                            <Typography>{emailState}</Typography>
+                        </DialogContent>
+                        <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
+                            <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
+                            <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} onClick={verifyOTP}>Verify OTP</Button>
+                        </DialogActions>
+                    </Dialog>
                 </div>
-                {/* testing OTP */}
-                <Box width="60%" m="100px">
-                    <button onClick={generateOTP}>Generate OTP</button>
-                    <input type='text' placeholder='otp here' onChange={(e) => setOtp(e.target.value)} />
-                    <button onClick={verifyOTP}>Verify OTP</button>
-                </Box>
-                <Box width="60%" m="100px">
-                    {emailState}
-                    {otpCorrect ? <p>OTP is correct</p> : <p>OTP is wrong</p>}
-                </Box>
-
             </main>
         </>
     );

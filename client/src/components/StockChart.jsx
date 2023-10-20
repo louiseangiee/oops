@@ -7,7 +7,9 @@ import { colors } from '@mui/material';
 import { getAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
 
-const API_BASE_URL = 'http://localhost:8080';
+
+
+
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -23,38 +25,42 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const StockChart = ({ chosenStock }) => {
+  
   const [chartData, setChartData] = useState([]);
   const [timeSpan, setTimeSpan] = useState("1Y");
+  const [cookie, removeCookie] = useCookies(["accessToken"])
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [cookies] = useCookies(['accessToken']); // Get the accessToken from cookies
+
+
+  
 
   useEffect(() => {
     fetchData();
   }, [chosenStock, timeSpan]);
 
   const fetchData = async () => {
-    let endpoint = '/stocks/OneYearData';  // Default to 1 year data
+    let endpoint = 'stocks/OneYearData';  // Default to 1 year data
 
     switch (timeSpan) {
       case "1Y":
-        endpoint = '/stocks/OneYearData';
+        endpoint = 'stocks/OneYearData';
         break;
       case "1Q":
-        endpoint = '/stocks/OneQuarterData';
+        endpoint = 'stocks/OneQuarterData';
         break;
       case "1M":
-        endpoint = '/stocks/OneMonthData';
+        endpoint = 'stocks/OneMonthData';
         break;
       case "1W":
-        endpoint = '/stocks/OneWeekData';
+        endpoint = 'stocks/OneWeekData';
         break;
       default:
-        endpoint = '/stocks';
+        endpoint = 'stocks';
     }
 
     try {
-      const response = await getAsync(`${API_BASE_URL}${endpoint}?symbol=${chosenStock.code}`, cookies.accessToken); // Use the accessToken from cookies
+      const response = await getAsync(`${endpoint}?symbol=${chosenStock.code}`, cookie.accessToken); // Use the accessToken from cookies
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -95,7 +101,7 @@ const StockChart = ({ chosenStock }) => {
     <div>
       <ButtonGroup
         variant="outlined"
-        style={{ borderColor: "white" }}
+        style={{ borderColor: "white", alignContent: "center" }}
         width="100%"
       >
         <Button

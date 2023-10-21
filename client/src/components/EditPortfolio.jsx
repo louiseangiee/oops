@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { getAsync, putAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
+import loadingLight from "./lotties/loading_light.json"
+import Lottie from 'lottie-react';
 
 
 export default function EditPortfolio({ portfolioId, small }) {
@@ -30,7 +32,7 @@ export default function EditPortfolio({ portfolioId, small }) {
     const [isNameEdited, setIsNameEdited] = useState(false);
     const [isDescriptionEdited, setIsDescriptionEdited] = useState(false);
     const [isCapitalEdited, setIsCapitalEdited] = useState(false);
-
+    const [loading, setLoading] = useState(false); // Add a loading state
 
 
     useEffect(() => {
@@ -45,7 +47,7 @@ export default function EditPortfolio({ portfolioId, small }) {
         }
         fetchData();
 
-        if (!/^\d*\.?\d*$/.test(updatedCapital) || updatedCapital === '') {
+        if (!/^\d*\.?\d*$/.test(updatedCapital) || updatedCapital === '' || parseFloat(updatedCapital) <=0) {
             setCapitalError(true);
             setIsButtonDisabled(true);
             return; // Prevent form submission
@@ -110,6 +112,7 @@ export default function EditPortfolio({ portfolioId, small }) {
 
     const handleChanges = () => {
         // Gather the form data (e.g., portfolio name, description, capital)
+        setLoading(true);
         const formData = {
             name: portfolioData.name,
             description: portfolioData.description,
@@ -132,13 +135,20 @@ export default function EditPortfolio({ portfolioId, small }) {
         }
 
         console.log(formData);
+        setLoading(true);
 
         async function editPortfolio() {
             const response = await putAsync('portfolios/' + portfolioId, formData, cookie.accessToken);
             if (response.ok) {
+                setLoading(false);
                 handleOpenSuccessAlert();
                 setOpen(false);
-                setPortfolioData({ ...portfolioData, name: updatedName });
+                setUpdatedCapital('');
+                setUpdatedDescription('');
+                setUpdatedName('');
+                setIsNameEdited(false);
+                setIsDescriptionEdited(false);
+                setIsCapitalEdited(false);
                 return;
                 // setTimeout(() => {
                 //     navigate("/portfolio/" + portfolioId);
@@ -146,6 +156,7 @@ export default function EditPortfolio({ portfolioId, small }) {
                 // window.location.reload();
                 // fetchData();
             } else {
+                setLoading(false);
                 handleOpenErrorAlert();
             }
         }
@@ -259,7 +270,7 @@ export default function EditPortfolio({ portfolioId, small }) {
                     `}</style>
                 </DialogContent>
                 <DialogActions
-                    sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}
+                    sx={{ backgroundColor: colors.primary[400], paddingBottom: "30px", paddingRight: "20px" }}
                 >
                     <Button
                         onClick={handleClose}
@@ -269,11 +280,20 @@ export default function EditPortfolio({ portfolioId, small }) {
                     </Button>
                     <Button
                         type="submit"
-                        sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }}
+                        sx={{ backgroundColor: loading ? colors.greenAccent[600] : colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold", width: "150px", height: "40px", "&:hover": { backgroundColor: colors.greenAccent[600]}}}
                         onClick={handleChanges}
                         disabled={ !isNameEdited && !isDescriptionEdited && (capitalError || !isCapitalEdited) }
                     >
-                        Confirm Changes
+                        {loading ?  
+                            <Lottie
+                                animationData={loadingLight}
+                                loop={true} // Set to true for looping
+                                autoplay={true} // Set to true to play the animation automatically
+                                style={{ width: '80px', height: '80px' }} // Customize the dimensions
+                            /> 
+                            : 
+                            "Confirm Changes"
+                        }
                     </Button>
                 </DialogActions>
             </Dialog>

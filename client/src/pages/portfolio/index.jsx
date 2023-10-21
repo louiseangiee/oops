@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import noDataAnimation from './no_data.json';
 import Loading from './fetching_data.json';
+import loadingLight from "./loading_light.json";
 
 
 function DeletePortfolio() {
@@ -33,6 +34,7 @@ function DeletePortfolio() {
   const { portfolioId } = useParams();
   const [portfolioData, setPortfolioData] = useState({}); // [portfolioData, setPortfolioData
   const [cookie, removeCookie] = useCookies(["accessToken"]);
+  const [loading, setLoading] = useState(false); // Add a loading state
 
   // Fetch the portfolio data based on portfolioId
   useEffect(() => {
@@ -80,16 +82,17 @@ function DeletePortfolio() {
       setOpen(false);
       return;
     }
+    setLoading(true);
     const response = await deleteAsync('portfolios/' + portfolioData['portfolioId'], cookie.accessToken);
     if (response.ok) {
       // Handle the case when the response is not OK, for example, show an error message.
+      setLoading(false);
       console.log("Deleted portfolio with ID " + portfolioData['portfolioId']);
-      handleOpenSuccessAlert();
       setOpen(false);
       navigate("/");
-      // Reload the page to refresh it
-      window.location.reload();
+      handleOpenSuccessAlert();
     } else {
+      setLoading(false);
       handleOpenErrorAlert();
       setOpen(false);
       return;
@@ -158,9 +161,38 @@ function DeletePortfolio() {
             sx={{ color: colors.grey[100] }}
           />
         </DialogContent>
-        <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
-          <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-          <Button onClick={handleDelete} sx={{ backgroundColor: colors.redAccent[600], color: colors.grey[100], fontWeight: "bold" }}>Delete</Button>
+        <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "30px", paddingRight: "20px" }}>
+          <Button
+            onClick={handleClose}
+            sx={{
+              color: colors.grey[300],
+              fontWeight: "bold"
+            }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDelete}
+            sx={{
+              backgroundColor: loading ? colors.redAccent[700] :colors.redAccent[600],
+              color: colors.grey[100],
+              fontWeight: "bold",
+              height: "40px",
+              width: "80px",
+              ":hover": {
+                backgroundColor: colors.redAccent[700]
+              }
+            }}>
+            {loading ?
+              <Lottie
+                animationData={loadingLight}
+                loop={true} // Set to true for looping
+                autoplay={true} // Set to true to play the animation automatically
+                style={{ width: '80px', height: '80px' }} // Customize the dimensions
+              />
+              :
+              "Delete"
+            }
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

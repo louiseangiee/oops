@@ -22,7 +22,7 @@ const Home = () => {
 
   const { userData } = useAuth();
   const [searchQuery, setSearchQuery] = useState(""); // State variable to store the search query
-  const [filteredData, setFilteredData] = useState(null); // State variable for filtered results
+  const [filteredData, setFilteredData] = useState([]); // State variable for filtered results
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,13 +35,13 @@ const Home = () => {
     fetchData();
 
     // Filter data based on the search query
-    const filteredResults = dataFetched.filter((portfolio) =>
+    const filteredResults = dataFetched?.filter((portfolio) =>
       portfolio.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       portfolio.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredData(filteredResults);
 
-  }, [searchQuery, userData]);
+  }, [searchQuery, userData, dataFetched]);
 
   return (
     <Box m="20px">

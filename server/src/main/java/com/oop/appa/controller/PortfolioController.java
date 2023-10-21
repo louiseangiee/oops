@@ -80,23 +80,21 @@ public class PortfolioController {
     // PUT endpoint for updating an existing portfolio
     @PutMapping("/{portfolioId}")
     public void updatePortfolio(@PathVariable Integer portfolioId, @RequestBody Portfolio portfolio) {
+        // logging here
         portfolioService.updatePortfolio(portfolioId, portfolio);
     }
 
     @PutMapping("/{portfolioId}/stocks")
     public void addStockPortfolio(@PathVariable Integer portfolioId, @RequestBody PortfolioStock stock) {
+        // logging here
         portfolioService.addStockToPortfolio(portfolioId, stock);
     }
 
     // DELETE endpoints
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Integer id) {
+        // logging here
         portfolioService.deleteById(id);
-    }
-
-    @DeleteMapping
-    public void delete(@RequestBody Portfolio portfolio) {
-        portfolioService.delete(portfolio);
     }
 
 }

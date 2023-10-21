@@ -9,10 +9,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.oop.appa.dao.AccessLogRepository;
 import com.oop.appa.dao.PortfolioRepository;
 import com.oop.appa.dao.PortfolioStockRepository;
 import com.oop.appa.dao.StockRepository;
 import com.oop.appa.dao.UserRepository;
+import com.oop.appa.entity.AccessLog;
 import com.oop.appa.entity.PerformanceMetrics;
 import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.PortfolioStock;
@@ -28,14 +30,17 @@ public class PortfolioService {
     private UserRepository userRepository;
     private PortfolioStockRepository portfolioStockRepository;
     private StockRepository stockRepository;
+    private AccessLogRepository accessLogRepository;
 
     @Autowired
     public PortfolioService(PortfolioRepository portfolioRepository, UserRepository userRepository,
-            PortfolioStockRepository portfolioStockRepository, StockRepository stockRepository) {
+            PortfolioStockRepository portfolioStockRepository, StockRepository stockRepository,
+            AccessLogRepository accessLogRepository) {
         this.portfolioRepository = portfolioRepository;
         this.userRepository = userRepository;
         this.portfolioStockRepository = portfolioStockRepository;
         this.stockRepository = stockRepository;
+        this.accessLogRepository = accessLogRepository;
     }
 
     // GET
@@ -77,6 +82,8 @@ public class PortfolioService {
             performance.setPortfolio(portfolio);
         }
         portfolioRepository.save(portfolio);
+        String action = String.format("User creates portfolio ID: %d Name: %s", portfolio.getPortfolioId(), portfolio.getName());
+        accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
     }
 
     @Transactional
@@ -107,6 +114,11 @@ public class PortfolioService {
         stockToAdd.setPortfolio(portfolio);
 
         portfolioStockRepository.save(stockToAdd);
+        String action = String.format("User addes %s stock to portfolio ID: %d Name: %s", 
+                                    stockToAdd.getStock().getStockSymbol(), 
+                                    portfolio.getPortfolioId(), 
+                                    portfolio.getName());
+        accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
     }
 
     public void updatePortfolio(Integer portfolioId, Portfolio portfolio) {
@@ -122,14 +134,19 @@ public class PortfolioService {
         existingPortfolio.setTotalCapital(portfolio.getTotalCapital());
 
         portfolioRepository.save(existingPortfolio);
+
+        String action = String.format("User updates portfolio ID: %d Name: %s", portfolio.getPortfolioId(), portfolio.getName());
+        accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
     }
 
     // DELETE
-    public void delete(Portfolio entity) {
-        portfolioRepository.delete(entity);
-    }
-
     public void deleteById(Integer id) {
+        Portfolio existingPortfolio = portfolioRepository.findById(id).orElse(null);
+        User deletedPortfolioUser = existingPortfolio.getUser();
+        Integer deletedPortfolioId = existingPortfolio.getPortfolioId();
+        String portfolioName = existingPortfolio.getName();
         portfolioRepository.deleteById(id);
+        String action = String.format("User deletes portfolio ID: %d Name: %s",deletedPortfolioId, portfolioName);
+        accessLogRepository.save(new AccessLog(deletedPortfolioUser, action));
     }
 }

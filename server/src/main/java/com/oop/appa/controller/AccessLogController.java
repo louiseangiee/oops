@@ -1,5 +1,6 @@
 package com.oop.appa.controller;
 
+import com.oop.appa.dto.AccessLogDTO;
 import com.oop.appa.entity.AccessLog;
 import com.oop.appa.service.AccessLogService;
 
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/accessLogs")
@@ -23,8 +25,9 @@ public class AccessLogController {
 
     // GET endpoints
     @GetMapping()
-    public List<AccessLog> findAll() {
-        return accessLogService.findAll();
+    public List<AccessLogDTO> findAll() {
+        List<AccessLog> accessLogs = accessLogService.findAll();
+        return accessLogs.stream().map(AccessLogDTO::new).collect(Collectors.toList());
     }
 
     @GetMapping("/paged")

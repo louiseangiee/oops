@@ -41,6 +41,7 @@ public class User implements UserDetails {
     private String password;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, mappedBy="user")
+    @JsonManagedReference
     private List<AccessLog> accessLogs;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)

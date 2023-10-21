@@ -2,6 +2,9 @@ package com.oop.appa.entity;
 
 import java.sql.Timestamp;
 
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -17,23 +20,24 @@ public class AccessLog {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    @JsonIgnore
+    //@JsonIgnore
+    @JsonBackReference
     private User user;
 
     @Column(name="action")
     private String action;
 
     @Column(name="timestamp")
+    @CreationTimestamp
     private Timestamp timestamp;
 
     // constructors
     public AccessLog(){
     }
 
-    public AccessLog(User user, String action, Timestamp timestamp) {
+    public AccessLog(User user, String action) {
         this.user = user;
         this.action = action;
-        this.timestamp = timestamp;
     }
 
     // getters and setters

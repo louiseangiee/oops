@@ -14,6 +14,53 @@ import { useState } from "react";
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+
+function ButtonField(props) {
+    const {
+        setOpen,
+        label,
+        id,
+        disabled,
+        InputProps: { ref } = {},
+        inputProps: { 'aria-label': ariaLabel } = {},
+    } = props;
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+
+    return (
+        <Button
+            variant="outlined"
+            id={id}
+            disabled={disabled}
+            ref={ref}
+            fullWidth
+            aria-label={ariaLabel}
+            onClick={() => setOpen?.((prev) => !prev)}
+            sx={{ color: colors.grey[100], borderColor: colors.grey[500], marginBottom: "10px", marginTop: "10px" }}
+        >
+            {label ? `Buy date: ${label}` : 'Choose Buy Date'}
+        </Button>
+    );
+}
+
+function ButtonDatePicker(props) {
+    const [open, setOpen] = React.useState(false);
+  
+    return (
+      <DatePicker
+        slots={{ field: ButtonField, ...props.slots }}
+        slotProps={{ field: { setOpen } }}
+        {...props}
+        open={open}
+        onClose={() => setOpen(false)}
+        onOpen={() => setOpen(true)}
+      />
+    );
+  }
 
 export default function AddStocks() {
     const navigate = useNavigate();
@@ -23,6 +70,7 @@ export default function AddStocks() {
     // Initialize state variables for form fields
     const [stockQuantity, setStockQuantity] = useState(0);
     const [stockPrice, setStockPrice] = useState(0);
+    const [date, setDate] = useState(null);
 
     const [open, setOpen] = React.useState(false);
 
@@ -32,6 +80,7 @@ export default function AddStocks() {
 
     const handleClose = () => {
         setOpen(false);
+        setDate(null);
     };
 
     const handleAddClick = () => {
@@ -69,14 +118,21 @@ export default function AddStocks() {
                     {/* SEARCH BAR */}
                     <Box
                         display="flex"
-                        backgroundColor={colors.primary[500]}
+                        backgroundColor={theme.palette.mode === "dark" ? colors.primary[500] : colors.grey[900]}
                         borderRadius="3px"
                     >
                         <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-                        <IconButton type="button" sx={{ p: 1 }}>
+                        <IconButton type="button" sx={{ p: 1, color: colors.primary[300] }}>
                             <SearchIcon />
                         </IconButton>
                     </Box>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <ButtonDatePicker
+                            label={date == null ? null : date.format('DD/MM/YYYY')}
+                            value={date}
+                            onChange={(newValue) => setDate(newValue)}
+                        />
+                    </LocalizationProvider>
                     <TextField
                         autoFocus
                         margin="dense"
@@ -86,11 +142,11 @@ export default function AddStocks() {
                         startAdornment="$"
                         type="number"
                         fullWidth
-                        variant="standard"
                         sx={{ color: colors.grey[100] }}
                         value={stockPrice}
                         onChange={(e) => setStockPrice(e.target.value)}
                     />
+
                     <TextField
                         autoFocus
                         margin="dense"
@@ -99,15 +155,14 @@ export default function AddStocks() {
                         placeholder="e.g. 5"
                         type="number"
                         fullWidth
-                        variant="standard"
                         sx={{ color: colors.grey[100] }}
                         value={stockQuantity}
                         onChange={(e) => setStockQuantity(e.target.value)}
                     />
                 </DialogContent>
-                <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px"}}>
+                <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
                     <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold"}} onClick={handleAddClick}>Add</Button>
+                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} onClick={handleAddClick}>Add</Button>
                 </DialogActions>
             </Dialog>
         </div>

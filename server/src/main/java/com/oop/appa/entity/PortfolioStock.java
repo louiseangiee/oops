@@ -3,6 +3,7 @@ package com.oop.appa.entity;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
@@ -33,6 +34,11 @@ public class PortfolioStock {
 
     @Column(name = "buy_date")
     private LocalDate buyDate;
+
+    @JsonProperty("stockSymbol")
+    public String getStockSymbol() {
+        return this.stock.getStockSymbol();
+    }
 
     public PortfolioStock() {
 

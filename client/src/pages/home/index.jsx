@@ -10,22 +10,25 @@ import loading from './fetching_data.json';
 import noData from './no_data.json';
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { getAsync } from "../../utils/utils";
 
 const Home = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
   const [dataFetched, setDataFetched] = useState(null);
+  const [cookie, removeCookie] = useCookies(["accessToken"]);
 
   const { userData } = useAuth();
 
   useEffect(() => {
-    console.log(userData);
-    if (!userData.portfolios) {
-      setDataFetched(null);
-    } else {
-      setDataFetched(userData.portfolios);
+    const fetchData = async () => {
+      const response = await getAsync('portfolios/user/'+userData.id, cookie.accessToken);
+      const data = await response.json();
+      console.log(data);
+      setDataFetched(data);
     }
+    fetchData();
   }, [userData, dataFetched]);
 
   return (

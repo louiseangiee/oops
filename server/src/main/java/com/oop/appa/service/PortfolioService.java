@@ -22,6 +22,7 @@ import com.oop.appa.entity.Stock;
 import com.oop.appa.entity.User;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -148,5 +149,9 @@ public class PortfolioService {
         portfolioRepository.deleteById(id);
         String action = String.format("User deletes portfolio ID: %d Name: %s",deletedPortfolioId, portfolioName);
         accessLogRepository.save(new AccessLog(deletedPortfolioUser, action));
+    }
+
+    public void findByPortfolioId(Integer portfolioId) {
+        portfolioStockRepository.findByPortfolioPortfolioId(portfolioId);
     }
 }

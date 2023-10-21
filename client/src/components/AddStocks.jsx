@@ -17,7 +17,23 @@ import IconButton from '@mui/material/IconButton';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import { FixedSizeList } from 'react-window';
 import dayjs from 'dayjs';
+
+function renderRow(props) {
+    const { index, style } = props;
+
+    return (
+        <ListItem style={style} key={index} component="div" disablePadding>
+            <ListItemButton>
+                <ListItemText primary={`Stock ${index + 1}`} />
+            </ListItemButton>
+        </ListItem>
+    );
+}
 
 function ButtonField(props) {
     const {
@@ -49,18 +65,18 @@ function ButtonField(props) {
 
 function ButtonDatePicker(props) {
     const [open, setOpen] = React.useState(false);
-  
+
     return (
-      <DatePicker
-        slots={{ field: ButtonField, ...props.slots }}
-        slotProps={{ field: { setOpen } }}
-        {...props}
-        open={open}
-        onClose={() => setOpen(false)}
-        onOpen={() => setOpen(true)}
-      />
+        <DatePicker
+            slots={{ field: ButtonField, ...props.slots }}
+            slotProps={{ field: { setOpen } }}
+            {...props}
+            open={open}
+            onClose={() => setOpen(false)}
+            onOpen={() => setOpen(true)}
+        />
     );
-  }
+}
 
 export default function AddStocks() {
     const navigate = useNavigate();
@@ -125,6 +141,20 @@ export default function AddStocks() {
                         <IconButton type="button" sx={{ p: 1, color: colors.primary[300] }}>
                             <SearchIcon />
                         </IconButton>
+                    </Box>
+                    <Box
+                        sx={{ width: '100%', height: 200, marginTop: "10px"}}
+                        backgroundColor={theme.palette.mode === "dark" ? colors.primary[500] : colors.grey[900]}
+                    >
+                        <FixedSizeList
+                            height={200}
+                            width="100%"
+                            itemSize={40}
+                            itemCount={200}
+                            overscanCount={5}
+                        >
+                            {renderRow}
+                        </FixedSizeList>
                     </Box>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <ButtonDatePicker

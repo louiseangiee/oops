@@ -189,7 +189,7 @@ const Portfolio = () => {
       console.log(data);
     }
     fetchData();
-  }, [portfolioId, cookie.accessToken]);
+  }, [portfolioId, portfolioData, cookie.accessToken]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href="/" sx={{ fontSize: "22px" }}>

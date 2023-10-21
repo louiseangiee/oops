@@ -32,13 +32,14 @@ function DeletePortfolio() {
   // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
   const [portfolioData, setPortfolioData] = useState({}); // [portfolioData, setPortfolioData
-  const [cookie, removeCookie] = useCookies(["accessToken"]);
+  const [cookie, removeCookie] = useCookies();
 
   // Fetch the portfolio data based on portfolioId
   useEffect(() => {
     // Replace this with your actual data fetching logic
     // Example: fetch portfolio data using portfolioId
     async function fetchData() {
+      if (portfolioId === undefined) return;
       const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
       const data = await response.json();
       setPortfolioData(data);
@@ -170,7 +171,7 @@ function DeletePortfolio() {
 const Portfolio = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [cookie, removeCookie] = useCookies(["accessToken"]);
+  const [cookie] = useCookies();
 
   // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();

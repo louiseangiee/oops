@@ -19,7 +19,7 @@ export default function EditPortfolio({ portfolioId, small }) {
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [cookie, removeCookie] = useCookies(["accessToken"]);
+    const [cookie] = useCookies();
     const [portfolioData, setPortfolioData] = useState(null);
     const [updatedName, setUpdatedName] = useState('');
     const [updatedDescription, setUpdatedDescription] = useState('');
@@ -33,13 +33,14 @@ export default function EditPortfolio({ portfolioId, small }) {
         // Example: fetch portfolio data using portfolioId
         // Fetch the portfolio data based on portfolioId
         async function fetchData() {
+            if (portfolioId === undefined) return;
             const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
             const data = await response.json();
             setPortfolioData(data);
             console.log(data);
         }
         fetchData();
-    }, [portfolioId, portfolioData, updatedCapital, updatedName, updatedDescription, cookie.accessToken]);
+    }, [portfolioId, cookie.accessToken]);
 
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
@@ -67,7 +68,7 @@ export default function EditPortfolio({ portfolioId, small }) {
     const handleOpenSuccessAlert = () => {
         setIsSuccessAlertOpen(true);
         setIsErrorAlertOpen(false);
-        
+
     };
     const handleCloseSuccessAlert = () => {
         setIsSuccessAlertOpen(false);

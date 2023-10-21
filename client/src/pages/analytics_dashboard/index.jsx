@@ -1,21 +1,12 @@
 import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
-import { mockTransactions } from "../../data/mockData";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import EditIcon from '@mui/icons-material/Edit';
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
 import Header from "../../components/Header";
-import LineChart from "../../components/LineChart";
-import GeographyChart from "../../components/GeographyChart";
-import BarChart from "../../components/BarChart";
-import StatBox from "../../components/StatBox";
-import PortfolioCard from "../../components/PortfolioCard";
-import ProgressCircle from "../../components/ProgressCircle";
-import CreatePortfolio from "../../components/CreatePortfolioForm";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 const Analytics = () => {
   const theme = useTheme();
@@ -25,18 +16,14 @@ const Analytics = () => {
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="PORTFOLIOS" subtitle="Welcome to your portfolios page" />
-
-        <Box>
-          <CreatePortfolio />
-        </Box>
+        <Header title="Analytics Overview" subtitle="this is an analytics page" />
       </Box>
 
       {/* GRID & CHARTS */}
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="450px"
+        gridAutoRows="250px"
         gap="20px"
       >
         {/* ROW 1 */}
@@ -46,58 +33,66 @@ const Analytics = () => {
           display="flex"
           alignItems="center"
           justifyContent="center"
+          name="Total Portfolio Value"
         >
-          <PortfolioCard
+          TOTAL PORTFOLIO VALUE HERE
+          {/* <PortfolioCard
             title="Technology Stocks"
             subtitle="All the technological stocks"
             capital="23456"
             returns="-1234"
-          />
+          /> */}
         </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <PortfolioCard
-            title="Technology Stocks"
-            subtitle="All the technological stocks"
-            progress="0.75"
-            increase="+14%"
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <PortfolioCard
-            title="Technology Stocks"
-            subtitle="All the technological stocks"
-            progress="0.75"
-            increase="+14%"
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <PortfolioCard
-            title="Technology Stocks"
-            subtitle="All the technological stocks"
-            progress="0.75"
-            increase="+14%"
-          />
+        {/* Individual Portfolio Details */}
+        <Box gridColumn="span 9" backgroundColor={colors.primary[400]} padding={"10px 20px"} sx={{ overflow: "auto" }}>
+          <Header title="Your Portfolios" />
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Portfolio Name</TableCell>
+                  <TableCell>Average Purchase Price</TableCell>
+                  <TableCell>Average Market Cost</TableCell>
+                  <TableCell>Yield Cost Ratio</TableCell>
+                  <TableCell>Evaluation</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell>Technology Stocks</TableCell>
+                  <TableCell>$123.45</TableCell>
+                  <TableCell>$234.56</TableCell>
+                  <TableCell>1.23</TableCell>
+                  <TableCell>+$123.45</TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell>Technology Stocks</TableCell>
+                  <TableCell>$123.45</TableCell>
+                  <TableCell>$234.56</TableCell>
+                  <TableCell>1.23</TableCell>
+                  <TableCell>+$123.45</TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell>Technology Stocks</TableCell>
+                  <TableCell>$123.45</TableCell>
+                  <TableCell>$234.56</TableCell>
+                  <TableCell>1.23</TableCell>
+                  <TableCell>+$123.45</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
 
-        
+        {/* ROW 2 */}
+
+
+
+
+
+
       </Box>
     </Box>
   );

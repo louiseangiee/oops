@@ -11,7 +11,7 @@ import { Box, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useNavigate } from 'react-router-dom';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { postAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
 import { useAuth } from "../context/AuthContext";
@@ -24,13 +24,14 @@ export default function CreatePortfolio() {
     const colors = tokens(theme.palette.mode);
     const [cookie, removeCookie] = useCookies(["accessToken"]);
     const { userData } = useAuth();
-    const [portfolioId, setPortfolioId] = useState(null);
+    const [capitalError, setCapitalError] = useState(false);
 
 
     // Initialize state variables for form fields
     const [portfolioName, setPortfolioName] = useState('');
     const [portfolioDescription, setPortfolioDescription] = useState('');
     const [portfolioCapital, setPortfolioCapital] = useState(null);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
     const [open, setOpen] = React.useState(false);
 
@@ -42,8 +43,25 @@ export default function CreatePortfolio() {
         setOpen(false);
     };
 
+    useEffect(() => {
+        if (!/^\d*\.?\d*$/.test(portfolioCapital) || portfolioCapital === '') {
+            setCapitalError(true);
+            setIsButtonDisabled(true);
+            return; // Prevent form submission
+        } else {
+            setIsButtonDisabled(false);
+            setCapitalError(false);
+        }
+
+        if (portfolioName && portfolioDescription && portfolioCapital) {
+            setIsButtonDisabled(false);
+        } else {
+            setIsButtonDisabled(true);
+        }
+        
+    }, [portfolioCapital, portfolioName, portfolioDescription]);
+
     const handleCreate = () => {
-        // Gather the form data (e.g., portfolio name, description, capital)
         const formData = {
             user: { id: userData.id }, // This is the user ID that we need to pass to the backend
             name: portfolioName,
@@ -54,7 +72,6 @@ export default function CreatePortfolio() {
         async function createPortfolio() {
             const response = await postAsync('portfolios', formData, cookie.accessToken);
             const data = await response.json();
-            setPortfolioId(data["portfolioId"]);
             navigate("/portfolio/" + data["portfolioId"]);
             console.log(data);
         }
@@ -134,11 +151,24 @@ export default function CreatePortfolio() {
                         sx={{ color: colors.grey[100] }}
                         value={portfolioCapital}
                         onChange={(e) => setPortfolioCapital(e.target.value)}
+                        error={capitalError}
+                        helperText={capitalError ? 'Invalid capital value' : ''}
                     />
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
                     <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} onClick={handleCreate}>Create</Button>
+                    <Button 
+                        type="submit" 
+                        sx={{ 
+                            backgroundColor: colors.blueAccent[700], 
+                            color: colors.grey[100], 
+                            fontWeight: "bold" 
+                        }} 
+                        onClick={handleCreate} 
+                        disabled = {isButtonDisabled}
+                    >
+                        Create
+                    </Button>
                 </DialogActions>
             </Dialog>
         </div>

@@ -25,6 +25,7 @@ const StockSelector = (props) => {
             }}
             options={stocks}
             getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.code === value.code} // Add this line
             style={{ minWidth: 200, marginBottom: 20 }}
             renderInput={(params) => 
                 <TextField 
@@ -34,6 +35,13 @@ const StockSelector = (props) => {
                 />
             }
         />
+
+
+
+
+
+
+
     );
 };
 

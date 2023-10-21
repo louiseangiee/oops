@@ -8,9 +8,6 @@ import { getAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
 
 
-
-
-
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -25,6 +22,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const StockChart = ({ chosenStock }) => {
+  
   
   const [chartData, setChartData] = useState([]);
   const [timeSpan, setTimeSpan] = useState("1Y");
@@ -60,11 +58,15 @@ const StockChart = ({ chosenStock }) => {
     }
 
     try {
+      
       const response = await getAsync(`${endpoint}?symbol=${chosenStock.code}`, cookie.accessToken); // Use the accessToken from cookies
+      console.log(response)
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const responseData = await response.json();
+      console.log(responseData)
+      
       const data = responseData.map(item => ({
         time: item.date,
         value: parseFloat(item["4. close"])

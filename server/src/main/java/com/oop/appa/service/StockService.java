@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 
@@ -54,8 +55,8 @@ public class StockService {
     }
 
     // POST and UPDATE
-    public void save(Stock stock) {
-        stockRepository.save(stock);
+    public Stock save(Stock stock) {
+        return stockRepository.save(stock);
     }
 
     // DELETE
@@ -65,6 +66,10 @@ public class StockService {
 
     public void deleteByStockSymbol(String stockSymbol) {
         stockRepository.deleteById(stockSymbol); // ID is the stock symbol
+    }
+
+    public Optional<Stock> findBySymbol(String symbol) {
+        return stockRepository.findById(symbol);
     }
 
     public double calculateOneYearReturn(String stockSymbol) {

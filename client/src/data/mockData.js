@@ -1281,3 +1281,276 @@ export const mockGeographyData = [
     value: 171135,
   },
 ];
+
+export const mockAccessLogs = [
+          {
+            "id": 1,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:00:00.000Z"),
+            "HTTPMethod": "GET",
+            "endpoint": "/api/users",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 2,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:05:00.000Z"),
+            "HTTPMethod": "POST",
+            "endpoint": "/api/users",
+            "responseCode": 201,
+            "auth": true
+          },
+          {
+            "id": 3,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:10:00.000Z"),
+            "HTTPMethod": "PUT",
+            "endpoint": "/api/users/14",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 4,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:15:00.000Z"),
+            "HTTPMethod": "DELETE",
+            "endpoint": "/api/users/14",
+            "responseCode": 204,
+            "auth": true
+          },
+          {
+            "id": 5,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:20:00.000Z"),
+            "HTTPMethod": "GET",
+            "endpoint": "/api/users",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 6,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:25:00.000Z"),
+            "HTTPMethod": "POST",
+            "endpoint": "/api/users",
+            "responseCode": 201,
+            "auth": true
+          },
+          {
+            "id": 7,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:30:00.000Z"),
+            "HTTPMethod": "PUT",
+            "endpoint": "/api/users/14",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 8,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:35:00.000Z"),
+            "HTTPMethod": "DELETE",
+            "endpoint": "/api/users/14",
+            "responseCode": 204,
+            "auth": true
+          },
+          {
+            "id": 9,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:40:00.000Z"),
+            "HTTPMethod": "GET",
+            "endpoint": "/api/users",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 10,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:45:00.000Z"),
+            "HTTPMethod": "POST",
+            "endpoint": "/api/users",
+            "responseCode": 201,
+            "auth": true
+          },
+          {
+            "id": 11,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:50:00.000Z"),
+            "HTTPMethod": "PUT",
+            "endpoint": "/api/users/14",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 12,
+            "userId": 14,
+            "time": new Date("2021-09-01T00:55:00.000Z"),
+            "HTTPMethod": "DELETE",
+            "endpoint": "/api/users/14",
+            "responseCode": 204,
+            "auth": true
+          },
+          {
+            "id": 13,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:00:00.000Z"),
+            "HTTPMethod": "GET",
+            "endpoint": "/api/users",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 14,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:05:00.000Z"),
+            "HTTPMethod": "POST",
+            "endpoint": "/api/users",
+            "responseCode": 201,
+            "auth": true
+          },
+          {
+            "id": 15,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:10:00.000Z"),
+            "HTTPMethod": "PUT",
+            "endpoint": "/api/users/14",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 16,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:15:00.000Z"),
+            "HTTPMethod": "DELETE",
+            "endpoint": "/api/users/14",
+            "responseCode": 204,
+            "auth": true
+          },
+          {
+            "id": 17,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:20:00.000Z"),
+            "HTTPMethod": "GET",
+            "endpoint": "/api/users",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 18,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:25:00.000Z"),
+            "HTTPMethod": "POST",
+            "endpoint": "/api/users",
+            "responseCode": 201,
+            "auth": true
+          },
+          {
+            "id": 19,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:30:00.000Z"),
+            "HTTPMethod": "PUT",
+            "endpoint": "/api/users/14",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 20,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:35:00.000Z"),
+            "HTTPMethod": "DELETE",
+            "endpoint": "/api/users/14",
+            "responseCode": 204,
+            "auth": true
+          },
+          {
+            "id": 21,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:40:00.000Z"),
+            "HTTPMethod": "GET",
+            "endpoint": "/api/users",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 22,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:45:00.000Z"),
+            "HTTPMethod": "POST",
+            "endpoint": "/api/users",
+            "responseCode": 201,
+            "auth": true
+          },
+          {
+            "id": 23,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:50:00.000Z"),
+            "HTTPMethod": "PUT",
+            "endpoint": "/api/users/14",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 24,
+            "userId": 14,
+            "time": new Date("2021-09-01T01:55:00.000Z"),
+            "HTTPMethod": "DELETE",
+            "endpoint": "/api/users/14",
+            "responseCode": 204,
+            "auth": true
+          },
+          {
+            "id": 25,
+            "userId": 14,
+            "time": new Date("2021-09-01T02:00:00.000Z"),
+            "HTTPMethod": "GET",
+            "endpoint": "/api/users",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 26,
+            "userId": 14,
+            "time": new Date("2021-09-01T02:05:00.000Z"),
+            "HTTPMethod": "POST",
+            "endpoint": "/api/users",
+            "responseCode": 201,
+            "auth": true
+          },
+          {
+            "id": 27,
+            "userId": 14,
+            "time": new Date("2021-09-01T02:10:00.000Z"),
+            "HTTPMethod": "PUT",
+            "endpoint": "/api/users/14",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 28,
+            "userId": 14,
+            "time": new Date("2021-09-01T02:15:00.000Z"),
+            "HTTPMethod": "DELETE",
+            "endpoint": "/api/users/14",
+            "responseCode": 204,
+            "auth": true
+          },
+          {
+            "id": 29,
+            "userId": 14,
+            "time": new Date("2021-09-01T02:20:00.000Z"),
+            "HTTPMethod": "GET",
+            "endpoint": "/api/users",
+            "responseCode": 200,
+            "auth": true
+          },
+          {
+            "id": 30,
+            "userId": 14,
+            "time": new Date("2021-09-01T02:25:00.000Z"),
+            "HTTPMethod": "POST",
+            "endpoint": "/api/users",
+            "responseCode": 201,
+            "auth": true
+          }
+]

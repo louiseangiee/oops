@@ -45,8 +45,8 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public void updateOTP(int userid, String otp){
-        Optional<User> user = userRepository.findById(userid);
+    public void updateOTP(String email, String otp){
+        Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             User confirmedUser = user.get();
             confirmedUser.setOtp(otp);

@@ -9,9 +9,11 @@ import Lottie from 'lottie-react';
 import loading from './fetching_data.json';
 import noData from './no_data.json';
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
   const [dataFetched, setDataFetched] = useState(null);
 

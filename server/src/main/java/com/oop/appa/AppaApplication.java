@@ -12,6 +12,7 @@ public class AppaApplication {
 		System.setProperty("spring.datasource.url", dotenv.get("DATABASE_URL"));
 		System.setProperty("spring.datasource.username", dotenv.get("DATABASE_USERNAME"));
 		System.setProperty("spring.datasource.password", dotenv.get("DATABASE_PASSWORD"));
+		System.setProperty("springdoc.swagger-ui.display-request-duration", "true");
 		SpringApplication.run(AppaApplication.class, args);
 	}
 

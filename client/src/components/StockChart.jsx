@@ -25,15 +25,15 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const StockChart = ({ chosenStock }) => {
-  
+
   const [chartData, setChartData] = useState([]);
   const [timeSpan, setTimeSpan] = useState("1Y");
-  const [cookie, removeCookie] = useCookies(["accessToken"])
+  const [cookie] = useCookies()
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
 
-  
+
 
   useEffect(() => {
     fetchData();

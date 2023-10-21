@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.oop.appa.dao.PortfolioRepository;
 import com.oop.appa.dao.PortfolioStockRepository;
 import com.oop.appa.dao.StockRepository;
@@ -29,16 +28,14 @@ public class PortfolioService {
     private UserRepository userRepository;
     private PortfolioStockRepository portfolioStockRepository;
     private StockRepository stockRepository;
-    private MarketDataService marketDataService;
 
     @Autowired
     public PortfolioService(PortfolioRepository portfolioRepository, UserRepository userRepository,
-            PortfolioStockRepository portfolioStockRepository, StockRepository stockRepository, MarketDataService marketDataService) {
+            PortfolioStockRepository portfolioStockRepository, StockRepository stockRepository) {
         this.portfolioRepository = portfolioRepository;
         this.userRepository = userRepository;
         this.portfolioStockRepository = portfolioStockRepository;
         this.stockRepository = stockRepository;
-        this.marketDataService = marketDataService;
     }
 
     // GET
@@ -92,15 +89,8 @@ public class PortfolioService {
 
         Stock stockFromDb = stockRepository.findById(stockToAdd.getStock().getStockSymbol()).orElse(null);
         if (stockFromDb == null) {
-            JsonNode stockInfo = marketDataService.fetchStockInfo(stockToAdd.getStock().getStockSymbol());
-            Stock newStock = new Stock();
-            newStock.setStockSymbol(stockInfo.get("Symbol").asText());
-            newStock.setName(stockInfo.get("Name").asText());
-            newStock.setIndustry(stockInfo.get("Industry").asText());
-            newStock.setSector(stockInfo.get("Sector").asText());
-            newStock.setCountry(stockInfo.get("Country").asText());
-            stockRepository.save(newStock);
-            stockFromDb = newStock;
+            System.out.println("No stock found with symbol: " + stockToAdd.getStock().getStockSymbol());
+            return;
         }
         stockToAdd.setStock(stockFromDb);
 

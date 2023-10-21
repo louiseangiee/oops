@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-	const [userEmail, setUserEmail] = useState("Log Out");
+	const [userEmail, setUserEmail] = useState("");
 	const [userData, setUserData] = useState({});
 	const [cookie, setCookie] = useCookies();
+
 
 	const signIn = async (email, password) => {
 		const response = await fetch(
@@ -23,11 +24,15 @@ export const AuthProvider = ({ children }) => {
 				}),
 			}
 		);
-		const data = await response.json();
-		setUserEmail("another email");
-		setCookie("accessToken", data.token, { path: "/", maxAge: 86400 });
-		setCookie("email", email, { path: "/", maxAge: 86400 });
-		return data;
+		if (response.ok) {
+			const data = await response.json();
+			setCookie("accessToken", data.token, { path: "/", maxAge: 86400 });
+			setCookie("email", email, { path: "/", maxAge: 86400 });
+			return data;
+		}
+		else {
+			return null;
+		}
 	}
 
 

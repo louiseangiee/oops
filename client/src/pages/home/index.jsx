@@ -17,13 +17,14 @@ const Home = () => {
   const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
   const [dataFetched, setDataFetched] = useState(null);
-  const [cookie, removeCookie] = useCookies(["accessToken"]);
+  const [cookie] = useCookies();
 
   const { userData } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getAsync('portfolios/user/'+userData.id, cookie.accessToken);
+      if (!userData.id) return;
+      const response = await getAsync('portfolios/user/' + userData.id, cookie.accessToken);
       const data = await response.json();
       console.log(data);
       setDataFetched(data);

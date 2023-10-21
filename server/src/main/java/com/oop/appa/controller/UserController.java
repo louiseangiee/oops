@@ -1,6 +1,8 @@
 package com.oop.appa.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,20 +50,21 @@ import java.util.Optional;
         }
 
         @GetMapping("/sendOTP")
-        public void sendEmail(@RequestParam String email){
+        public ResponseEntity<String> sendEmail(@RequestParam String email){
             String otp = userService.generateOtp();
-//            Optional<User> user = userService.findUserByEmail(email);
+            Optional<User> user = userService.findUserByEmail(email);
 //            String userEmail = "vitto.tedja2332@gmail.com";
-//            if(user.isPresent()) {
-//                userEmail = user.get().getEmail();
-//            }
-            userService.updateOTP(email, otp);
-            String body = String.format("This is your otp: %s", otp);
-            userService.sendSimpleMessage(
-                    email,
-                    "This is your OTP for OOP",
-                    body
-            );
+            if(user.isPresent()) {
+                userService.updateOTP(email, otp);
+                String body = String.format("This is your otp: %s", otp);
+                userService.sendSimpleMessage(
+                        email,
+                        "This is your OTP for OOP",
+                        body
+                );
+                return ResponseEntity.ok(otp);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
         @GetMapping("/verifyOTP")

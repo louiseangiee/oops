@@ -11,7 +11,8 @@ import com.oop.appa.entity.PortfolioStock;
 
 public interface PortfolioStockRepository extends JpaRepository<PortfolioStock, Integer> {
     Page<PortfolioStock> findAll(Pageable pageable);
-    
+
     @EntityGraph(attributePaths = {"stock"})
     List<PortfolioStock> findByPortfolioPortfolioId(Integer portfolio_id);
+    List<PortfolioStock> findByPortfolioPortfolioIdAndStockStockSymbol(Integer portfolioId, String stockSymbol);
 }

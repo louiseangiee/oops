@@ -60,4 +60,16 @@ public class MarketDataService {
                 .block();
     }
 
+    public JsonNode fetchOverviewData(String symbol){
+        String apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
+        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=OVERVIEW&symbol=" + symbol + "&apikey=" + apiKey;
+
+        return webClient.get()
+                .uri(apiUrl)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .onErrorMap(e -> new Exception("Error fetching overview data.", e))
+                .block();
+    }
+
 }

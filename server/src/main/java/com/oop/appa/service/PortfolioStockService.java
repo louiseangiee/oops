@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.hibernate.mapping.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,17 +76,36 @@ public class PortfolioStockService {
         portfolioStockRepository.deleteById(portfolioStockId);
     }
 
-    public double calculatePortfolioStockReturn(Integer portfolioStockId) {
-        PortfolioStock stock = portfolioStockRepository.findById(portfolioStockId).orElse(null);
-        if (stock == null) {
-            throw new IllegalArgumentException("PortfolioStock not found for ID: " + portfolioStockId);
-        }
-        double currentPrice = marketDataService.fetchCurrentData(stock.getStock().getStockSymbol()).path("Global Quote")
-                .path("5. close price").asDouble();
-        double buyPrice = stock.getBuyPrice();
-
-        return ((currentPrice - buyPrice) / buyPrice) * 100;
+    public List<PortfolioStock> findByPortfolioIdAndStockSymbol(Integer portfolioId, String stockSymbol) {
+        return portfolioStockRepository.findByPortfolioPortfolioIdAndStockStockSymbol(portfolioId, stockSymbol);
     }
+
+    public double calculateWeightedStockReturn(Integer portfolioId, String stockSymbol) {
+        List<PortfolioStock> stocks = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
+        if (stocks.isEmpty()) {
+            throw new IllegalArgumentException("No PortfolioStock found for portfolio ID: " + portfolioId + " and stock symbol: " + stockSymbol);
+        }
+    
+        double totalReturn = 0;
+        int totalQuantity = 0;
+    
+        double currentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
+                .path("5. close price").asDouble();
+    
+        for (PortfolioStock stock : stocks) {
+            totalQuantity += stock.getQuantity();
+        }
+    
+        for (PortfolioStock stock : stocks) {
+            double buyPrice = stock.getBuyPrice();
+            double individualReturn = ((currentPrice - buyPrice) / buyPrice) * 100;
+    
+            totalReturn += (double) stock.getQuantity() / totalQuantity * individualReturn;
+        }
+    
+        return totalReturn;
+    }
+    
 
     public double calculateAnnualisedReturn(Integer portfolioStockId) {
         PortfolioStock stock = portfolioStockRepository.findById(portfolioStockId).orElse(null);

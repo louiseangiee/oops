@@ -13,6 +13,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
+            .components(null)
             .addSecurityItem(new SecurityRequirement().addList("JWT"))
             .components(
                 new io.swagger.v3.oas.models.Components()

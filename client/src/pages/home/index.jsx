@@ -30,7 +30,7 @@ const Home = () => {
       setDataFetched(data);
     }
     fetchData();
-  }, [userData, dataFetched]);
+  }, [userData]);
 
   return (
     <Box m="20px">

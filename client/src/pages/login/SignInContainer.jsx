@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { tokens } from '../../theme.js';
 import { Grid, Box, Button, useTheme, Typography, Link } from '@mui/material';
@@ -15,7 +15,9 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import { getAsync } from "../../utils/utils";
-import { useCookies } from "react-cookie";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+
 
 
 const SignInContainer = (props) => {
@@ -26,6 +28,8 @@ const SignInContainer = (props) => {
     const [emailState, setEmailState] = useState("");
     const [otp, setOtp] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [isAlertOpen, setIsAlertOpen] = useState(false);
+
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
@@ -39,14 +43,24 @@ const SignInContainer = (props) => {
     };
 
     const handleSignIn = async () => {
-        await signIn(email, password);
-        navigate('/')
+        const response = await signIn(email, password);
+        if (response != null) {
+            navigate('/');
+        }
+        else {
+            alert("Wrong email or password");
+            setOpen(false);
+        }
     }
 
     const generateOTP = async () => {
         const response = await getAsync('users/sendOTP?email=' + email);
         if (response.ok) {
             setEmailState("Email has been sent");
+        }
+        else {
+            alert('Email not found')
+            setOpen(false);
         }
     }
 
@@ -60,6 +74,7 @@ const SignInContainer = (props) => {
             alert('error verifying')
         }
     }
+
 
     return (
         <>
@@ -101,6 +116,8 @@ const SignInContainer = (props) => {
                 <Button sx={{ color: colors.grey[100], width: '100%' }} onClick={handleClickOpen}>Sign In</Button>
             </Grid >
 
+
+            {/* OTP DIALOG */}
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle
                     sx={{
@@ -142,6 +159,22 @@ const SignInContainer = (props) => {
                     <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} onClick={verifyOTP}>Verify OTP</Button>
                 </DialogActions>
             </Dialog>
+
+            {/* <Snackbar
+                open={false}
+                autoHideDuration={5000} // Adjust the duration as needed
+                onClose={setIsAlertOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="error"
+                    onClose={setIsAlertOpen(false)}
+                    sx={{ backgroundColor: colors.greenAccent[600] }}
+                >
+                </Alert>
+            </Snackbar> */}
         </>
     );
 };

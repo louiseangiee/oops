@@ -1,5 +1,7 @@
 package com.oop.appa.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oop.appa.dto.PortfolioCreationDTO;
 import com.oop.appa.dto.PortfolioStockCreationDTO;
 import com.oop.appa.entity.Portfolio;
@@ -93,14 +95,14 @@ public class PortfolioController {
         portfolioService.updatePortfolio(portfolioId, portfolio);
     }
 
-    @PutMapping("/{portfolioId}/stocks")
-    public void addStockPortfolio(@PathVariable Integer portfolioId, @RequestBody PortfolioStock stock) {
-        // logging here
-        portfolioService.addStockToPortfolio(portfolioId, stock);
-    }
+    // @PutMapping("/{portfolioId}/stocks")
+    // public void addStockPortfolio(@PathVariable Integer portfolioId, @RequestBody
+    // PortfolioStock stock) {
+    // portfolioService.addStockToPortfolio(portfolioId, stock);
+    // }
 
     // DELETE endpoints
-    @Operation(summary = "Delete a portfolio by id") 
+    @Operation(summary = "Delete a portfolio by id")
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Integer id) {
         // logging here
@@ -126,20 +128,29 @@ public class PortfolioController {
         return portfolioStockService.findByPortfolioId(portfolioId);
     }
 
-    @Operation(summary = "Create a new portfolio stock  ")
+    @Operation(summary = "Create a new portfolio stock")
     @PostMapping("/{portfolioId}/stocks")
-    public ResponseEntity<?> addStockToPortfolio(@PathVariable Integer portfolioId,
+    public ResponseEntity<PortfolioStock> addStockToPortfolio(@PathVariable Integer portfolioId,
             @RequestBody PortfolioStockCreationDTO stockDto) {
         try {
-            Optional<Portfolio> portfolioOptional = portfolioService.findById(portfolioId);
-            if (!portfolioOptional.isPresent()) {
-                return new ResponseEntity<>("Portfolio not found", HttpStatus.BAD_REQUEST);
-            }
-            PortfolioStock portfolioStock = portfolioStockService.createPortfolioStock(portfolioOptional.get(),
-                    stockDto);
-            return new ResponseEntity<>(portfolioStock, HttpStatus.CREATED);
+            PortfolioStock portfolioStock = portfolioStockService.createPortfolioStock(stockDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(portfolioStock);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @Operation(summary = "Get the weight of a specific stock within a portfolio")
+    @GetMapping("/{portfolioId}/stocks/{stockSymbol}/weight")
+    public ResponseEntity<Double> getStockWeight(@PathVariable Integer portfolioId, 
+                                                 @PathVariable String stockSymbol) {
+        try {
+            double stockWeight = portfolioStockService.calculateStockWeight(portfolioId, stockSymbol);
+            return ResponseEntity.ok(stockWeight);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(null);
         }
     }
 

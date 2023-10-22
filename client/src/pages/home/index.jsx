@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Button, IconButton, Typography, useTheme, InputBase } from "@mui/material";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import PortfolioCard from "../../components/PortfolioCard";
@@ -11,25 +11,37 @@ import noData from './no_data.json';
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { getAsync } from "../../utils/utils";
+import SearchIcon from '@mui/icons-material/Search';
 
 const Home = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
   const [dataFetched, setDataFetched] = useState(null);
-  const [cookie, removeCookie] = useCookies(["accessToken"]);
+  const [cookie] = useCookies();
 
   const { userData } = useAuth();
+  const [searchQuery, setSearchQuery] = useState(""); // State variable to store the search query
+  const [filteredData, setFilteredData] = useState([]); // State variable for filtered results
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getAsync('portfolios/user/'+userData.id, cookie.accessToken);
+      if (!userData.id) return;
+      const response = await getAsync('portfolios/user/' + userData.id, cookie.accessToken);
       const data = await response.json();
       console.log(data);
       setDataFetched(data);
     }
     fetchData();
-  }, [userData, dataFetched]);
+
+    // Filter data based on the search query
+    const filteredResults = dataFetched?.filter((portfolio) =>
+      portfolio.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      portfolio.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredData(filteredResults);
+
+  }, [searchQuery, userData, dataFetched]);
 
   return (
     <Box m="20px">
@@ -42,8 +54,29 @@ const Home = () => {
         </Box>
       </Box>
 
-      {/* GRID & CHARTS */}
-      {!dataFetched ? (
+      {/* SEARCH BAR */}
+        <Box display="flex" marginBottom="20px">
+          <Box
+            display="flex"
+            backgroundColor={colors.primary[400]}
+            borderRadius="3px"
+            width="100%"
+          >
+            <InputBase 
+              sx={{ ml: 2, flex: 1 }} 
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <IconButton type="button" sx={{ p: 1 }}>
+              <SearchIcon />
+            </IconButton>
+          </Box>
+        </Box>
+
+
+        {/* GRID & CHARTS */ }
+      {!filteredData ? (
         <Box display="flex" justifyContent="center" alignItems="center" height="100%">
           <Lottie
             animationData={loading}
@@ -53,7 +86,7 @@ const Home = () => {
           />
         </Box>
 
-      ) : dataFetched.length === 0 ? (
+      ) : filteredData.length === 0 ? (
 
         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
 
@@ -76,8 +109,8 @@ const Home = () => {
           gap="20px"
         >
           {/* ROW 1 */}
-          {Array.isArray(dataFetched) &&
-            dataFetched.map((portfolio, index) => (
+          {Array.isArray(filteredData) &&
+            filteredData.map((portfolio, index) => (
               <Box
                 gridColumn="span 3"
                 backgroundColor={colors.primary[400]}

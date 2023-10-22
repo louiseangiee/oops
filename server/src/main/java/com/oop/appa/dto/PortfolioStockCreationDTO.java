@@ -3,17 +3,17 @@ package com.oop.appa.dto;
 import java.time.LocalDate;
 
 public class PortfolioStockCreationDTO {
-    private int portfolioId; // Corrected the typo 'porfolioId' to 'portfolioId'
-    private StockReference stock;
+    private int portfolioId;
+    private String symbol; // Replaced StockReference with symbol
     private float buyPrice;
     private int quantity;
     private LocalDate buyDate;
 
     public PortfolioStockCreationDTO() {}
 
-    public PortfolioStockCreationDTO(int portfolioId, StockReference stock, float buyPrice, int quantity, LocalDate buyDate) {
+    public PortfolioStockCreationDTO(int portfolioId, String symbol, float buyPrice, int quantity, LocalDate buyDate) {
         this.portfolioId = portfolioId;
-        this.stock = stock;
+        this.symbol = symbol;
         this.buyPrice = buyPrice;
         this.quantity = quantity;
         this.buyDate = buyDate;
@@ -27,12 +27,12 @@ public class PortfolioStockCreationDTO {
         this.portfolioId = portfolioId;
     }
 
-    public StockReference getStock() {
-        return stock;
+    public String getSymbol() {
+        return symbol;
     }
 
-    public void setStock(StockReference stock) {
-        this.stock = stock;
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 
     public float getBuyPrice() {
@@ -57,23 +57,5 @@ public class PortfolioStockCreationDTO {
 
     public void setBuyDate(LocalDate buyDate) {
         this.buyDate = buyDate;
-    }
-
-    public static class StockReference {
-        private String symbol;
-
-        public StockReference() {}
-
-        public StockReference(String symbol) {
-            this.symbol = symbol;
-        }
-
-        public String getSymbol() {
-            return symbol;
-        }
-
-        public void setSymbol(String symbol) {
-            this.symbol = symbol;
-        }
     }
 }

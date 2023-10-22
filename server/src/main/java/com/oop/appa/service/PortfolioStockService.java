@@ -3,6 +3,7 @@ package com.oop.appa.service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.hibernate.mapping.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.oop.appa.dao.PortfolioRepository;
 import com.oop.appa.dao.PortfolioStockRepository;
 import com.oop.appa.dto.PortfolioStockCreationDTO;
 import com.oop.appa.entity.Portfolio;
@@ -23,13 +25,15 @@ public class PortfolioStockService {
     private PortfolioStockRepository portfolioStockRepository;
     private MarketDataService marketDataService;
     private StockService stockService;
+    private PortfolioRepository portfolioRepository;
 
     @Autowired
     public PortfolioStockService(PortfolioStockRepository portfolioStockRepository, MarketDataService marketDataService,
-            StockService stockService) {
+            StockService stockService, PortfolioRepository portfolioRepository) {
         this.portfolioStockRepository = portfolioStockRepository;
         this.marketDataService = marketDataService;
         this.stockService = stockService;
+        this.portfolioRepository = portfolioRepository;
     }
 
     // GET
@@ -46,13 +50,11 @@ public class PortfolioStockService {
     }
 
     // POST
-    public PortfolioStock createPortfolioStock(Portfolio portfolio, PortfolioStockCreationDTO dto) {
-        Stock stock = stockService.findBySymbol(dto.getStock().getSymbol())
-                .orElseGet(() -> {
-                    Stock newStock = new Stock();
-                    newStock.setStockSymbol(dto.getStock().getSymbol());
-                    return stockService.save(newStock);
-                });
+    public PortfolioStock createPortfolioStock(PortfolioStockCreationDTO dto) {
+        Portfolio portfolio = portfolioRepository.findById(dto.getPortfolioId())
+                .orElseThrow(() -> new NoSuchElementException("Portfolio not found for ID: " + dto.getPortfolioId()));
+        Stock stock = stockService.findBySymbol(dto.getSymbol())
+                .orElseThrow(() -> new NoSuchElementException("Stock not found for symbol: " + dto.getSymbol()));
         PortfolioStock portfolioStock = new PortfolioStock();
         portfolioStock.setStock(stock);
         portfolioStock.setBuyPrice(dto.getBuyPrice());
@@ -83,26 +85,27 @@ public class PortfolioStockService {
     public double calculateWeightedStockReturn(Integer portfolioId, String stockSymbol) {
         List<PortfolioStock> stocks = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
         if (stocks.isEmpty()) {
-            throw new IllegalArgumentException("No PortfolioStock found for portfolio ID: " + portfolioId + " and stock symbol: " + stockSymbol);
+            throw new IllegalArgumentException(
+                    "No PortfolioStock found for portfolio ID: " + portfolioId + " and stock symbol: " + stockSymbol);
         }
-    
+
         double totalReturn = 0;
         int totalQuantity = 0;
-    
+
         double currentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
                 .path("5. close price").asDouble();
-    
+
         for (PortfolioStock stock : stocks) {
             totalQuantity += stock.getQuantity();
         }
-    
+
         for (PortfolioStock stock : stocks) {
             double buyPrice = stock.getBuyPrice();
             double individualReturn = ((currentPrice - buyPrice) / buyPrice) * 100;
-    
+
             totalReturn += (double) stock.getQuantity() / totalQuantity * individualReturn;
         }
-    
+
         return totalReturn;
     }
     

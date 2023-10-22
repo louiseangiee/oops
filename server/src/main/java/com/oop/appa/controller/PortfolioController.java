@@ -140,6 +140,20 @@ public class PortfolioController {
         }
     }
 
+    @Operation(summary = "Get the weight of a specific stock within a portfolio")
+    @GetMapping("/{portfolioId}/stocks/{stockSymbol}/weight")
+    public ResponseEntity<Double> getStockWeight(@PathVariable Integer portfolioId, 
+                                                 @PathVariable String stockSymbol) {
+        try {
+            double stockWeight = portfolioStockService.calculateStockWeight(portfolioId, stockSymbol);
+            return ResponseEntity.ok(stockWeight);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
+
     @Operation(summary = "Get an existing portfolio's portfolio stock by stock symbol")
     @GetMapping("/{portfolioId}/stocks/{stockSymbol}")
     public List<PortfolioStock> findByPortfolioIdAndStockSymbol(@PathVariable Integer portfolioId,

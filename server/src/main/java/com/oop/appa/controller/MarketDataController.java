@@ -57,7 +57,7 @@ public class MarketDataController {
         }
     }
 
-    @Operation(summary = "returns the current market status (open vs. closed) of major trading venues for equities, forex, and cryptocurrencies around the world.")
+    @Operation(summary = "returns today price")
     @GetMapping("/currentData")
     public ResponseEntity<String> fetchCurrentData(@RequestParam String symbol) {
         try {

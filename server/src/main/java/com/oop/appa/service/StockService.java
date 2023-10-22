@@ -352,5 +352,4 @@ public class StockService {
         return annualizedVolatility;
     }
     
-
 }

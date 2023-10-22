@@ -106,6 +106,33 @@ public class PortfolioStockService {
         return totalReturn;
     }
     
+    public double calculateStockWeight(Integer portfolioId, String stockSymbol) {
+        List<PortfolioStock> stocks = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
+        if (stocks.isEmpty()) {
+            throw new IllegalArgumentException("No PortfolioStock found for portfolio ID: " + portfolioId + " and stock symbol: " + stockSymbol);
+        }
+    
+        double currentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
+                .path("5. close price").asDouble();
+    
+        double stockMarketValue = 0; // Market value of the specific stock
+        double totalPortfolioValue = 0; // Total market value of all stocks in the portfolio
+    
+        for (PortfolioStock stock : stocks) {
+            stockMarketValue += stock.getQuantity() * currentPrice;
+        }
+    
+        // You'd need a method to fetch all stocks in the portfolio to calculate the total portfolio value
+        List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
+        for (PortfolioStock stock : allStocksInPortfolio) {
+            double stockPrice = marketDataService.fetchCurrentData(stock.getStockSymbol()).path("Global Quote")
+                    .path("5. close price").asDouble();
+            totalPortfolioValue += stock.getQuantity() * stockPrice;
+        }
+    
+        return stockMarketValue / totalPortfolioValue;
+    }
+    
 
     public double calculateAnnualisedReturn(Integer portfolioStockId) {
         PortfolioStock stock = portfolioStockRepository.findById(portfolioStockId).orElse(null);

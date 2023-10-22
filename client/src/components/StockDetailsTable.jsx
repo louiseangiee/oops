@@ -47,19 +47,22 @@ function StockDetailsTable({ chosenStock }) {
     }
 
     return (
-        <TableContainer component={Paper} style={{ width: '300px', marginLeft: '20px' }}>
-            <Table size="small">
-                <TableBody>
-                    {Object.entries(details).map(([key, value]) => (
-                        <TableRow key={key}>
-                            <TableCell>{key}</TableCell>
-                            <TableCell align="right">{value}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10%' }}>
+            <TableContainer style={{ width: '100%', height: '100%', marginLeft: '20px' }}>
+                <Table size="small">
+                    <TableBody>
+                        {Object.entries(details).map(([key, value]) => (
+                            <TableRow key={key}>
+                                <TableCell>{key}</TableCell>
+                                <TableCell align="right">{value}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </div>
     );
+    
 }
 
 export default StockDetailsTable;

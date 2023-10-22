@@ -8,6 +8,8 @@ import StockSelector from "../../components/StockSelectorDropdown";
 import StockDetailsTable from "../../components/StockDetailsTable";
 import { useCookies } from "react-cookie"; // If you decide to use cookies again in the future
 import { getAsync } from "../../utils/utils";
+import PorfolioBarChart from "../../components/OverallReturnsBarChart";
+import PortfolioBreakdown from "../../components/UserPortfoliosBreakdown";
 
 const Analytics = () => {
   const theme = useTheme();
@@ -122,7 +124,12 @@ const Analytics = () => {
                 {/* Pass accessToken here if needed */}
                 <StockChart chosenStock={chosenStock} />
               </Box>
+              
             </Box>
+            <PorfolioBarChart />
+
+            <PortfolioBreakdown />
+            
           </div>
         </Box>
       </Box>

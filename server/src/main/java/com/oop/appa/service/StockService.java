@@ -231,37 +231,6 @@ public class StockService {
         return dataPoints;
     }
 
-    public List<Map<String, Object>> fetchFullDailyData(String stockSymbol) {
-        JsonNode dailyJson = marketDataService.fetchDailyData(stockSymbol, "full");
-        JsonNode dailyTimeSeries = dailyJson.path("Time Series (Daily)");
-    
-        // Calculate the starting date (one year ago)
-        String oneYearAgoDate = getDateOneYearAgo(false);
-        String closestAvailableDate = getClosestAvailableDate(dailyTimeSeries, oneYearAgoDate);
-    
-        List<String> keys = StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(dailyTimeSeries.fieldNames(), Spliterator.ORDERED),
-                false)
-                .collect(Collectors.toList());
-    
-        // Filter out dates that are older than one year
-        List<String> filteredKeys = keys.stream()
-                .filter(key -> key.compareTo(closestAvailableDate) >= 0)
-                .collect(Collectors.toList());
-    
-        List<Map<String, Object>> dataPoints = filteredKeys.stream()
-                .map(key -> {
-                    Map<String, Object> dataPoint = new HashMap<>();
-                    dataPoint.put("date", key);
-                    dataPoint.put("4. close", dailyTimeSeries.path(key).path("4. close").asText());
-                    return dataPoint;
-                })
-                .collect(Collectors.toList());
-    
-        return dataPoints;
-    }
-    
-
     public List<Map<String, Object>> fetchOneWeekData(String stockSymbol) {
         JsonNode dailyJson = marketDataService.fetchDailyData(stockSymbol, "compact");
         String oneWeekAgoDate = getDateOneWeekAgo(); // e.g., "2023-09-15"
@@ -312,9 +281,8 @@ public class StockService {
         LocalDate today = LocalDate.now();
         return today.toString();
     }
-
     
-    public double calculateMonthlyVolatility(String stockSymbol) {
+    public double calculateDailyVolatility(String stockSymbol) {
         List<Map<String, Object>> dataPoints = fetchOneMonthData(stockSymbol);
 
         // Extract closing prices from the data
@@ -337,35 +305,52 @@ public class StockService {
         return volatility;
     }
 
-    public double calculateAnnualizedVolatility(String stockSymbol) {
-        List<Map<String, Object>> dailyData = fetchFullDailyData(stockSymbol);
+    public double calculateMonthlyVolatility(String stockSymbol) {
+        // 1. Fetch the data
+        List<Map<String, Object>> monthlyData = fetchOneYearData(stockSymbol);
     
-        // Filter out data that's older than 1 year
-        String oneYearAgoDate = getDateOneYearAgo(false);
-        dailyData = dailyData.stream()
-                .filter(dataPoint -> ((String) dataPoint.get("date")).compareTo(oneYearAgoDate) >= 0)
-                .collect(Collectors.toList());
+        // 2. Extract the monthly closing prices
+        List<Double> monthlyClosingPrices = monthlyData.stream()
+              .map(dataPoint -> Double.parseDouble(dataPoint.get("4. close").toString()))
+              .collect(Collectors.toList());
     
-        // Calculate daily returns
-        List<Double> dailyReturns = new ArrayList<>();
-        for (int i = 1; i < dailyData.size(); i++) {
-            double previousClose = Double.parseDouble((String) dailyData.get(i - 1).get("4. close"));
-            double currentClose = Double.parseDouble((String) dailyData.get(i).get("4. close"));
-            double dailyReturn = (currentClose - previousClose) / previousClose;
-            dailyReturns.add(dailyReturn);
+        // 3. Calculate monthly returns
+        List<Double> monthlyReturns = new ArrayList<>();
+        for (int i = 1; i < monthlyClosingPrices.size(); i++) {
+            double monthlyReturn = (monthlyClosingPrices.get(i) - monthlyClosingPrices.get(i - 1)) / monthlyClosingPrices.get(i - 1);
+            monthlyReturns.add(monthlyReturn);
         }
     
-        // Calculate standard deviation of daily returns
-        double mean = dailyReturns.stream().mapToDouble(val -> val).average().orElse(0.0);
-        double variance = dailyReturns.stream().mapToDouble(val -> Math.pow(val - mean, 2)).sum() / dailyReturns.size();
-        double dailyVolatility = Math.sqrt(variance);
+        // 4. Compute the monthly volatility
+        double mean = monthlyReturns.stream().mapToDouble(val -> val).average().orElse(0.0);
+        double variance = monthlyReturns.stream().mapToDouble(val -> Math.pow(val - mean, 2)).sum() / monthlyReturns.size();
+    
+        return Math.sqrt(variance);
+    }
+    
+    public double calculateAnnualizedVolatility(String stockSymbol) {
+        List<Map<String, Object>> monthlyData = fetchOneYearData(stockSymbol);
+    
+        // Calculate monthly returns
+        List<Double> monthlyReturns = new ArrayList<>();
+        for (int i = 1; i < monthlyData.size(); i++) {
+            double previousClose = Double.parseDouble((String) monthlyData.get(i - 1).get("4. close"));
+            double currentClose = Double.parseDouble((String) monthlyData.get(i).get("4. close"));
+            double monthlyReturn = (currentClose - previousClose) / previousClose;
+            monthlyReturns.add(monthlyReturn);
+        }
+    
+        // Calculate standard deviation of monthly returns
+        double mean = monthlyReturns.stream().mapToDouble(val -> val).average().orElse(0.0);
+        double variance = monthlyReturns.stream().mapToDouble(val -> Math.pow(val - mean, 2)).sum() / monthlyReturns.size();
+        double monthlyVolatility = Math.sqrt(variance);
     
         // Annualize the volatility
-        double annualizedVolatility = dailyVolatility * Math.sqrt(252); // Assuming 252 trading days in a year
+        // Since we're using monthly data and there are roughly 12 months in a year, the sqrt value changes to 12.
+        double annualizedVolatility = monthlyVolatility * Math.sqrt(12); 
     
         return annualizedVolatility;
     }
-    
     
 
 }

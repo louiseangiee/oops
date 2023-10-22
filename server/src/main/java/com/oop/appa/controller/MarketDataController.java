@@ -1,6 +1,9 @@
 package com.oop.appa.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.oop.appa.service.MarketDataService;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,7 @@ public class MarketDataController {
         this.marketDataService = marketDataService;
     }
 
+    @Operation(summary = "returns monthly time series(date, daily open, daily high, daily low, daily close, daily volume)")
     @GetMapping("/monthData")
     public ResponseEntity<String> fetchMonthData(@RequestParam String symbol) {
         try {
@@ -31,6 +35,7 @@ public class MarketDataController {
         }
     }
 
+    @Operation(summary = "returns raw (as-traded) daily time series (date, daily open, daily high, daily low, daily close, daily volume)")
     @GetMapping("/dailyData")
     public ResponseEntity<String> fetchDailyData(@RequestParam String symbol, @RequestParam(defaultValue = "compact") String outputSize) {
         try {
@@ -41,6 +46,18 @@ public class MarketDataController {
         }
     }
 
+    @Operation(summary = "You can use the month parameter (in YYYY-MM format) to query a specific month in history")
+    @GetMapping("/intraday")
+     public ResponseEntity<JsonNode> fetchIntradayData(@RequestParam String symbol, @RequestParam String month) {
+        try {
+            JsonNode intradayData = marketDataService.fetchIntraday(symbol, month);
+            return ResponseEntity.ok(intradayData);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @Operation(summary = "returns the current market status (open vs. closed) of major trading venues for equities, forex, and cryptocurrencies around the world.")
     @GetMapping("/currentData")
     public ResponseEntity<String> fetchCurrentData(@RequestParam String symbol) {
         try {

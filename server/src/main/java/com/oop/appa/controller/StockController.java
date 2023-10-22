@@ -170,15 +170,25 @@ public class StockController {
         }
     }
 
+    @GetMapping("/calculateDailyVolatility")
+    public ResponseEntity<Double> calculateDailyVolatility(@RequestParam String symbol) {
+        try {
+            double volatility = stockService.calculateDailyVolatility(symbol);
+            return ResponseEntity.ok(volatility);
+        } catch (Exception e) {
+            // It's a good practice to log the exception for debugging purposes.
+            // e.g., logger.error("Error calculating volatility for symbol: " + symbol, e);
+        return ResponseEntity.status(500).body(0.0);
+        }
+    }
+
     @GetMapping("/calculateMonthlyVolatility")
     public ResponseEntity<Double> calculateMonthlyVolatility(@RequestParam String symbol) {
         try {
             double volatility = stockService.calculateMonthlyVolatility(symbol);
             return ResponseEntity.ok(volatility);
         } catch (Exception e) {
-            // It's a good practice to log the exception for debugging purposes.
-            // e.g., logger.error("Error calculating volatility for symbol: " + symbol, e);
-        return ResponseEntity.status(500).body(0.0);
+            return ResponseEntity.status(500).body(0.0);
         }
     }
 

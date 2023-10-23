@@ -25,7 +25,7 @@ public class AccessLogService {
         try {
             return accessLogRepository.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all AccessLogs service：", e);
+            throw new RuntimeException("Error fetching all AccessLogs service：" + e.getMessage(), e);
         }
     }
 
@@ -33,7 +33,7 @@ public class AccessLogService {
         try {
             return accessLogRepository.findAll(pageable);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all AccessLogs with pagination service: ", e);
+            throw new RuntimeException("Error fetching all AccessLogs with pagination service: " + e.getMessage(), e);
         }
  
     }
@@ -45,7 +45,7 @@ public class AccessLogService {
             throw new RuntimeException("Illegal argument", e);
         }
         catch (Exception e) {
-            throw new RuntimeException("Error fetching all AccessLogs with pagination service: ", e);
+            throw new RuntimeException("Error fetching all AccessLogs with pagination service: " + e.getMessage(), e);
         }
     }
 
@@ -54,7 +54,7 @@ public class AccessLogService {
         try {
             return accessLogRepository.save(accessLog);
         } catch (Exception e) {
-            throw new RuntimeException("Error saving AccessLog service: ", e);
+            throw new RuntimeException("Error saving AccessLog service: " + e.getMessage(), e);
         }
     }
 
@@ -64,7 +64,7 @@ public class AccessLogService {
             accessLogRepository.delete(entity);
             return;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting AccessLog service: ", e);
+            throw new RuntimeException("Error deleting AccessLog service: " + e.getMessage(), e);
         }
     }
 
@@ -73,7 +73,7 @@ public class AccessLogService {
             accessLogRepository.deleteById(id);
             return;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting AccessLog by id service: ", e);
+            throw new RuntimeException("Error deleting AccessLog by id service: " + e.getMessage(), e);
         }
     }
 

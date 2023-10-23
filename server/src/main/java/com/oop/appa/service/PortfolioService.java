@@ -38,7 +38,7 @@ public class PortfolioService {
         try {
             return portfolioRepository.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all portfolios service: ", e);
+            throw new RuntimeException("Error fetching all portfolios service: " + e.getMessage(), e);
         }
     }
 
@@ -48,7 +48,7 @@ public class PortfolioService {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Illegal argument", e);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all portfolios with pagination service: ", e);
+            throw new RuntimeException("Error fetching all portfolios with pagination service: " + e.getMessage(), e);
         }
     }
 
@@ -58,7 +58,7 @@ public class PortfolioService {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Illegal argument", e);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all portfolios with pagination service: ", e);
+            throw new RuntimeException("Error fetching all portfolios with pagination service: " + e.getMessage(), e);
         }
     }
 
@@ -68,7 +68,7 @@ public class PortfolioService {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Illegal argument", e);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching portfolio by id service: ", e);
+            throw new RuntimeException("Error fetching portfolio by id service: " + e.getMessage(), e);
         }
     }
 
@@ -93,7 +93,7 @@ public class PortfolioService {
             accessLogRepository.save(new AccessLog(user, action));
             return savedPortfolio;
         } catch (Exception e) {
-            throw new RuntimeException("Error creating a new portfolio service: ", e);
+            throw new RuntimeException("Error creating a new portfolio service: " + e.getMessage(), e);
         }
 
     }
@@ -115,7 +115,7 @@ public class PortfolioService {
             accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
             return updatedPortfolio;
         } catch (Exception e) {
-            throw new RuntimeException("Error updating an existing portfolio service: ", e);
+            throw new RuntimeException("Error updating an existing portfolio service: " + e.getMessage(), e);
         }
 
     }
@@ -132,7 +132,7 @@ public class PortfolioService {
             String action = String.format("User deletes portfolio ID: %d Name: %s", deletedPortfolioId, portfolioName);
             accessLogRepository.save(new AccessLog(deletedPortfolioUser, action));
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting portfolio service: ", e);
+            throw new RuntimeException("Error deleting portfolio service: " + e.getMessage(), e);
         }
 
     }
@@ -141,7 +141,7 @@ public class PortfolioService {
         try {
             portfolioRepository.deleteByUserId(user_id);
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting portfolio service: ", e);
+            throw new RuntimeException("Error deleting portfolio service: "+ e.getMessage(), e);
         }
     }
 }

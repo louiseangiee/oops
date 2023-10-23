@@ -75,7 +75,7 @@ public class StockService {
             stockRepository.delete(stock);
             return;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting stock service: ", e);
+            throw new RuntimeException("Error deleting stock service: " + e.getMessage(), e);
         }
     }
 
@@ -84,7 +84,7 @@ public class StockService {
             stockRepository.deleteById(stockSymbol); // ID is the stock symbol
             return;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting stock by stock symbol service:", e);
+            throw new RuntimeException("Error deleting stock by stock symbol service: " + e.getMessage(), e);
         }
     }
 
@@ -108,7 +108,7 @@ public class StockService {
             double oneYearReturn = (currentClose - oneYearAgoClose) / oneYearAgoClose;
             return oneYearReturn;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating one year return service: ", e);
+            throw new RuntimeException("Error calculating one year return service: " + e.getMessage(), e);
         }
     }
 
@@ -131,7 +131,7 @@ public class StockService {
             double oneMonthReturn = (currentClose - oneMonthAgoClose) / oneMonthAgoClose;
             return oneMonthReturn;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating one month return service: ", e);
+            throw new RuntimeException("Error calculating one month return service: " + e.getMessage(), e);
         }
     }
 
@@ -155,7 +155,7 @@ public class StockService {
             double specificDateReturn = (currentClose - specificDateClose) / specificDateClose;
             return specificDateReturn;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating one week return service: ", e);
+            throw new RuntimeException("Error calculating one week return service: " + e.getMessage(), e);
         }
 
     }
@@ -169,7 +169,7 @@ public class StockService {
             double yesterdayReturn = (currentClose - yesterdayClose) / yesterdayClose;
             return yesterdayReturn;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating yesterday return service; ", e);
+            throw new RuntimeException("Error calculating yesterday return service:  " + e.getMessage(), e);
         }
 
     }
@@ -199,7 +199,7 @@ public class StockService {
                     .collect(Collectors.toList());
             return dataPoints;
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching one year data service: ", e);
+            throw new RuntimeException("Error fetching one year data service: " + e.getMessage(), e);
         }
 
     }
@@ -231,7 +231,7 @@ public class StockService {
 
             return dataPoints;
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching one quarter data service: ", e);
+            throw new RuntimeException("Error fetching one quarter data service: " + e.getMessage(), e);
         }
 
     }
@@ -277,7 +277,7 @@ public class StockService {
 
             return dataPoints;
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching one month data service: ", e);
+            throw new RuntimeException("Error fetching one month data service: " + e.getMessage(), e);
         }
 
     }
@@ -308,7 +308,7 @@ public class StockService {
 
             return dataPoints;
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching one week data service: ", e);
+            throw new RuntimeException("Error fetching one week data service: " + e.getMessage(), e);
         }
     }
 
@@ -335,7 +335,7 @@ public class StockService {
             double volatility = Math.sqrt(variance);
             return volatility;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating daily volatility service: ", e);
+            throw new RuntimeException("Error calculating daily volatility service: " + e.getMessage(), e);
         }
 
     }
@@ -365,7 +365,7 @@ public class StockService {
 
             return Math.sqrt(variance);
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating monthly volatility service: ", e);
+            throw new RuntimeException("Error calculating monthly volatility service: "+ e.getMessage(), e);
         }
 
     }
@@ -396,7 +396,7 @@ public class StockService {
 
             return annualizedVolatility;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating annualized volatility service: ", e);
+            throw new RuntimeException("Error calculating annualized volatility service: "+ e.getMessage(), e);
         }
 
     }

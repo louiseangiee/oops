@@ -43,7 +43,7 @@ public class PortfolioStockService {
         try {
             return portfolioStockRepository.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all PortfolioStocks service:", e);
+            throw new RuntimeException("Error fetching all PortfolioStocks service: " + e.getMessage(), e);
         }
     }
 
@@ -51,7 +51,7 @@ public class PortfolioStockService {
         try {
             return portfolioStockRepository.findAll(pageable);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all PortfolioStocks with pagination service:", e);
+            throw new RuntimeException("Error fetching all PortfolioStocks with pagination service: " + e.getMessage(), e);
         }
     }
 
@@ -107,7 +107,7 @@ public class PortfolioStockService {
                 return portfolioStockRepository.save(portfolioStock);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error creating PortfolioStock service:", e);
+            throw new RuntimeException("Error creating PortfolioStock service: " + e.getMessage() , e);
         }
 
     }
@@ -117,7 +117,7 @@ public class PortfolioStockService {
         try {
             portfolioStockRepository.save(stock);
         } catch (Exception e) {
-            throw new RuntimeException("Error saving PortfolioStock service: ", e);
+            throw new RuntimeException("Error saving PortfolioStock service: " + e.getMessage(), e);
         }
     }
 
@@ -132,7 +132,7 @@ public class PortfolioStockService {
             accessLogRepository.save(new AccessLog(portfolioStockRef.getPortfolio().getUser(), action));
             return;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting PortfolioStock service: ", e);
+            throw new RuntimeException("Error deleting PortfolioStock service: " + e.getMessage(), e);
         }
     }
 
@@ -146,7 +146,7 @@ public class PortfolioStockService {
             accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
             return;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting PortfolioStock by id service: ", e);
+            throw new RuntimeException("Error deleting PortfolioStock by id service: " + e.getMessage(), e);
         }
     }
 
@@ -174,7 +174,7 @@ public class PortfolioStockService {
             }
             return totalReturn;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating weighted stock return service: ", e);
+            throw new RuntimeException("Error calculating weighted stock return service: " + e.getMessage(), e);
         }
 
     }
@@ -209,7 +209,7 @@ public class PortfolioStockService {
 
             return stockMarketValue / totalPortfolioValue;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating stock weight service: ", e);
+            throw new RuntimeException("Error calculating stock weight service: " + e.getMessage(), e);
         }
 
     }
@@ -228,7 +228,7 @@ public class PortfolioStockService {
 
             return ((Math.pow((currentPrice / buyPrice), (365.0 / days))) - 1) * 100;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating annualised return service: ", e);
+            throw new RuntimeException("Error calculating annualised return service: " + e.getMessage(), e);
         }
 
     }
@@ -243,7 +243,7 @@ public class PortfolioStockService {
             LocalDate currentDate = LocalDate.now();
             return ChronoUnit.DAYS.between(buyDate, currentDate);
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating days held service: ", e);
+            throw new RuntimeException("Error calculating days held service: " + e.getMessage(), e);
         }
 
     }

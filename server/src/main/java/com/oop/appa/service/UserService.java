@@ -31,7 +31,7 @@ public class UserService {
         try {
             return userRepository.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all users service: ", e);
+            throw new RuntimeException("Error fetching all users service: "+ e.getMessage(), e);
         }
     }
 
@@ -39,7 +39,7 @@ public class UserService {
         try {
             return userRepository.findById(user_id);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching user by id service: ", e);
+            throw new RuntimeException("Error fetching user by id service: "+ e.getMessage(), e);
         }
     }
 
@@ -47,7 +47,7 @@ public class UserService {
         try {
             return userRepository.findAll(pageable);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all users with pagination service: ", e);
+            throw new RuntimeException("Error fetching all users with pagination service: "+ e.getMessage(), e);
         }
     }
 
@@ -55,7 +55,7 @@ public class UserService {
         try {
             return userRepository.findByEmail(email);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching user by email service: ", e);
+            throw new RuntimeException("Error fetching user by email service: "+ e.getMessage(), e);
         }
     }
 
@@ -65,7 +65,7 @@ public class UserService {
             user.setOtp(otp);
             userRepository.save(user);
         } catch (Exception e) {
-            throw new RuntimeException("Error updating OTP service: ", e);
+            throw new RuntimeException("Error updating OTP service: "+ e.getMessage(), e);
         }
 
     }
@@ -76,7 +76,7 @@ public class UserService {
             userRepository.save(user);
             return;
         } catch (Exception e) {
-            throw new RuntimeException("Error saving user service: ", e);
+            throw new RuntimeException("Error saving user service: "+ e.getMessage(), e);
         }
     }
 
@@ -86,7 +86,7 @@ public class UserService {
             userRepository.delete(user);
             return;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting user service: ", e);
+            throw new RuntimeException("Error deleting user service: "+ e.getMessage(), e);
         }
     }
 
@@ -95,7 +95,7 @@ public class UserService {
             userRepository.deleteById(id);
             return;
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting user by id service: ", e);
+            throw new RuntimeException("Error deleting user by id service: "+ e.getMessage(), e);
         }
     }
 
@@ -106,7 +106,7 @@ public class UserService {
             int randInt = secureRandom.nextInt(900000) + 100000;
             return String.format("%06d", randInt);
         } catch (Exception e) {
-            throw new RuntimeException("Error generating OTP service: ", e);
+            throw new RuntimeException("Error generating OTP service: "+ e.getMessage(), e);
         }
 
     }
@@ -122,7 +122,7 @@ public class UserService {
             mailSender.send(message);
             System.out.println("Main sent successfully");
         } catch (Exception e) {
-            throw new RuntimeException("Error sending email service: ", e);
+            throw new RuntimeException("Error sending email service: "+ e.getMessage(), e);
         }
     }
 
@@ -138,7 +138,7 @@ public class UserService {
             }
             throw new RuntimeException("User not found");
         } catch (Exception e) {
-            throw new RuntimeException("Error handling OTP service: ", e);
+            throw new RuntimeException("Error handling OTP service: "+ e.getMessage(), e);
         }
     }
 
@@ -147,7 +147,7 @@ public class UserService {
             User user = findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
             return otp.equals(user.getOtp());
         } catch (Exception e) {
-            throw new RuntimeException("Error verifying OTP service: ", e);
+            throw new RuntimeException("Error verifying OTP service: "+ e.getMessage(), e);
         }
     }
 

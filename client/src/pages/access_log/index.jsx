@@ -31,7 +31,7 @@ const AccessLog = () => {
       setAccessLogData(data?.content);
     };
     fetchData();
-  }, [accessLogData, cookie.accessToken]);
+  }, [useAuth, cookie.accessToken]);
 
 
   const columns = [

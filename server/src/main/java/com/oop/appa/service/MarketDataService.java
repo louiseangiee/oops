@@ -86,7 +86,6 @@ public class MarketDataService {
                 .uri(apiUrl)
                 .retrieve()
                 .bodyToMono(JsonNode.class)
-                .onErrorMap(e -> new Exception("Error fetching intraday data.", e))
                 .block();
 
         if (response.has("Error Message")) {
@@ -104,7 +103,6 @@ public class MarketDataService {
                 .uri(apiUrl)
                 .retrieve()
                 .bodyToMono(JsonNode.class)
-                .onErrorMap(e -> new Exception("Error fetching overview data.", e))
                 .block();
         if (response.isEmpty()) {
             throw new IllegalArgumentException("No data found for symbol: " + symbol);

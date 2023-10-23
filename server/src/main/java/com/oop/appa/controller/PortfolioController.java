@@ -1,12 +1,9 @@
 package com.oop.appa.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oop.appa.dto.PortfolioCreationDTO;
 import com.oop.appa.dto.PortfolioStockCreationDTO;
 import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.PortfolioStock;
-import com.oop.appa.entity.Stock;
 import com.oop.appa.entity.User;
 import com.oop.appa.service.PortfolioService;
 import com.oop.appa.service.PortfolioStockService;
@@ -109,7 +106,7 @@ public class PortfolioController {
         portfolioService.deleteById(id);
     }
 
-    @Operation(summary = "Delete a portfolio")
+    @Operation(summary = "Delete a portfolio by portfolio object")
     @DeleteMapping
     public void delete(@RequestBody Portfolio portfolio) {
         portfolioService.delete(portfolio);

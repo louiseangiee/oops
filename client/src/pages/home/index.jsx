@@ -97,7 +97,7 @@ const Home = () => {
             style={{ width: 300, height: 300 }}
           />
           <Typography variant="h4" fontWeight="600" color={colors.grey[100]} mb="20px">
-            You have no portfolios yet. Create one now!
+            No portfolios found
           </Typography>
         </Box>
 

@@ -4,13 +4,14 @@ import com.oop.appa.dto.PortfolioCreationDTO;
 import com.oop.appa.dto.PortfolioStockCreationDTO;
 import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.PortfolioStock;
-import com.oop.appa.entity.User;
+import com.oop.appa.exception.ErrorResponse;
 import com.oop.appa.service.PortfolioService;
 import com.oop.appa.service.PortfolioStockService;
 import com.oop.appa.service.StockService;
 import com.oop.appa.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,42 +26,76 @@ import java.util.Optional;
 @RequestMapping("/portfolios")
 public class PortfolioController {
     private PortfolioService portfolioService;
-    private UserService userService;
     private PortfolioStockService portfolioStockService;
-    private StockService stockService;
 
     @Autowired
     public PortfolioController(PortfolioService portfolioService, UserService userService,
             PortfolioStockService portfolioStockService, StockService stockService) {
         this.portfolioService = portfolioService;
-        this.userService = userService;
         this.portfolioStockService = portfolioStockService;
-        this.stockService = stockService;
     }
 
     // GET endpoints
     @Operation(summary = "Retrieve all portfolios")
     @GetMapping()
-    public List<Portfolio> findAll() {
-        return portfolioService.findAll();
+    public ResponseEntity<?> findAll() {
+        try {
+            List<Portfolio> portfolios = portfolioService.findAll();
+            return ResponseEntity.ok(portfolios);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all portfolios");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     @Operation(summary = "Retrieve all portfolios with pagination")
+    @Parameter(name = "pageable", description = "pagination object")
     @GetMapping("/paged")
-    public Page<Portfolio> findAllPaged(Pageable pageable) {
-        return portfolioService.findAllPaged(pageable);
+    public ResponseEntity<?> findAllPaged(Pageable pageable) {
+        try {
+            Page<Portfolio> portfolios = portfolioService.findAllPaged(pageable);
+            return ResponseEntity.ok(portfolios);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all portfolios with pagination");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
     }
 
     @Operation(summary = "Retrieve all portfolios by user id")
+    @Parameter(name = "user_id", description = "user id")
     @GetMapping("/user/{user_id}")
-    public List<Portfolio> findByUserId(@PathVariable Integer user_id) {
-        return portfolioService.findByUserId(user_id);
+    public ResponseEntity<?> findByUserId(@PathVariable Integer user_id) {
+        try {
+            List<Portfolio> portoflios = portfolioService.findByUserId(user_id);
+            return ResponseEntity.ok(portoflios);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all portfolios by user id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
     }
 
     @Operation(summary = "Retrieve a portfolio by portfolio id")
+    @Parameter(name = "id", description = "portfolio id")
     @GetMapping("/{id}")
-    public Optional<Portfolio> findById(@PathVariable Integer id) {
-        return portfolioService.findById(id);
+    public ResponseEntity<?> findById(@PathVariable Integer id) {
+        try {
+            Optional<Portfolio> portfolio = portfolioService.findById(id);
+            return ResponseEntity.ok(portfolio);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching portfolio by id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
     }
 
     // POST endpoint for creating a new portfolio
@@ -68,105 +103,182 @@ public class PortfolioController {
     @PostMapping
     public ResponseEntity<?> createPortfolio(@RequestBody PortfolioCreationDTO portfolioDto) {
         try {
-            Optional<User> userOptional = userService.findByUserId(portfolioDto.getUser().getId());
-            if (!userOptional.isPresent()) {
-                return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
-            }
-            Portfolio portfolio = new Portfolio();
-            portfolio.setName(portfolioDto.getName());
-            portfolio.setDescription(portfolioDto.getDescription());
-            portfolio.setTotalCapital(portfolioDto.getTotalCapital());
-            portfolio.setUser(userOptional.get());
-            portfolioService.save(portfolio);
-            return new ResponseEntity<>(portfolio, HttpStatus.CREATED);
+            Portfolio portfolio = portfolioService.createPortfolio(portfolioDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(portfolio);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error creating a new portfolio");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     // PUT endpoint for updating an existing portfolio
     @Operation(summary = "Update an existing portfolio")
     @PutMapping("/{portfolioId}")
-    public void updatePortfolio(@PathVariable Integer portfolioId, @RequestBody Portfolio portfolio) {
-        // logging here
-        portfolioService.updatePortfolio(portfolioId, portfolio);
+    public ResponseEntity<?> updatePortfolio(@PathVariable Integer portfolioId, @RequestBody Portfolio portfolio) {
+        try {
+            Portfolio updatedPortfolio = portfolioService.updatePortfolio(portfolioId, portfolio);
+            return ResponseEntity.ok(updatedPortfolio);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error updating portfolio");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
-
-    // @PutMapping("/{portfolioId}/stocks")
-    // public void addStockPortfolio(@PathVariable Integer portfolioId, @RequestBody
-    // PortfolioStock stock) {
-    // portfolioService.addStockToPortfolio(portfolioId, stock);
-    // }
 
     // DELETE endpoints
     @Operation(summary = "Delete a portfolio by id")
+    @Parameter(name = "id", description = "portfolio id")
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Integer id) {
-        // logging here
-        portfolioService.deleteById(id);
+    public ResponseEntity<?> deleteById(@PathVariable Integer id) {
+        try {
+            portfolioService.deleteById(id);
+            return ResponseEntity.ok("Portfolio with ID " + id + " was successfully deleted.");
+
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error deleting portfolio by id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    
+    @Operation(summary="Delete a portfolio by user id")
+    @Parameter(name = "user_id", description = "user id")
+    @DeleteMapping("/user/{user_id}")
+    public ResponseEntity<?> deleteByUserId(@PathVariable Integer user_id) {
+        try {
+            portfolioService.deleteByUserId(user_id);
+            return ResponseEntity.ok("Portfolio with user ID " + user_id + " was successfully deleted.");
+
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error deleting portfolio by user id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
-    @Operation(summary = "Delete a portfolio by portfolio object")
-    @DeleteMapping
-    public void delete(@RequestBody Portfolio portfolio) {
-        portfolioService.delete(portfolio);
-    }
+
+    //////////////////////   PORTFOLIO STOCKS   //////////////////////////////////////
 
     // PortfolioStock endpoints
+    //GET
     @Operation(summary = "Retrieve all portfolio stocks")
     @GetMapping("/stocks")
-    public List<PortfolioStock> findAllPortfolioStocks() {
-        return portfolioStockService.findAll();
+    public ResponseEntity<?> findAllPortfolioStocks() {
+        try {
+            List<PortfolioStock> portfolios = portfolioStockService.findAll();
+            return ResponseEntity.ok(portfolios);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all portfolio stocks");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     @Operation(summary = "Retrieve all portfolio stocks by portfolio id")
+    @Parameter(name = "portfolioId", description = "portfolio id")
     @GetMapping("/{portfolioId}/stocks/")
-    public List<PortfolioStock> findByPortfolioId(@PathVariable Integer portfolioId) {
-        return portfolioStockService.findByPortfolioId(portfolioId);
+    public ResponseEntity<?> findByPortfolioId(@PathVariable Integer portfolioId) {
+        try {
+            List<PortfolioStock> portfolioStocks = portfolioStockService.findByPortfolioId(portfolioId);
+            return ResponseEntity.ok(portfolioStocks);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all portfolio stocks by portfolio id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
+    @Operation(summary = "Get an existing portfolio's portfolio stock by stock symbol")
+    @Parameter(name = "portfolioId", description = "portfolio id")
+    @Parameter(name = "stockSymbol", description = "stock symbol")
+    @GetMapping("/{portfolioId}/stocks/{stockSymbol}")
+    public ResponseEntity<?> findByPortfolioIdAndStockSymbol(@PathVariable Integer portfolioId,
+            @PathVariable String stockSymbol) {
+        try {
+            List<PortfolioStock> portfolios = portfolioStockService.findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
+            return ResponseEntity.ok(portfolios);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching portfolio stock by stock symbol");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    
+    
+    //POST
     @Operation(summary = "Create a new portfolio stock")
+    @Parameter(name = "portfolioId", description = "portfolio id")
     @PostMapping("/{portfolioId}/stocks")
-    public ResponseEntity<PortfolioStock> addStockToPortfolio(@PathVariable Integer portfolioId,
+    public ResponseEntity<?> addStockToPortfolio(@PathVariable Integer portfolioId,
             @RequestBody PortfolioStockCreationDTO stockDto) {
         try {
             PortfolioStock portfolioStock = portfolioStockService.createPortfolioStock(stockDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(portfolioStock);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error creating a new portfolio stock");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
+    //Delete
+    @Operation(summary = "Delete a portfolio stock by id")
+    @Parameter(name = "id", description = "portfolio id")
+    @DeleteMapping("/stocks/{id}")
+    public ResponseEntity<?> deletePortfolioStockById(@PathVariable Integer id) {
+        try {
+            portfolioStockService.deleteById(id);
+            return ResponseEntity.ok("Portfolio stock with ID " + id + " was successfully deleted.");
+
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error deleting portfolio stock by id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    //Other endpoints
     @Operation(summary = "Get the weight of a specific stock within a portfolio")
+    @Parameter(name = "portfolioId", description = "portfolio id")
+    @Parameter(name = "stockSymbol", description = "stock symbol")
     @GetMapping("/{portfolioId}/stocks/{stockSymbol}/weight")
-    public ResponseEntity<Double> getStockWeight(@PathVariable Integer portfolioId, 
-                                                 @PathVariable String stockSymbol) {
+    public ResponseEntity<?> getStockWeight(@PathVariable Integer portfolioId,
+            @PathVariable String stockSymbol) {
         try {
             double stockWeight = portfolioStockService.calculateStockWeight(portfolioId, stockSymbol);
             return ResponseEntity.ok(stockWeight);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(null);
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error calculating stock weight");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.internalServerError().body(error);
         }
     }
 
-    @Operation(summary = "Get an existing portfolio's portfolio stock by stock symbol")
-    @GetMapping("/{portfolioId}/stocks/{stockSymbol}")
-    public List<PortfolioStock> findByPortfolioIdAndStockSymbol(@PathVariable Integer portfolioId,
-            @PathVariable String stockSymbol) {
-        return portfolioStockService.findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
-    }
-
     @Operation(summary = "Calculate weighted return of a stock in a portfolio by portfolio id and stock symbol")
+    @Parameter(name = "portfolioId", description = "portfolio id")
+    @Parameter(name = "stockSymbol", description = "stock symbol")
     @GetMapping("/{portfolioId}/stocks/{stockSymbol}/calculateWeightedReturn")
-    public ResponseEntity<Double> calculateWeightedStockReturn(@PathVariable Integer portfolioId,
+    public ResponseEntity<?> calculateWeightedStockReturn(@PathVariable Integer portfolioId,
             @PathVariable String stockSymbol) {
         try {
             double weightedReturn = portfolioStockService.calculateWeightedStockReturn(portfolioId, stockSymbol);
             return ResponseEntity.ok(weightedReturn);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(0.0);
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error calculating weighted return");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.internalServerError().body(error);
         }
     }
 

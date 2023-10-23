@@ -1,10 +1,6 @@
 package com.oop.appa.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -35,7 +31,7 @@ public class MarketDataService {
 
         if (response.has("Error Message")) {
             String errorMessage = response.get("Error Message").asText();
-            throw new RuntimeException(errorMessage);
+            throw new RuntimeException("Error fetching month data service: " + errorMessage);
         }
         return response;
     }
@@ -53,7 +49,7 @@ public class MarketDataService {
 
         if (response.has("Error Message")) {
             String errorMessage = response.get("Error Message").asText();
-            throw new RuntimeException(errorMessage);
+            throw new RuntimeException("Error fetching daily data service: " + errorMessage);
         }
         return response;
     }
@@ -90,7 +86,7 @@ public class MarketDataService {
 
         if (response.has("Error Message")) {
             String errorMessage = response.get("Error Message").asText();
-            throw new RuntimeException(errorMessage);
+            throw new RuntimeException("Error fetching intraday data service: " + errorMessage);
         }
         return response;
     }

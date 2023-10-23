@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/portfolioStocks")
@@ -61,8 +62,8 @@ public class PortfolioStockController {
     public ResponseEntity<?> findByPortfolioIdAndStockSymbol(@PathVariable Integer portfolioId,
             @PathVariable String stockSymbol) {
         try {
-            List<PortfolioStock> portfolios = portfolioStockService.findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
-            return ResponseEntity.ok(portfolios);
+            PortfolioStock portfolioStock = portfolioStockService.findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
+            return ResponseEntity.ok(portfolioStock);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error fetching portfolio stock by stock symbol");
@@ -141,4 +142,36 @@ public class PortfolioStockController {
         }
     }
     
+    @Operation(summary = "Annualised return of a stock in a portfolio by portfolio id and stock symbol")
+    @Parameter(name = "portfolioStockId", description = "portfolio stock id")
+    @GetMapping("/{portfolioId}/stocks/{stockSymbol}/calculateAnnualisedReturn")
+    public ResponseEntity<?> calculateAnnualisedReturn(@PathVariable Integer portfolioId,
+    @PathVariable String stockSymbol) {
+        try {
+            double annualisedReturn = portfolioStockService.calculateAnnualisedReturn(portfolioId, stockSymbol);
+            return ResponseEntity.ok(annualisedReturn);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error calculating annualised return");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.internalServerError().body(error);
+        }
+    }
+
+    @Operation(summary = "Groups the portfolio stocks into a sector and returns a map of the Stock, its actual value and percentage of the portfolio")
+    @Parameter(name = "portfolioId", description = "portfolio id")
+    @Parameter(name = "groupBy", description = "group by 'sector', 'industry' or 'exchange'" )
+    @GetMapping("/{portfolioId}/stocks")
+    public ResponseEntity<?> getPortfolioStocksByGroup(@PathVariable Integer portfolioId,
+            @RequestParam String groupBy) {
+        try {
+            Map<String, Map<String, Double>> portfolioStocksBySector = portfolioStockService.calculateTotalPortfolioValueByGroup(portfolioId, groupBy);
+            return ResponseEntity.ok(portfolioStocksBySector);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error getting portfolio stocks by sector");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.internalServerError().body(error);
+        }
+    }
 }

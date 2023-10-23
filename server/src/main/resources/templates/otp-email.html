@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Libre+Bodoni:wght@700&display=swap');
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .header {
+            background-color: #6B96C3;
+            text-align: left;
+            color: #ffffff;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            padding-left: 20px; /* Adjust left padding */
+            padding-top: 10px;  /* Adjust top padding */
+            padding-bottom: 10px; /* Adjust bottom padding */
+        }
+
+        .otp {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f2f2f2;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        .header span {
+            font-family: 'Libre Bodoni','Serif';
+            font-weight: 900;
+            font-size: 36px;
+            line-height: 0.7;
+        }
+
+
+        .footer {
+            background-color: #6B96C3;
+            padding: 10px 0;
+            font-size: 12px;
+            color: #ffffff;
+            text-align: center;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span>Goldman<br>Sachs</span>
+        </div>
+        <p>Hello,</p>
+        <p>We received a request for an OTP for your account. Your OTP is:</p>
+        <div class="otp" th:text="${otp}"></div>
+        <p>If you did not request this OTP, please ignore this email or contact support.</p>
+        <div class="footer">
+            &copy; 2023 Goldman Sachs OOP. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

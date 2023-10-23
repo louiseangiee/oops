@@ -2,7 +2,11 @@ package com.oop.appa.service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,7 +55,8 @@ public class PortfolioStockService {
         try {
             return portfolioStockRepository.findAll(pageable);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all PortfolioStocks with pagination service: " + e.getMessage(), e);
+            throw new RuntimeException("Error fetching all PortfolioStocks with pagination service: " + e.getMessage(),
+                    e);
         }
     }
 
@@ -59,13 +64,16 @@ public class PortfolioStockService {
         try {
             return portfolioStockRepository.findByPortfolioPortfolioId(portfolio_id);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all PortfolioStocks by portfolio ID service: " + portfolio_id, e);
+            throw new RuntimeException("Error fetching all PortfolioStocks by portfolio ID service: " + portfolio_id,
+                    e);
         }
     }
 
-    public List<PortfolioStock> findByPortfolioIdAndStockSymbol(Integer portfolioId, String stockSymbol) {
+    public PortfolioStock findByPortfolioIdAndStockSymbol(Integer portfolioId, String stockSymbol) {
         try {
-            return portfolioStockRepository.findByPortfolioPortfolioIdAndStockStockSymbol(portfolioId, stockSymbol);
+            return portfolioStockRepository.findByPortfolioPortfolioIdAndStockStockSymbol(portfolioId, stockSymbol)
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Stock " + stockSymbol + "not found in portfolio id" + portfolioId));
         } catch (Exception e) {
             throw new RuntimeException("Error fetching PortfolioStock by portfolio ID: " + portfolioId
                     + " and stock symbol: " + stockSymbol, e);
@@ -107,7 +115,7 @@ public class PortfolioStockService {
                 return portfolioStockRepository.save(portfolioStock);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error creating PortfolioStock service: " + e.getMessage() , e);
+            throw new RuntimeException("Error creating PortfolioStock service: " + e.getMessage(), e);
         }
 
     }
@@ -124,7 +132,8 @@ public class PortfolioStockService {
     // DELETE
     public void delete(PortfolioStock portfolioStock) {
         try {
-            PortfolioStock portfolioStockRef = portfolioStockRepository.findById(portfolioStock.getId()).orElseThrow(()-> new EntityNotFoundException("PortfolioStock not found"));
+            PortfolioStock portfolioStockRef = portfolioStockRepository.findById(portfolioStock.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("PortfolioStock not found"));
             portfolioStockRepository.delete(portfolioStock);
             String action = String.format("User deletes stock %s from portfolio ID: %d Name: %s",
                     portfolioStockRef.getStock().getStockSymbol(), portfolioStockRef.getPortfolio().getPortfolioId(),
@@ -138,7 +147,8 @@ public class PortfolioStockService {
 
     public void deleteById(int portfolioStockId) {
         try {
-            PortfolioStock portfolioStock = portfolioStockRepository.findById(portfolioStockId).orElseThrow(()-> new EntityNotFoundException("PortfolioStock not found"));
+            PortfolioStock portfolioStock = portfolioStockRepository.findById(portfolioStockId)
+                    .orElseThrow(() -> new EntityNotFoundException("PortfolioStock not found"));
             portfolioStockRepository.deleteById(portfolioStockId);
             String action = String.format("User deletes stock %s from portfolio ID: %d Name: %s",
                     portfolioStock.getStock().getStockSymbol(), portfolioStock.getPortfolio().getPortfolioId(),
@@ -150,28 +160,17 @@ public class PortfolioStockService {
         }
     }
 
-    //Other services
+    // Other services
     public double calculateWeightedStockReturn(Integer portfolioId, String stockSymbol) {
         try {
-            List<PortfolioStock> stocks = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
-            if (stocks.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "No PortfolioStock found for portfolio ID: " + portfolioId + " and stock symbol: "
-                                + stockSymbol);
-            }
+            PortfolioStock stock = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
             double totalReturn = 0;
-            int totalQuantity = 0;
+            int totalQuantity = stock.getQuantity();
             double currentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
-                    .path("5. close price").asDouble();
-            for (PortfolioStock stock : stocks) {
-                totalQuantity += stock.getQuantity();
-            }
-            for (PortfolioStock stock : stocks) {
-                double buyPrice = stock.getBuyPrice();
-                double individualReturn = ((currentPrice - buyPrice) / buyPrice) * 100;
-
-                totalReturn += (double) stock.getQuantity() / totalQuantity * individualReturn;
-            }
+                    .path("05. price").asDouble();
+            double buyPrice = stock.getBuyPrice();
+            double individualReturn = ((currentPrice - buyPrice) / buyPrice) * 100;
+            totalReturn += (double) stock.getQuantity() / totalQuantity * individualReturn;
             return totalReturn;
         } catch (Exception e) {
             throw new RuntimeException("Error calculating weighted stock return service: " + e.getMessage(), e);
@@ -181,32 +180,22 @@ public class PortfolioStockService {
 
     public double calculateStockWeight(Integer portfolioId, String stockSymbol) {
         try {
-            List<PortfolioStock> stocks = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
-            if (stocks.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "No PortfolioStock found for portfolio ID: " + portfolioId + " and stock symbol: "
-                                + stockSymbol);
-            }
-
+            PortfolioStock currentStock = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
             double currentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
-                    .path("5. close price").asDouble();
-
-            double stockMarketValue = 0; // Market value of the specific stock
-            double totalPortfolioValue = 0; // Total market value of all stocks in the portfolio
-
-            for (PortfolioStock stock : stocks) {
-                stockMarketValue += stock.getQuantity() * currentPrice;
-            }
-
+                    .path("05. price").asDouble();
+            double stockMarketValue = currentStock.getQuantity() * currentPrice;
+            System.out.println(stockSymbol);
+            System.out.println(currentPrice);
+            System.out.println(stockMarketValue);
             // You'd need a method to fetch all stocks in the portfolio to calculate the
             // total portfolio value
+            double totalPortfolioValue = 0; // Total market value of all stocks in the portfolio
             List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
             for (PortfolioStock stock : allStocksInPortfolio) {
                 double stockPrice = marketDataService.fetchCurrentData(stock.getStockSymbol()).path("Global Quote")
-                        .path("5. close price").asDouble();
+                        .path("05. price").asDouble();
                 totalPortfolioValue += stock.getQuantity() * stockPrice;
             }
-
             return stockMarketValue / totalPortfolioValue;
         } catch (Exception e) {
             throw new RuntimeException("Error calculating stock weight service: " + e.getMessage(), e);
@@ -214,23 +203,67 @@ public class PortfolioStockService {
 
     }
 
-    public double calculateAnnualisedReturn(Integer portfolioStockId) {
+    public double calculateAnnualisedReturn(Integer portfolioStockId, String stockSymbol) {
         try {
-            PortfolioStock stock = portfolioStockRepository.findById(portfolioStockId).orElse(null);
+            PortfolioStock stock = portfolioStockRepository
+                    .findByPortfolioPortfolioIdAndStockStockSymbol(portfolioStockId, stockSymbol).orElse(null);
             if (stock == null) {
                 throw new IllegalArgumentException("PortfolioStock not found for ID: " + portfolioStockId);
             }
             double currentPrice = marketDataService.fetchCurrentData(stock.getStock().getStockSymbol())
                     .path("Global Quote")
-                    .path("5. close price").asDouble();
+                    .path("05. close price").asDouble();
             double buyPrice = stock.getBuyPrice();
             long days = getDaysHeld(portfolioStockId);
-
             return ((Math.pow((currentPrice / buyPrice), (365.0 / days))) - 1) * 100;
         } catch (Exception e) {
             throw new RuntimeException("Error calculating annualised return service: " + e.getMessage(), e);
         }
 
+    }
+
+    public Map<String, Map<String, Double>> calculateTotalPortfolioValueByGroup(Integer portfolioId, String groupBy) {
+        try {
+            List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
+
+            Map<String, Double> currentPrices = new HashMap<>();
+            for (PortfolioStock stock : allStocksInPortfolio) {
+                String stockSymbol = stock.getStock().getStockSymbol();
+                if (!currentPrices.containsKey(stockSymbol)) {
+                    double currentPrice = marketDataService.fetchCurrentData(stockSymbol)
+                            .path("Global Quote").path("05. price").asDouble();
+                    currentPrices.put(stockSymbol, currentPrice);
+                }
+            }
+
+            double totalPortfolioValue = allStocksInPortfolio.stream()
+                    .mapToDouble(stock -> stock.getQuantity() * currentPrices.get(stock.getStock().getStockSymbol()))
+                    .sum();
+
+            Function<PortfolioStock, String> groupingFunction = getGroupingFunction(groupBy);
+
+            Map<String, Double> valueByGroup = allStocksInPortfolio.stream()
+                    .collect(Collectors.groupingBy(
+                            groupingFunction,
+                            Collectors.summingDouble(stock -> stock.getQuantity()
+                                    * currentPrices.get(stock.getStock().getStockSymbol()))));
+
+            // Construct the result
+            Map<String, Map<String, Double>> result = valueByGroup.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            entry -> {
+                                Map<String, Double> details = new HashMap<>();
+                                details.put("actualValue", entry.getValue());
+                                details.put("percentage", (entry.getValue() / totalPortfolioValue) * 100);
+                                return details;
+                            }));
+
+            return result;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error calculating total portfolio value by sector: " + e.getMessage(), e);
+        }
     }
 
     public Long getDaysHeld(Integer portfolioStockId) {
@@ -246,6 +279,20 @@ public class PortfolioStockService {
             throw new RuntimeException("Error calculating days held service: " + e.getMessage(), e);
         }
 
+    }
+
+    private Function<PortfolioStock, String> getGroupingFunction(String groupBy) {
+        switch (groupBy.toLowerCase()) {
+            case "sector":
+                return stock -> stock.getStock().getSector();
+            case "industry":
+                return stock -> stock.getStock().getIndustry();
+            // case "exchange":
+            // // Assuming Stock has a getExchange() method. If not, adjust accordingly.
+            // return stock -> stock.getStock().getExchange();
+            default:
+                throw new IllegalArgumentException("Unsupported groupBy value: " + groupBy);
+        }
     }
 
 }

@@ -140,6 +140,10 @@ public class PortfolioService {
     public void deleteByUserId(Integer user_id) {
         try {
             portfolioRepository.deleteByUserId(user_id);
+            List<Portfolio> portfolios = portfolioRepository.findByUserId(user_id);
+            User user = portfolios.get(0).getUser();
+            String action = String.format("User deletes all portfolios under user ID: " + user_id);
+            accessLogRepository.save(new AccessLog(user, action));
         } catch (Exception e) {
             throw new RuntimeException("Error deleting portfolio service: "+ e.getMessage(), e);
         }

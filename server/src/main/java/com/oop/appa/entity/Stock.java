@@ -32,18 +32,23 @@ public class Stock {
     @JsonManagedReference(value = "stock-portfoliostock")
     private List<PortfolioStock> portfolioStocks;
 
+    @Column(name = "exchange")
+    private String exchange;
 
     // Default constructor
     public Stock() {
     }
 
     // Parameterized constructor
-    public Stock(String stockSymbol, String name, String industry, String sector, String country) {
+    public Stock(String stockSymbol, String name, String industry, String sector, String country,
+    List<PortfolioStock> portfolioStocks, String exchange) {
         this.stockSymbol = stockSymbol;
         this.name = name;
         this.industry = industry;
         this.sector = sector;
         this.country = country;
+        this.portfolioStocks = portfolioStocks;
+        this.exchange = exchange;
     }
 
     // Getters and setters
@@ -109,6 +114,6 @@ public class Stock {
     @Override
     public String toString() {
         return "Stock [stockSymbol=" + stockSymbol + ", name=" + name + ", industry=" + industry + ", sector=" + sector
-                + ", country=" + country + "]";
+                + ", country=" + country + ", portfolioStocks=" + portfolioStocks + ", exchange=" + exchange + "]";
     }
 }

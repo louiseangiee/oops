@@ -21,16 +21,24 @@ const Home = () => {
   const [cookie] = useCookies();
 
   const { userData } = useAuth();
+  const role = userData.role;
   const [searchQuery, setSearchQuery] = useState(""); // State variable to store the search query
   const [filteredData, setFilteredData] = useState([]); // State variable for filtered results
 
   useEffect(() => {
     const fetchData = async () => {
       if (!userData.id) return;
-      const response = await getAsync('portfolios/user/' + userData.id, cookie.accessToken);
-      const data = await response.json();
-      console.log(data);
-      setDataFetched(data);
+      if (role === "ROLE_ADMIN") {
+        const response = await getAsync('portfolios', cookie.accessToken);
+        const data = await response.json();
+        setDataFetched(data);
+        console.log(data);
+      } else if (role === "ROLE_USER"){
+        const response = await getAsync('portfolios/user/' + userData.id, cookie.accessToken);
+        const data = await response.json();
+        setDataFetched(data);
+        console.log(data);
+      }
     }
     fetchData();
 
@@ -47,7 +55,7 @@ const Home = () => {
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="PORTFOLIOS" subtitle="Welcome to your portfolios page!" />
+        <Header title="PORTFOLIOS" subtitle={role === "ROLE_USER" ? "Welcome to your portfolios page!" : "Welcome Admin!"} />
 
         <Box>
           <CreatePortfolio />

@@ -204,7 +204,7 @@ const Portfolio = () => {
   const colors = tokens(theme.palette.mode);
   const [cookie, removeCookie] = useCookies(["accessToken"]);
 
-  const user = useAuth();
+  const { userData } = useAuth();
 
   // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
@@ -215,16 +215,28 @@ const Portfolio = () => {
 
   // Function to fetch portfolio data
   const fetchPortfolioData = async () => {
-    if (user && portfolioId) {
-      const response = await getAsync(`portfolios/${user.userData.id}/${portfolioId}`, cookie.accessToken);
-      if (!response.ok) {
-        // Handle the case when the response is not OK, for example, show an error message.
-        setPortfolioData(null);
-        return;
+    if (userData && portfolioId) {
+      if (userData.role === "ROLE_ADMIN") {
+        const response = await getAsync(`portfolios/${portfolioId}`, cookie.accessToken);
+        if (!response.ok) {
+          // Handle the case when the response is not OK, for example, show an error message.
+          setPortfolioData(null);
+          return;
+        }
+        const data = await response.json();
+        setPortfolioData(data);
+        console.log(data);
+      } else if (userData.role === "ROLE_USER") {
+        const response = await getAsync(`portfolios/${userData.id}/${portfolioId}`, cookie.accessToken);
+        if (!response.ok) {
+          // Handle the case when the response is not OK, for example, show an error message.
+          setPortfolioData(null);
+          return;
+        }
+        const data = await response.json();
+        setPortfolioData(data);
+        console.log(data);
       }
-      const data = await response.json();
-      setPortfolioData(data);
-      console.log(data);
     }
   };
 

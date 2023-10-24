@@ -119,6 +119,7 @@ const Home = () => {
                 justifyContent="center"
                 key={index}
                 padding="20px"
+                borderRadius="3px"
               >
                 <PortfolioCard
                   title={portfolio.name}

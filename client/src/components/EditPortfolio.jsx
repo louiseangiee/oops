@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { getAsync, putAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
+import loadingLight from "./lotties/loading_light.json"
+import Lottie from 'lottie-react';
 
 
 export default function EditPortfolio({ portfolioId, small }) {
@@ -24,8 +26,13 @@ export default function EditPortfolio({ portfolioId, small }) {
     const [updatedName, setUpdatedName] = useState('');
     const [updatedDescription, setUpdatedDescription] = useState('');
     const [updatedCapital, setUpdatedCapital] = useState('');
-
-
+    const [capitalError, setCapitalError] = useState(false);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    // Add state variables to track whether the fields have been edited
+    const [isNameEdited, setIsNameEdited] = useState(false);
+    const [isDescriptionEdited, setIsDescriptionEdited] = useState(false);
+    const [isCapitalEdited, setIsCapitalEdited] = useState(false);
+    const [loading, setLoading] = useState(false); // Add a loading state
 
 
     useEffect(() => {
@@ -39,7 +46,29 @@ export default function EditPortfolio({ portfolioId, small }) {
             console.log(data);
         }
         fetchData();
-    }, [portfolioId, portfolioData, updatedCapital, updatedName, updatedDescription, cookie.accessToken]);
+
+        if (!/^\d*\.?\d*$/.test(updatedCapital) || updatedCapital === '' || parseFloat(updatedCapital) <=0) {
+            setCapitalError(true);
+            setIsButtonDisabled(true);
+            return; // Prevent form submission
+        } else {
+            setIsButtonDisabled(false);
+            setCapitalError(false);
+        }
+
+        // if (capitalError) {
+        //     setIsButtonDisabled(true);
+        // } else {
+        //     setIsButtonDisabled(false);
+        // }
+
+        // if (updatedName === portfolioData?.name && updatedDescription === portfolioData?.description && updatedCapital === portfolioData?.totalCapital) {
+        //     setIsButtonDisabled(true);
+        // } else {
+        //     setIsButtonDisabled(false);
+        // }
+
+    }, [portfolioId, updatedCapital]);
 
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
@@ -52,6 +81,12 @@ export default function EditPortfolio({ portfolioId, small }) {
 
     const handleClose = () => {
         setOpen(false);
+        setUpdatedCapital('');
+        setUpdatedDescription('');
+        setUpdatedName('');
+        setIsNameEdited(false);
+        setIsDescriptionEdited(false);
+        setIsCapitalEdited(false);
     };
 
     // error alert handler
@@ -67,7 +102,7 @@ export default function EditPortfolio({ portfolioId, small }) {
     const handleOpenSuccessAlert = () => {
         setIsSuccessAlertOpen(true);
         setIsErrorAlertOpen(false);
-        
+
     };
     const handleCloseSuccessAlert = () => {
         setIsSuccessAlertOpen(false);
@@ -77,6 +112,7 @@ export default function EditPortfolio({ portfolioId, small }) {
 
     const handleChanges = () => {
         // Gather the form data (e.g., portfolio name, description, capital)
+        setLoading(true);
         const formData = {
             name: portfolioData.name,
             description: portfolioData.description,
@@ -99,13 +135,20 @@ export default function EditPortfolio({ portfolioId, small }) {
         }
 
         console.log(formData);
+        setLoading(true);
 
         async function editPortfolio() {
             const response = await putAsync('portfolios/' + portfolioId, formData, cookie.accessToken);
             if (response.ok) {
+                setLoading(false);
                 handleOpenSuccessAlert();
                 setOpen(false);
-                setPortfolioData({ ...portfolioData, name: updatedName });
+                setUpdatedCapital('');
+                setUpdatedDescription('');
+                setUpdatedName('');
+                setIsNameEdited(false);
+                setIsDescriptionEdited(false);
+                setIsCapitalEdited(false);
                 return;
                 // setTimeout(() => {
                 //     navigate("/portfolio/" + portfolioId);
@@ -113,6 +156,7 @@ export default function EditPortfolio({ portfolioId, small }) {
                 // window.location.reload();
                 // fetchData();
             } else {
+                setLoading(false);
                 handleOpenErrorAlert();
             }
         }
@@ -182,7 +226,7 @@ export default function EditPortfolio({ portfolioId, small }) {
                         variant="standard"
                         sx={{ color: colors.grey[100] }}
                         defaultValue={portfolioData?.name}
-                        onChange={(e) => setUpdatedName(e.target.value)}
+                        onInput={(e) => { setUpdatedName(e.target.value); setIsNameEdited(true) }}
                         InputProps={{
                             classes: {
                                 notchedOutline: 'portfolio-name-outline',
@@ -199,7 +243,7 @@ export default function EditPortfolio({ portfolioId, small }) {
                         variant="standard"
                         sx={{ color: colors.grey[100] }}
                         defaultValue={portfolioData?.description}
-                        onChange={(e) => setUpdatedDescription(e.target.value)}
+                        onChange={(e) => { setUpdatedDescription(e.target.value); setIsDescriptionEdited(true) }}
                     />
                     <TextField
                         margin="dense"
@@ -210,10 +254,12 @@ export default function EditPortfolio({ portfolioId, small }) {
                         variant="standard"
                         sx={{ color: colors.grey[100] }}
                         defaultValue={portfolioData?.totalCapital}
-                        onChange={(e) => setUpdatedCapital(e.target.value)}
+                        onChange={(e) => { setUpdatedCapital(e.target.value); setIsCapitalEdited(true) }}
                         InputProps={{
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
+                        error={capitalError && isCapitalEdited} // Show error only if edited
+                        helperText={capitalError && isCapitalEdited ? 'Invalid capital value' : ''}
                     />
                     <style jsx>{`
                         .portfolio-name-outline {
@@ -223,9 +269,32 @@ export default function EditPortfolio({ portfolioId, small }) {
 
                     `}</style>
                 </DialogContent>
-                <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
-                    <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} onClick={handleChanges}>Confirm Changes</Button>
+                <DialogActions
+                    sx={{ backgroundColor: colors.primary[400], paddingBottom: "30px", paddingRight: "20px" }}
+                >
+                    <Button
+                        onClick={handleClose}
+                        sx={{ color: colors.grey[300], fontWeight: "bold" }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type="submit"
+                        sx={{ backgroundColor: loading ? colors.greenAccent[600] : colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold", width: "150px", height: "40px", "&:hover": { backgroundColor: colors.greenAccent[600]}}}
+                        onClick={handleChanges}
+                        disabled={ !isNameEdited && !isDescriptionEdited && (capitalError || !isCapitalEdited) }
+                    >
+                        {loading ?  
+                            <Lottie
+                                animationData={loadingLight}
+                                loop={true} // Set to true for looping
+                                autoplay={true} // Set to true to play the animation automatically
+                                style={{ width: '80px', height: '80px' }} // Customize the dimensions
+                            /> 
+                            : 
+                            "Confirm Changes"
+                        }
+                    </Button>
                 </DialogActions>
             </Dialog>
         </div>

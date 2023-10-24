@@ -3,24 +3,25 @@ package com.oop.appa.entity;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="portfolio_stocks")
+@Table(name = "portfolio_stocks")
 public class PortfolioStock {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "portfolio_stock_id")
     private Integer id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "portfolio_id", nullable = false)
     @JsonBackReference(value = "portfolio-portfoliostock")
     private Portfolio portfolio;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinColumn(name = "stock_symbol", nullable = false)
     @JsonBackReference(value = "stock-portfoliostock")
     private Stock stock;
@@ -33,6 +34,26 @@ public class PortfolioStock {
 
     @Column(name = "buy_date")
     private LocalDate buyDate;
+
+    @JsonProperty("stockSymbol")
+    public String getStockSymbol() {
+        return this.stock.getStockSymbol();
+    }
+
+    @JsonProperty("stockCountry")
+    public String getStockCountry() {
+        return this.stock.getCountry();
+    }
+
+    @JsonProperty("stockIndustry")
+    public String getStockIndustry() {
+        return this.stock.getIndustry();
+    }
+
+    @JsonProperty("stockSector")
+    public String getStockSector() {
+        return this.stock.getSector();
+    }
 
     public PortfolioStock() {
 
@@ -95,7 +116,8 @@ public class PortfolioStock {
 
     @Override
     public String toString() {
-        return "PortfolioStock [id=" + id + ", portfolio=" + portfolio.getPortfolioId() + ", stock=" + stock.getStockSymbol() + ", buyPrice=" + buyPrice
+        return "PortfolioStock [id=" + id + ", portfolio=" + portfolio.getPortfolioId() + ", stock="
+                + stock.getStockSymbol() + ", buyPrice=" + buyPrice
                 + ", quantity=" + quantity + "]";
     }
 

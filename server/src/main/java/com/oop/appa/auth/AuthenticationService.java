@@ -1,7 +1,9 @@
 package com.oop.appa.auth;
 
 import com.oop.appa.config.JwtService;
+import com.oop.appa.dao.AccessLogRepository;
 import com.oop.appa.dao.UserRepository;
+import com.oop.appa.entity.AccessLog;
 import com.oop.appa.entity.Role;
 import com.oop.appa.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +19,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
+    private final AccessLogRepository accessLogRepository;
 
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
@@ -28,6 +30,7 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
+        accessLogRepository.save(new AccessLog(user, "User creates account"));
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
@@ -41,6 +44,7 @@ public class AuthenticationService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
+        accessLogRepository.save(new AccessLog(user, "User logs in"));
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 }

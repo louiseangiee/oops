@@ -11,7 +11,7 @@ const Layout = () => {
 		<>
 			<Sidebar isSidebar={isSidebar} />
 			<main className="content">
-				<Topbar setIsSidebar={setIsSidebar} visible={true}/>
+				<Topbar setIsSidebar={setIsSidebar} invisible/>
 				<Outlet />
 			</main>
 		</>

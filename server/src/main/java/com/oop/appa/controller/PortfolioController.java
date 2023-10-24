@@ -2,10 +2,11 @@ package com.oop.appa.controller;
 
 import com.oop.appa.dto.PortfolioCreationDTO;
 import com.oop.appa.entity.Portfolio;
-import com.oop.appa.entity.PortfolioStock;
-import com.oop.appa.entity.User;
+import com.oop.appa.exception.ErrorResponse;
 import com.oop.appa.service.PortfolioService;
-import com.oop.appa.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,83 +21,152 @@ import java.util.Optional;
 @RequestMapping("/portfolios")
 public class PortfolioController {
     private PortfolioService portfolioService;
-    private UserService userService;
 
     @Autowired
-    public PortfolioController(PortfolioService portfolioService, UserService userService) {
+    public PortfolioController(PortfolioService portfolioService) {
         this.portfolioService = portfolioService;
-        this.userService = userService;
     }
 
     // GET endpoints
+    @Operation(summary = "Retrieve all portfolios")
     @GetMapping()
-    public List<Portfolio> findAll() {
-        return portfolioService.findAll();
+    public ResponseEntity<?> findAll() {
+        try {
+            List<Portfolio> portfolios = portfolioService.findAll();
+            return ResponseEntity.ok(portfolios);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all portfolios");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
+    @Operation(summary = "Retrieve all portfolios with pagination")
+    @Parameter(name = "pageable", description = "pagination object")
     @GetMapping("/paged")
-    public Page<Portfolio> findAllPaged(Pageable pageable) {
-        return portfolioService.findAllPaged(pageable);
+    public ResponseEntity<?> findAllPaged(Pageable pageable) {
+        try {
+            Page<Portfolio> portfolios = portfolioService.findAllPaged(pageable);
+            return ResponseEntity.ok(portfolios);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all portfolios with pagination");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
     }
 
+    @Operation(summary = "Retrieve all portfolios by user id")
+    @Parameter(name = "user_id", description = "user id")
     @GetMapping("/user/{user_id}")
-    public List<Portfolio> findByUserId(@PathVariable Integer user_id) {
-        return portfolioService.findByUserId(user_id);
+    public ResponseEntity<?> findByUserId(@PathVariable Integer user_id) {
+        try {
+            List<Portfolio> portoflios = portfolioService.findByUserId(user_id);
+            return ResponseEntity.ok(portoflios);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all portfolios by user id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
     }
 
+    @Operation(summary = "Retrieve a portfolio by portfolio id")
+    @Parameter(name = "id", description = "portfolio id")
     @GetMapping("/{id}")
-    public Optional<Portfolio> findById(@PathVariable Integer id) {
-        return portfolioService.findById(id);
+    public ResponseEntity<?> findById(@PathVariable Integer id) {
+        try {
+            Optional<Portfolio> portfolio = portfolioService.findById(id);
+            return ResponseEntity.ok(portfolio);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching portfolio by id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
+    }
+
+    @Operation(summary = "Retrieve portfolio by user id and user id")
+    @Parameter(name = "userId", description = "user id")
+    @Parameter(name = "portfolioId", description = "portfolio id")
+    @GetMapping("/{userId}/{portfolioId}")
+    public ResponseEntity<?> findByUserIdPortfolioId(@PathVariable Integer userId, @PathVariable Integer portfolioId) {
+        try {
+            Portfolio portfolio = portfolioService.findByUserIdPortfolioId(userId, portfolioId);
+            return ResponseEntity.ok(portfolio);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching portfolio by user id and portfolio id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
     }
 
     // POST endpoint for creating a new portfolio
-    // POST endpoint for creating a new portfolio
+    @Operation(summary = "Create a new portfolio")
     @PostMapping
     public ResponseEntity<?> createPortfolio(@RequestBody PortfolioCreationDTO portfolioDto) {
         try {
-            // Fetch the user based on userId from the DTO's nested UserReference
-            Optional<User> userOptional = userService.findByUserId(portfolioDto.getUser().getId());
-
-            if (!userOptional.isPresent()) {
-                return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
-            }
-
-            // Create a new Portfolio entity and set its fields using the DTO
-            Portfolio portfolio = new Portfolio();
-            portfolio.setName(portfolioDto.getName());
-            portfolio.setDescription(portfolioDto.getDescription());
-            portfolio.setTotalCapital(portfolioDto.getTotalCapital());
-            portfolio.setUser(userOptional.get()); // Use .get() to retrieve the User from the Optional
-
-            // Save the new Portfolio entity
-            portfolioService.save(portfolio);
-
-            return new ResponseEntity<>(portfolio, HttpStatus.CREATED);
+            Portfolio portfolio = portfolioService.createPortfolio(portfolioDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(portfolio);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error creating a new portfolio");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     // PUT endpoint for updating an existing portfolio
+    @Operation(summary = "Update an existing portfolio")
     @PutMapping("/{portfolioId}")
-    public void updatePortfolio(@PathVariable Integer portfolioId, @RequestBody Portfolio portfolio) {
-        portfolioService.updatePortfolio(portfolioId, portfolio);
-    }
-
-    @PutMapping("/{portfolioId}/stocks")
-    public void addStockPortfolio(@PathVariable Integer portfolioId, @RequestBody PortfolioStock stock) {
-        portfolioService.addStockToPortfolio(portfolioId, stock);
+    public ResponseEntity<?> updatePortfolio(@PathVariable Integer portfolioId, @RequestBody Portfolio portfolio) {
+        try {
+            Portfolio updatedPortfolio = portfolioService.updatePortfolio(portfolioId, portfolio);
+            return ResponseEntity.ok(updatedPortfolio);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error updating portfolio");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     // DELETE endpoints
+    @Operation(summary = "Delete a portfolio by id")
+    @Parameter(name = "id", description = "portfolio id")
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Integer id) {
-        portfolioService.deleteById(id);
-    }
+    public ResponseEntity<?> deleteById(@PathVariable Integer id) {
+        try {
+            portfolioService.deleteById(id);
+            return ResponseEntity.ok("Portfolio with ID " + id + " was successfully deleted.");
 
-    @DeleteMapping
-    public void delete(@RequestBody Portfolio portfolio) {
-        portfolioService.delete(portfolio);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error deleting portfolio by id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
+    
+    @Operation(summary="Delete a portfolio by user id")
+    @Parameter(name = "user_id", description = "user id")
+    @DeleteMapping("/user/{user_id}")
+    public ResponseEntity<?> deleteByUserId(@PathVariable Integer user_id) {
+        try {
+            portfolioService.deleteByUserId(user_id);
+            return ResponseEntity.ok("Portfolio with user ID " + user_id + " was successfully deleted.");
 
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error deleting portfolio by user id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
 }

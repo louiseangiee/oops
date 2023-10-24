@@ -4,47 +4,47 @@ import { tokens } from "../../theme";
 import { mockAccessLogs, mockDataContacts } from "../../data/mockData";
 import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
+import { getAsync } from "../../utils/utils";
+import { useCookies } from "react-cookie";
+import { useAuth } from "../../context/AuthContext";
+import { useEffect, useState } from "react";
+import Lottie from 'lottie-react';
+import noData from './no_data.json';
+import loading from './fetching_data.json';
 
 const AccessLog = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [cookie] = useCookies(["accessToken"]);
+  const [accessLogData, setAccessLogData] = useState(null);
+
+  const userData = useAuth().userData;
+  // const accessLogs = userData.accessLogs;
+  const userId = userData.id;
+  // console.log(accessLogs);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getAsync("accessLogs/user/" + userId, cookie.accessToken);
+      const data = await response.json();
+      console.log(data?.content);
+      setAccessLogData(data?.content);
+    };
+    fetchData();
+  }, [useAuth, cookie.accessToken]);
+
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.5 },
-    { field: "userId", headerName: "User ID" },
-    // {
-    //   field: "name",
-    //   headerName: "Name",
-    //   flex: 1,
-    //   cellClassName: "name-column--cell",
-    // },
+    { field: "logId", headerName: "ID" },
+    { field: "action", headerName: "Action", flex: 1 },
     {
-      field: "time",
-      headerName: "Time",
+      field: "timestamp",
+      headerName: "Timestamp",
       type: "dateTime",
       headerAlign: "left",
       align: "left",
       flex: 1,
-    },
-    {
-      field: "HTTPMethod",
-      headerName: "HTTP Method",
-      flex: 1,
-    },
-    {
-      field: "endpoint",
-      headerName: "Request Endpoint",
-      flex: 1,
-    },
-    {
-      field: "responseCode",
-      headerName: "Response Code",
-      flex: 1,
-    },
-    {
-      field: "auth",
-      headerName: "Authentication Status",
-      flex: 1,
+      valueGetter: (params) => new Date(params.value),
     },
   ];
 
@@ -86,11 +86,33 @@ const AccessLog = () => {
           },
         }}
       >
-        <DataGrid
-          rows={mockAccessLogs}
-          columns={columns}
-          components={{ Toolbar: GridToolbar }}
-        />
+        {!accessLogData ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+            <Lottie
+              animationData={loading}
+              loop={true} // Set to true for looping
+              autoplay={true} // Set to true to play the animation automatically
+              style={{ width: 300, height: 300 }}
+            />
+          </Box>
+        ) : accessLogData.length === 0 ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+            <Lottie
+              animationData={noData}
+              loop={true} // Set to true for looping
+              autoplay={true} // Set to true to play the animation automatically
+              style={{ width: 300, height: 300 }}
+            />
+          </Box>
+          ) : (
+          <DataGrid
+            rows={accessLogData}
+            columns={columns}
+            components={{ Toolbar: GridToolbar }}
+            getRowId={(row) => row.logId}
+          />
+        )}
+
       </Box>
     </Box>
   );

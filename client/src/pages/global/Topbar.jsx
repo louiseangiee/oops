@@ -11,7 +11,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { Link } from 'react-router-dom';
 
-const Topbar = ({ visible }) => {
+const Topbar = ({ invisible }) => {
     // grabs the theme, allow you to have access to the theme
     const theme = useTheme();
     // anytime we want to use the color mode from MUI, we can grab it from useTheme and pass it to tokens
@@ -21,41 +21,15 @@ const Topbar = ({ visible }) => {
 
     return (
         <Box display="flex" justifyContent="space-between" p={2}> {/* Box component is like a div component but it's convenient because you can put CSS properties into the Box component directly */}
-            {/* SEARCH BAR */}
-            {visible ? (
-                <Box display="flex">
-                    <Box
-                        display="flex"
-                        backgroundColor={colors.primary[400]}
-                        borderRadius="3px"
-                        visibility={visible ? "visible" : "hidden"}
-                    >
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-                        <IconButton type="button" sx={{ p: 1 }}>
-                            <SearchIcon />
-                        </IconButton>
-                    </Box>
-                </Box>
-            ) : (
-                <Box display="flex">
-                    <Link to="/">
-                        <IconButton >
-                            <HomeOutlinedIcon visibility={visible ? "hidden" : "visible"} />
-                        </IconButton>
-                    </Link>
-                    <Box
-                        display="flex"
-                        backgroundColor={colors.primary[400]}
-                        borderRadius="3px"
-                        visibility={visible ? "visible" : "hidden"}
-                    >
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-                        <IconButton type="button" sx={{ p: 1 }}>
-                            <SearchIcon />
-                        </IconButton>
-                    </Box>
-                </Box>
-            )}
+
+            <Box display="flex">
+                <Link to="/">
+                    <IconButton >
+                        <HomeOutlinedIcon visibility={invisible ? "hidden" : "visible"} />
+                    </IconButton>
+                </Link>
+            </Box>
+
 
 
             {/* ICONS SECTION */}
@@ -67,9 +41,9 @@ const Topbar = ({ visible }) => {
                         <LightModeOutlinedIcon />
                     )}
                 </IconButton>
-                <IconButton>
+                {/* <IconButton>
                     <NotificationsOutlinedIcon />
-                </IconButton>
+                </IconButton> */}
                 {/* <IconButton>
                     <SettingsOutlinedIcon />
                 </IconButton> */}

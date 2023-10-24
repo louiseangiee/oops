@@ -72,6 +72,25 @@ public class PortfolioService {
         }
     }
 
+    public Portfolio findByUserIdPortfolioId(Integer user_id, Integer portfolio_id) {
+        try {
+            List<Portfolio> portfolios = portfolioRepository.findByUserId(user_id);
+            Portfolio portfolio = portfolioRepository.findById(portfolio_id).orElseThrow(
+                    () -> new EntityNotFoundException("No portfolio found with ID: " + portfolio_id + "."));
+            if (portfolios.contains(portfolio)) {
+                return portfolio;
+            } else {
+                throw new EntityNotFoundException("No portfolio found with ID: " + portfolio_id + " under user ID: "
+                        + user_id + ".");
+            }
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Illegal argument", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching portfolio by user id and portfolio id service: "
+                    + e.getMessage(), e);
+        }
+    }
+
     // POST
     public Portfolio createPortfolio(PortfolioCreationDTO portfolioDto) {
         try {

@@ -90,6 +90,23 @@ public class PortfolioController {
 
     }
 
+    @Operation(summary = "Retrieve portfolio by user id and user id")
+    @Parameter(name = "userId", description = "user id")
+    @Parameter(name = "portfolioId", description = "portfolio id")
+    @GetMapping("/{userId}/{portfolioId}")
+    public ResponseEntity<?> findByUserIdPortfolioId(@PathVariable Integer userId, @PathVariable Integer portfolioId) {
+        try {
+            Portfolio portfolio = portfolioService.findByUserIdPortfolioId(userId, portfolioId);
+            return ResponseEntity.ok(portfolio);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching portfolio by user id and portfolio id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
+    }
+
     // POST endpoint for creating a new portfolio
     @Operation(summary = "Create a new portfolio")
     @PostMapping

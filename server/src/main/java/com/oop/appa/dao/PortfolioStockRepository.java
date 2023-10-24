@@ -1,6 +1,7 @@
 package com.oop.appa.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,5 +15,6 @@ public interface PortfolioStockRepository extends JpaRepository<PortfolioStock, 
 
     @EntityGraph(attributePaths = {"stock"})
     List<PortfolioStock> findByPortfolioPortfolioId(Integer portfolio_id);
-    List<PortfolioStock> findByPortfolioPortfolioIdAndStockStockSymbol(Integer portfolioId, String stockSymbol);
+    @EntityGraph(attributePaths = {"stock"})
+    Optional<PortfolioStock> findByPortfolioPortfolioIdAndStockStockSymbol(Integer portfolioId, String stockSymbol);
 }

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 @RestController
 @RequestMapping("/api/marketData")
@@ -24,6 +24,7 @@ public class MarketDataController {
     }
 
     @Operation(summary = "returns monthly time series(date, daily open, daily high, daily low, daily close, daily volume)")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/monthData")
     public ResponseEntity<?> fetchMonthData(@RequestParam String symbol) {
         try {
@@ -38,6 +39,7 @@ public class MarketDataController {
     }
 
     @Operation(summary = "returns raw (date, daily open, daily high, daily low, daily close, daily volume)")
+    @Parameter(name = "symbol", description = "stock symbol")
     @Parameter(name = "outputSize", description = "compact OR full")
     @GetMapping("/dailyData")
     public ResponseEntity<?> fetchDailyData(@RequestParam String symbol,
@@ -54,6 +56,7 @@ public class MarketDataController {
     }
 
     @Operation(summary = "Query intraday data for a month for a stock")
+    @Parameter(name = "symbol", description = "stock symbol")
     @Parameter(name = "month", description = "YYYY-MM query a specific month in history")
     @GetMapping("/intraday")
     public ResponseEntity<?> fetchIntradayData(@RequestParam String symbol, @RequestParam String month) {
@@ -69,6 +72,7 @@ public class MarketDataController {
     }
 
     @Operation(summary = "returns today price")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/currentData")
     public ResponseEntity<?> fetchCurrentData(@RequestParam String symbol) {
         try {
@@ -83,6 +87,7 @@ public class MarketDataController {
     }
 
     @Operation(summary = "returns overview data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/overview")
     public ResponseEntity<?> fetchOverviewData(@RequestParam String symbol) {
         try {

@@ -173,7 +173,7 @@ function DeletePortfolio() {
           <Button
             onClick={handleDelete}
             sx={{
-              backgroundColor: loading ? colors.redAccent[700] :colors.redAccent[600],
+              backgroundColor: loading ? colors.redAccent[700] : colors.redAccent[600],
               color: colors.grey[100],
               fontWeight: "bold",
               height: "40px",
@@ -209,19 +209,34 @@ const Portfolio = () => {
 
   // State to store portfolio data
   const [portfolioData, setPortfolioData] = useState({});
+  const [refreshIntervalId, setRefreshIntervalId] = useState(null); // Store the interval ID
 
-  // Fetch the portfolio data based on portfolioId
-  useEffect(() => {
-    // Replace this with your actual data fetching logic
-    // Example: fetch portfolio data using portfolioId
-    async function fetchData() {
+  // Function to fetch portfolio data
+  const fetchPortfolioData = async () => {
+    if (portfolioId) {
       const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
       const data = await response.json();
       setPortfolioData(data);
       console.log(data);
     }
-    fetchData();
-  }, [portfolioId, portfolioData, cookie.accessToken]);
+  };
+
+  // Fetch data on initial component load
+  useEffect(() => {
+    fetchPortfolioData();
+    console.log("Cleared interval " + refreshIntervalId);
+    // Set up an interval to periodically fetch data (e.g., every 30 seconds)
+    const intervalId = setInterval(fetchPortfolioData, 30000); // Adjust the interval as needed
+    setRefreshIntervalId(intervalId);
+
+    // Clear the interval when the component unmounts
+    return () => {
+      if (refreshIntervalId) {
+        clearInterval(refreshIntervalId);
+
+      }
+    };
+  }, [portfolioId, cookie.accessToken]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href="/" sx={{ fontSize: "22px" }}>

@@ -44,75 +44,11 @@ function a11yProps(index) {
     };
 }
 
-export default function StocksTabs() {
+export default function StocksTabs({ stocks }) {
     const [value, setValue] = React.useState(0);
     const theme = useTheme();
+    console.log(stocks);
     const colors = tokens(theme.palette.mode);
-    // const mockData = {
-    //     "AAPL": {
-    //         "1. open": "140.3700",
-    //         "2. high": "141.2004",
-    //         "3. low": "139.9900",
-    //         "4. close": "141.0700",
-    //         "5. volume": "2637779"
-    //     },
-    //     "TSLA": {
-    //         "1. open": "140.8700",
-    //         "2. high": "141.6400",
-    //         "3. low": "140.0000",
-    //         "4. close": "140.3900",
-    //         "5. volume": "3284421"
-    //     }, "AMZN": {
-    //         "1. open": "145.5100",
-    //         "2. high": "146.1700",
-    //         "3. low": "143.0201",
-    //         "4. close": "143.2400",
-    //         "5. volume": "4824654"
-    //     }, "GOOG": {
-    //         "1. open": "145.9500",
-    //         "2. high": "146.9800",
-    //         "3. low": "145.9200",
-    //         "4. close": "146.5500",
-    //         "5. volume": "2627999"
-    //     }, "FB": {
-    //         "1. open": "146.9400",
-    //         "2. high": "147.7275",
-    //         "3. low": "146.5400",
-    //         "4. close": "146.8300",
-    //         "5. volume": "3885949"
-    //     }, "MSFT": {
-    //         "1. open": "141.7000",
-    //         "2. high": "142.0900",
-    //         "3. low": "140.5600",
-    //         "4. close": "140.6400",
-    //         "5. volume": "3285347"
-    //     }, "NVDA": {
-    //         "1. open": "143.7800",
-    //         "2. high": "145.2200",
-    //         "3. low": "143.3116",
-    //         "4. close": "144.4500",
-    //         "5. volume": "3952640"
-    //     }, "PYPL": {
-    //         "1. open": "135.5300",
-    //         "2. high": "136.4500",
-    //         "3. low": "135.1900",
-    //         "4. close": "135.4800",
-    //         "5. volume": "5519992"
-    //     }, "ABDE": {
-    //         "1. open": "131.7800",
-    //         "2. high": "133.8550",
-    //         "3. low": "131.7500",
-    //         "4. close": "132.0800",
-    //         "5. volume": "2982738"
-    //     }, "NFLX": {
-    //         "1. open": "129.3900",
-    //         "2. high": "131.4100",
-    //         "3. low": "129.3100",
-    //         "4. close": "131.3400",
-    //         "5. volume": "4845649"
-    //     }
-    // };
-    const mockData = {};
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -121,13 +57,45 @@ export default function StocksTabs() {
     return (
         <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: colors.primary[400] }} >
-                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="Stocks" {...a11yProps(0)} />
-                    <Tab label="Stocks Analytics" {...a11yProps(1)} />
+                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" TabIndicatorProps={{
+                    style: {
+                        backgroundColor: colors.greenAccent[400], // Change the color to your desired color
+                    },
+                }}>
+                    <Tab label="Stocks" {...a11yProps(0)}
+                        sx={{
+                            '&.Mui-selected': {
+                                color: colors.greenAccent[400], // Change the color to your desired color
+                            },
+                            '&.Mui-selected:hover': {
+                                color: colors.greenAccent[400], // Color for the active tab when hovered
+                            },
+                            '&:not(.Mui-selected)': {
+                                color: colors.primary[100], // Color for non-selected tabs
+                                '&:hover': {
+                                    color: colors.blueAccent[400], // Color for non-selected tabs when hovered
+                                },
+                            },
+                        }} />
+                    <Tab label="Stocks Analytics" {...a11yProps(1)}
+                        sx={{
+                            '&.Mui-selected': {
+                                color: colors.greenAccent[400], // Change the color to your desired color
+                            },
+                            '&.Mui-selected:hover': {
+                                color: colors.greenAccent[400], // Color for the active tab when hovered
+                            },
+                            '&:not(.Mui-selected)': {
+                                color: colors.primary[100], // Color for non-selected tabs
+                                '&:hover': {
+                                    color: colors.blueAccent[400], // Color for non-selected tabs when hovered
+                                },
+                            },
+                        }} />
                 </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-                {Object.keys(mockData).length > 0 ? (
+                {stocks && stocks?.length > 0 ? (
                     <Box display="flex" flexDirection="column">
                         <Box display="flex" alignItems="center" justifyContent="space-between" mb="20px">
                             <Typography variant="h3" fontWeight="bold" color={colors.grey[100]}>
@@ -146,7 +114,7 @@ export default function StocksTabs() {
                             </Box>
                         </Box>
                         <Box>
-                            {Object.keys(mockData).map((stock, index) => (
+                            {stocks.map((stock, index) => (
                                 <Box display="flex" justifyContent="space-between" mb="20px" key={index}>
                                     <Box display="flex" gap="10px">
                                         <img
@@ -163,13 +131,13 @@ export default function StocksTabs() {
                                                 fontWeight="bold"
                                                 sx={{ color: colors.grey[100] }}
                                             >
-                                                {stock}
+                                                {stock.stockSymbol}
                                             </Typography>
                                             <Typography
                                                 variant="h6"
                                                 sx={{ color: colors.grey[100] }}
                                             >
-                                                {stock}
+                                                {stock.stockIndustry}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -179,13 +147,13 @@ export default function StocksTabs() {
                                             fontWeight="bold"
                                             sx={{ color: colors.grey[100] }}
                                         >
-                                            ${mockData[stock]["4. close"]}
+                                            ${stock.buyPrice}
                                         </Typography>
                                         <Typography
                                             variant="h6"
                                             sx={{ color: colors.greenAccent[600] }}
                                         >
-                                            +${(mockData[stock]["4. close"] - mockData[stock]["1. open"]).toFixed(3)}
+                                            Qty: {stock.quantity}
                                         </Typography>
                                     </Box>
                                 </Box>

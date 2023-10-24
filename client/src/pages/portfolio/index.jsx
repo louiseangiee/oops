@@ -208,6 +208,7 @@ const Portfolio = () => {
 
   // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
+  const [isLoading, setIsLoading] = useState(true); // Add a loading state
 
   // State to store portfolio data
   const [portfolioData, setPortfolioData] = useState({});
@@ -221,20 +222,24 @@ const Portfolio = () => {
         if (!response.ok) {
           // Handle the case when the response is not OK, for example, show an error message.
           setPortfolioData(null);
+          setIsLoading(false);
           return;
         }
         const data = await response.json();
         setPortfolioData(data);
+        setIsLoading(false); // Data is loaded, set isLoading to false
         console.log(data);
       } else if (userData.role === "ROLE_USER") {
         const response = await getAsync(`portfolios/${userData.id}/${portfolioId}`, cookie.accessToken);
         if (!response.ok) {
           // Handle the case when the response is not OK, for example, show an error message.
           setPortfolioData(null);
+          setIsLoading(false);
           return;
         }
         const data = await response.json();
         setPortfolioData(data);
+        setIsLoading(false); // Data is loaded, set isLoading to false
         console.log(data);
       }
     }
@@ -280,6 +285,18 @@ const Portfolio = () => {
         <Typography variant="h4" fontWeight="600" color={colors.grey[100]} mb="20px" textAlign={"center"}>
           Sorry, we couldn't find the portfolio you're looking for! <br />Either this portfolio doesn't exist or you don't have access to it.
         </Typography>
+      </Box>
+    );
+  }
+  if (isLoading) {
+    return (
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="80%">
+        <Lottie
+          animationData={Loading}
+          loop={true} // Set to true for looping
+          autoplay={true} // Set to true to play the animation automatically
+          style={{ width: 300, height: 300 }}
+        />
       </Box>
     );
   }
@@ -374,7 +391,7 @@ const Portfolio = () => {
           // gridRow="span 2"
           backgroundColor={colors.primary[400]}
         >
-          <StocksTabs />
+          <StocksTabs stocks={portfolioData['portfolioStocks'] ? portfolioData['portfolioStocks'] : null} />
         </Box>
       </Box>
     </Box>

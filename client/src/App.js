@@ -24,40 +24,7 @@ import AccessLog from './pages/access_log';
 import AutoRefreshOnRouteChange from './AutoRefreshOnRouteChange';
 
 function App() {
-	// access to the theme and the color mode
-	const [theme, colorMode] = useMode();
-	const [isSidebar, setIsSidebar] = useState(true);
-	return (
-		<CookiesProvider>
-			<ColorModeContext.Provider value={colorMode}>
-				<ThemeProvider theme={theme}>
-					<CssBaseline />
-					<div className="app">
-						<Routes>
-							{/* <Route element={<AutoRefreshOnRouteChange />} /> */}
-							<Route path="/login" element={<Login />} />
-							<Route path="/profile" element={<Profile />} />
-							<Route path="/" element={<Layout />}>
-								{/* Routes that require authentication */}
-								<Route element={<RequireAuth />}>
-									<Route
-										path="/dashboard"
-										element={<Dashboard />}
-									/>
-									<Route
-										path="/portfolio/:portfolioId"
-										element={<Portfolio />}
-									/>
-									<Route path="/" element={<Home />} />
-									<Route
-										path="access_log"
-										element={<AccessLog />}
-									/>
-									<Route
-										path="analytics"
-										element={<Analytics />}
-									/>
-								</Route>
+	
   // access to the theme and the color mode
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -67,8 +34,8 @@ function App() {
     <CookiesProvider>
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <div className="app">
+          	<CssBaseline />
+          	<div className="app">
             <Routes>
               {/* <Route element={<AutoRefreshOnRouteChange />} /> */}
               <Route path="/login" element={<Login />} />
@@ -101,11 +68,11 @@ function App() {
 									element={<Geography />}
 								/>
 							</Route>
-						</Routes>
-					</div>
-				</ThemeProvider>
-			</ColorModeContext.Provider>
-		</CookiesProvider>
+				</Routes>
+				</div>
+			</ThemeProvider>
+		</ColorModeContext.Provider>
+	</CookiesProvider>
 	);
 }
 

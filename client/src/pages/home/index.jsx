@@ -125,7 +125,7 @@ const Home = () => {
                   title={portfolio.name}
                   subtitle={portfolio.description}
                   capital={portfolio.totalCapital}
-                  returns={portfolio.performanceMetrics.overallReturns}
+                  // returns={portfolio.performanceMetrics.overallReturns}
                   stocks={portfolio.portfolioStocks}
                   portfolioId={portfolio.portfolioId}
                 />

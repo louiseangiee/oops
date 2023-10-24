@@ -344,7 +344,7 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            ${portfolioData && portfolioData['performanceMetrics']?.overallReturns || '-'}
+            ${portfolioData && portfolioData['portfolioStocks'].length > 0 ? portfolioData['portfolioStocks'] : '-'}
           </Typography>
 
         </Box>

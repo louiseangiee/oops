@@ -32,6 +32,8 @@ public class MarketDataService {
         if (response.has("Error Message")) {
             String errorMessage = response.get("Error Message").asText();
             throw new RuntimeException("Error fetching month data service: " + errorMessage);
+        } else if (response.has("Information")) {
+            throw new RuntimeException("Error fetching intraday data service: " + response.get("Information").asText());
         }
         return response;
     }
@@ -50,6 +52,8 @@ public class MarketDataService {
         if (response.has("Error Message")) {
             String errorMessage = response.get("Error Message").asText();
             throw new RuntimeException("Error fetching daily data service: " + errorMessage);
+        } else if (response.has("Information")) {
+            throw new RuntimeException("Error fetching intraday data service: " + response.get("Information").asText());
         }
         return response;
     }
@@ -66,6 +70,8 @@ public class MarketDataService {
 
         if (response.has("Global Quote") && response.get("Global Quote").isEmpty()) {
             throw new RuntimeException("Global Quote data is empty for the provided symbol.");
+        } else if (response.has("Information")) {
+            throw new RuntimeException("Error fetching intraday data service: " + response.get("Information").asText());
         }
 
         return response;
@@ -87,6 +93,8 @@ public class MarketDataService {
         if (response.has("Error Message")) {
             String errorMessage = response.get("Error Message").asText();
             throw new RuntimeException("Error fetching intraday data service: " + errorMessage);
+        } else if (response.has("Information")) {
+            throw new RuntimeException("Error fetching intraday data service: " + response.get("Information").asText());
         }
         return response;
     }
@@ -102,6 +110,8 @@ public class MarketDataService {
                 .block();
         if (response.isEmpty()) {
             throw new IllegalArgumentException("No data found for symbol: " + symbol);
+        } else if (response.has("Information")) {
+            throw new RuntimeException("Error fetching intraday data service: " + response.get("Information").asText());
         }
         return response;
     }

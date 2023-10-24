@@ -7,6 +7,7 @@ import com.oop.appa.service.MarketDataService;
 import com.oop.appa.service.StockService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,59 +33,97 @@ public class StockController {
 
     @Operation(summary = "Retrieve all stocks")
     @GetMapping()
-    public List<Stock> findAll() {
-        return stockService.findAll();
+    public ResponseEntity<?> findAll() {
+        try {
+            List<Stock> stock = stockService.findAll();
+            return ResponseEntity.ok(stock);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all stocks");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     @Operation(summary = "Retrieve all stocks with pagination")
+    @Parameter(name = "pageable", description = "pagination object")
     @GetMapping("/paged")
-    public Page<Stock> findAllPaged(Pageable pageable) {
-        return stockService.findAllPaged(pageable);
+    public ResponseEntity<?> findAllPaged(Pageable pageable) {
+        try {
+            Page<Stock> stocks = stockService.findAllPaged(pageable);
+            return ResponseEntity.ok(stocks);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all stocks with pagination");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     @Operation(summary = "Create new stock or updates an existing stock")
+    @Parameter(name = "stock", description = "stock object")
     @PostMapping()
-    public void createStock(@RequestBody Stock stock) {
-        System.out.println(stock); // NOTE: post and put here does the same thing --> if i post a stock with the
-                                   // same symbol, it will update the existing stock instead of giving an error
-        stockService.save(stock);
+    public ResponseEntity<?> createStock(@RequestBody Stock stock) {
+        try {
+            stockService.save(stock);
+            return ResponseEntity.status(HttpStatus.CREATED).body(stock);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error creating stock");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     // PUT endpoint for updating an existing stock
     @Operation(summary = "Updating an existing stock")
+    @Parameter(name = "stock", description = "stock object")
     @PutMapping
-    public void updateStock(@RequestBody Stock stock) {
-        stockService.save(stock);
+    public ResponseEntity<?> updateStock(@RequestBody Stock stock) {
+        try {
+            stockService.save(stock);
+            return ResponseEntity.ok(stock);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error updating stock");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     // DELETE endpoints
     @Operation(summary = "Delete a stock by symbol")
+    @Parameter(name = "stockSymbol", description = "stock symbol")
     @DeleteMapping("/{stockSymbol}")
-    public void deleteByStockSymbol(@PathVariable String stockSymbol) {
-        stockService.deleteByStockSymbol(stockSymbol);
-    }
-
-    @Operation(summary = "Delete a stock by id")
-    @DeleteMapping
-    public void delete(@RequestBody Stock stock) {
-        stockService.delete(stock);
+    public ResponseEntity<?> deleteByStockSymbol(@PathVariable String stockSymbol) {
+        try {
+            stockService.deleteByStockSymbol(stockSymbol);
+            return ResponseEntity.ok("Stock deleted");
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error deleting stock");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     @Operation(summary = "Calculate One Year Return of a stock based on monthly data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/calculateOneYearReturn")
     public ResponseEntity<?> calculateOneYearReturn(@RequestParam String symbol) {
         try {
             double oneYearReturn = stockService.calculateOneYearReturn(symbol);
-            System.out.println(oneYearReturn);
             return ResponseEntity.ok(oneYearReturn);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in calculating one year return");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Calculate One Month Return of a stock based on daily data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/calculateOneMonthReturn")
     public ResponseEntity<?> calculateOneMonthReturn(@RequestParam String symbol) {
         try {
@@ -93,11 +132,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in calculating one month return");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Calculate One Week Return of a stock based on daily data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/calculateOneWeekReturn")
     public ResponseEntity<?> calculateOneWeekReturn(@RequestParam String symbol) {
         try {
@@ -106,11 +147,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in calculating one week return");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Calculate One Day Return of a stock based on current data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/calculateOneDayReturn")
     public ResponseEntity<?> calculateOneDayReturn(@RequestParam String symbol) {
         try {
@@ -119,11 +162,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in calculating one day return");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Get one year's worth of data for a stock on monthly data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/oneYearData")
     public ResponseEntity<?> fetchOneYearData(@RequestParam String symbol) {
         try {
@@ -132,11 +177,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in getting one year's worth of data using monthly data");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Get one quarter's worth of data for a stock on daily data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/oneQuarterData")
     public ResponseEntity<?> fetchOneQuarterData(@RequestParam String symbol) {
         try {
@@ -145,11 +192,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in getting one quarter's worth of data using daily data");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Get one month's worth of data for a stock on daily data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/oneMonthData")
     public ResponseEntity<?> fetchOneMonthData(@RequestParam String symbol) {
         try {
@@ -158,23 +207,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in getting one month's worth of data using daily data");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
-    // @GetMapping("/fullDailyData")
-    // public ResponseEntity<List<Map<String, Object>>>
-    // fetchFullDailyData(@RequestParam String symbol) {
-    // try {
-    // List<Map<String, Object>> data = stockService.fetchFullDailyData(symbol);
-    // return ResponseEntity.ok(data);
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // return ResponseEntity.status(500).body(null);
-    // }
-    // }
-
     @Operation(summary = "Get one week's worth of data for a stock on daily data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/oneWeekData")
     public ResponseEntity<?> fetchOneWeekData(@RequestParam String symbol) {
         try {
@@ -183,11 +222,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in calculating one week's worth of data using daily data");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Get daily volatility of a stock")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/calculateDailyVolatility")
     public ResponseEntity<?> calculateDailyVolatility(@RequestParam String symbol) {
         try {
@@ -196,11 +237,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in calculating daily volatility");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Get weekly volatility of a stock")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/calculateMonthlyVolatility")
     public ResponseEntity<?> calculateMonthlyVolatility(@RequestParam String symbol) {
         try {
@@ -209,11 +252,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in calculating monthly volatility");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Get annualized volatility of a stock")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/calculateAnnualizedVolatility")
     public ResponseEntity<?> calculateAnnualizedVolatility(@RequestParam String symbol) {
         try {
@@ -222,11 +267,13 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in calculating annualized volatility");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @Operation(summary = "Get a stock's overview data")
+    @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/overviewData")
     public ResponseEntity<?> fetchOverviewData(@RequestParam String symbol) {
         try {
@@ -235,6 +282,7 @@ public class StockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in fetching overview data");
+            error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }

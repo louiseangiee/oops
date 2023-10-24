@@ -6,6 +6,7 @@ import com.oop.appa.exception.ErrorResponse;
 import com.oop.appa.service.AccessLogService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,45 +46,99 @@ public class AccessLogController {
     }
 
     @Operation(summary = "Retrieve all AccessLogs with pagination")
+    @Parameter(name = "pageable", description = "pagination object")
     @GetMapping("/paged")
-    public Page<AccessLog> findAllPaged(Pageable pageable) {
-        return accessLogService.findAllPaged(pageable);
+    public ResponseEntity<?> findAllPaged(Pageable pageable) {
+        try {
+            Page<AccessLog> accessLogs = accessLogService.findAllPaged(pageable);
+            return ResponseEntity.ok(accessLogs);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all access logs with pagination");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+
     }
 
-    @Operation(summary = "Retrieve all AccessLogs by user id")
+    @Operation(summary = "Retrieve all AccessLogs by user id with pagination")
+    @Parameter(name = "user_id", description = "user id")
+    @Parameter(name = "page", description = "Page number for pagination")
+    @Parameter(name = "size", description = "Number of records per page for pagination")
     @GetMapping("/user/{user_id}")
-    public Page<AccessLog> findByUserId(@PathVariable Integer user_id,
+    public ResponseEntity<?> findByUserId(@PathVariable Integer user_id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return accessLogService.findByUserId(user_id, pageable);
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<AccessLog> accessLogs = accessLogService.findByUserId(user_id, pageable);
+            return ResponseEntity.ok(accessLogs);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all access logs by user id with pagination");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     // POST endpoint for creating a new AccessLog
     @Operation(summary = "Create a new AccessLog")
     @PostMapping
-    public void createAccessLog(@RequestBody AccessLog AccessLog) {
-        accessLogService.save(AccessLog);
+    public ResponseEntity<?> createAccessLog(@RequestBody AccessLog AccessLog) {
+        try {
+            AccessLog accessLog = accessLogService.save(AccessLog);
+            return ResponseEntity.status(HttpStatus.CREATED).body(accessLog);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error creating a new access log");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+        
     }
 
     // PUT endpoint for updating an existing AccessLog
     @Operation(summary = "Update an existing AccessLog")
     @PutMapping
-    public void updateAccessLog(@RequestBody AccessLog AccessLog) {
-        accessLogService.save(AccessLog);
+    public ResponseEntity<?> updateAccessLog(@RequestBody AccessLog AccessLog) {
+        try {
+            AccessLog accessLog = accessLogService.save(AccessLog);
+            return ResponseEntity.ok(accessLog);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error updating an existing access log");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     // DELETE endpoints
     @Operation(summary = "Delete an AccessLog by id")
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Integer id) {
-        accessLogService.deleteById(id);
+    public ResponseEntity<?> deleteById(@PathVariable Integer id) {
+        try {
+            accessLogService.deleteById(id);
+            return ResponseEntity.ok("AccessLog with ID " + id + " was successfully deleted.");
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error deleting AccessLog with ID " + id);
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
     @Operation(summary = "Delete an AccessLog by AccessLog object")
     @DeleteMapping
-    public void delete(@RequestBody AccessLog AccessLog) {
-        accessLogService.delete(AccessLog);
+    public ResponseEntity<?> delete(@RequestBody AccessLog AccessLog) {
+        try {
+            accessLogService.delete(AccessLog);
+            return ResponseEntity.ok("AccessLog was successfully deleted.");
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error deleting AccessLog");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 
 }

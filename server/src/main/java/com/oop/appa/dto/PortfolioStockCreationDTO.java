@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class PortfolioStockCreationDTO {
     private int portfolioId;
-    private String symbol; // Replaced StockReference with symbol
+    private String symbol;
     private float buyPrice;
     private int quantity;
     private LocalDate buyDate;

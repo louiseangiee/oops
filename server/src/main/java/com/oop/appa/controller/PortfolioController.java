@@ -106,12 +106,6 @@ public class PortfolioController {
         portfolioService.deleteById(id);
     }
 
-    @Operation(summary = "Delete a portfolio by portfolio object")
-    @DeleteMapping
-    public void delete(@RequestBody Portfolio portfolio) {
-        portfolioService.delete(portfolio);
-    }
-
     // PortfolioStock endpoints
     @Operation(summary = "Retrieve all portfolio stocks")
     @GetMapping("/stocks")

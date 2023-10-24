@@ -2,6 +2,7 @@ package com.oop.appa.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.oop.appa.entity.Stock;
+import com.oop.appa.entity.StockLookup;
 import com.oop.appa.exception.ErrorResponse;
 import com.oop.appa.service.MarketDataService;
 import com.oop.appa.service.StockService;
@@ -34,6 +35,12 @@ public class StockController {
     @GetMapping()
     public List<Stock> findAll() {
         return stockService.findAll();
+    }
+
+    @Operation(summary = "Retrieve all stock lookups")
+    @GetMapping("/stocklookup")
+    public List<StockLookup> findAllStockLookups() {
+        return stockService.findAllStockLookups();
     }
 
     @Operation(summary = "Retrieve all stocks with pagination")

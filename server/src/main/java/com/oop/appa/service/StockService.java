@@ -29,8 +29,10 @@ import java.util.stream.StreamSupport;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.oop.appa.dao.StockLookupRepository;
 import com.oop.appa.dao.StockRepository;
 import com.oop.appa.entity.Stock;
+import com.oop.appa.entity.StockLookup;
 
 @Service
 @Transactional // Adding @Transactional annotation to handle transactions at the service layer.
@@ -38,11 +40,13 @@ public class StockService {
 
     private final StockRepository stockRepository;
     private final MarketDataService marketDataService;
+    private final StockLookupRepository stockLookupRepository;
 
     @Autowired
-    public StockService(StockRepository stockRepository, MarketDataService marketDataService) {
+    public StockService(StockRepository stockRepository, MarketDataService marketDataService, StockLookupRepository stockLookupRepository) {
         this.stockRepository = stockRepository;
         this.marketDataService = marketDataService;
+        this.stockLookupRepository = stockLookupRepository;
     }
 
     // GET
@@ -52,6 +56,10 @@ public class StockService {
 
     public Page<Stock> findAllPaged(Pageable pageable) {
         return stockRepository.findAll(pageable);
+    }
+
+    public List<StockLookup> findAllStockLookups() {
+        return stockLookupRepository.findAll();
     }
 
     // POST and UPDATE

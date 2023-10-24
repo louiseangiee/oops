@@ -101,4 +101,19 @@ public class MarketDataController {
         }
     }
 
+    @Operation(summary = "returns daily US Treasury Yield for 3 months")
+    @GetMapping("/3month")
+    public ResponseEntity<JsonNode> fetchThreeMonthTreasuryYield() {
+        try {
+            JsonNode data = marketDataService.fetchThreeMonthTreasuryYield();
+            return ResponseEntity.ok(data);
+            
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching 3-month Treasury yield data");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
 }

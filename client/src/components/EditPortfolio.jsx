@@ -56,11 +56,11 @@ export default function EditPortfolio({ portfolioId, small }) {
             setCapitalError(false);
         }
 
-        if (capitalError) {
-            setIsButtonDisabled(true);
-        } else {
-            setIsButtonDisabled(false);
-        }
+        // if (capitalError) {
+        //     setIsButtonDisabled(true);
+        // } else {
+        //     setIsButtonDisabled(false);
+        // }
 
         // if (updatedName === portfolioData?.name && updatedDescription === portfolioData?.description && updatedCapital === portfolioData?.totalCapital) {
         //     setIsButtonDisabled(true);
@@ -68,7 +68,7 @@ export default function EditPortfolio({ portfolioId, small }) {
         //     setIsButtonDisabled(false);
         // }
 
-    }, [portfolioId, portfolioData, updatedCapital, updatedName, updatedDescription, cookie.accessToken, capitalError, isNameEdited, isDescriptionEdited, isCapitalEdited]);
+    }, [portfolioId, updatedCapital]);
 
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);

@@ -204,6 +204,8 @@ const Portfolio = () => {
   const colors = tokens(theme.palette.mode);
   const [cookie, removeCookie] = useCookies(["accessToken"]);
 
+  const user = useAuth();
+
   // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
 
@@ -213,8 +215,13 @@ const Portfolio = () => {
 
   // Function to fetch portfolio data
   const fetchPortfolioData = async () => {
-    if (portfolioId) {
-      const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
+    if (user && portfolioId) {
+      const response = await getAsync(`portfolios/${user.userData.id}/${portfolioId}`, cookie.accessToken);
+      if (!response.ok) {
+        // Handle the case when the response is not OK, for example, show an error message.
+        setPortfolioData(null);
+        return;
+      }
       const data = await response.json();
       setPortfolioData(data);
       console.log(data);
@@ -258,8 +265,8 @@ const Portfolio = () => {
           autoplay={true} // Set to true to play the animation automatically
           style={{ width: 300, height: 300 }}
         />
-        <Typography variant="h4" fontWeight="600" color={colors.grey[100]} mb="20px">
-          Sorry, we couldn't find the portfolio you're looking for!
+        <Typography variant="h4" fontWeight="600" color={colors.grey[100]} mb="20px" textAlign={"center"}>
+          Sorry, we couldn't find the portfolio you're looking for! <br />Either this portfolio doesn't exist or you don't have access to it.
         </Typography>
       </Box>
     );
@@ -344,7 +351,7 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            ${portfolioData && portfolioData['portfolioStocks'].length > 0 ? portfolioData['portfolioStocks'] : '-'}
+            $-
           </Typography>
 
         </Box>

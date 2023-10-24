@@ -118,7 +118,7 @@ public class MarketDataService {
 
     public JsonNode fetchThreeMonthTreasuryYield() {
         String apiKey = System.getenv("ALPHAVANTAGE_API_KEY"); // Make sure the API key is set as an environment variable
-        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=TREASURY_YIELD&interval=daily&maturity=3month&apikey=" + apiKey;
+        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=TREASURY_YIELD&interval=monthly&maturity=3month&apikey=" + apiKey;
 
         JsonNode response = webClient.get()
                 .uri(apiUrl)

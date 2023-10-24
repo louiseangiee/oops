@@ -1,6 +1,7 @@
 package com.oop.appa.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oop.appa.exception.ErrorResponse;
 import com.oop.appa.service.MarketDataService;
 
@@ -101,13 +102,12 @@ public class MarketDataController {
         }
     }
 
-    @Operation(summary = "returns daily US Treasury Yield for 3 months")
+    @Operation(summary = "returns Risk-Free rate or monthly US Treasury Yield for 3 months")
     @GetMapping("/3month")
-    public ResponseEntity<JsonNode> fetchThreeMonthTreasuryYield() {
+    public ResponseEntity<?> fetchThreeMonthTreasuryYield() {
         try {
             JsonNode data = marketDataService.fetchThreeMonthTreasuryYield();
             return ResponseEntity.ok(data);
-            
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error fetching 3-month Treasury yield data");

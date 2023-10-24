@@ -322,4 +322,27 @@ public class PortfolioStockService {
         double annualizedVolatility = monthlyVolatility * Math.sqrt(12); 
         return annualizedVolatility;
     }
+
+    public double getTotalPortfolioValue(Integer portfolioId) {
+        List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
+    
+        // Fetch the current prices of unique stocks only once to minimize API calls
+        Map<String, Double> currentPrices = new HashMap<>();
+        for (PortfolioStock stock : allStocksInPortfolio) {
+            String stockSymbol = stock.getStock().getStockSymbol();
+            if (!currentPrices.containsKey(stockSymbol)) {
+                double currentPrice = marketDataService.fetchCurrentData(stockSymbol)
+                        .path("Global Quote").path("05. price").asDouble();
+                currentPrices.put(stockSymbol, currentPrice);
+            }
+        }
+    
+        // Calculate total portfolio value
+        double totalPortfolioValue = allStocksInPortfolio.stream()
+                .mapToDouble(stock -> stock.getQuantity() * currentPrices.get(stock.getStock().getStockSymbol()))
+                .sum();
+    
+        return totalPortfolioValue;
+    }
+    
 }

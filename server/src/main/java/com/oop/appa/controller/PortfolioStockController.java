@@ -200,4 +200,19 @@ public class PortfolioStockController {
             return ResponseEntity.internalServerError().body(null);
         }
     }
+
+    @Operation(summary = "Retrieve the total value of a given portfolio")
+    @Parameter(name = "portfolioId", description = "portfolio id")
+    @GetMapping("/{portfolioId}/value")
+    public ResponseEntity<?> getPortfolioTotalValue(@PathVariable Integer portfolioId) {
+        try {
+            double portfolioValue = portfolioStockService.getTotalPortfolioValue(portfolioId);
+            return ResponseEntity.ok(portfolioValue);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error calculating total portfolio value");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.internalServerError().body(error);
+        }
+    }
 }

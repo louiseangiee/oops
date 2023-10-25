@@ -22,12 +22,14 @@ import Analytics from './pages/analytics_dashboard';
 import Profile from './pages/profile';
 import AccessLog from './pages/access_log';
 import AutoRefreshOnRouteChange from './AutoRefreshOnRouteChange';
+import StockMarketPage from './pages/stockMarketpage';
 import OTP from './pages/otp';
 
 function App() {
 	// access to the theme and the color mode
 	const [theme, colorMode] = useMode();
 	const [isSidebar, setIsSidebar] = useState(true);
+
 	return (
 		<CookiesProvider>
 			<ColorModeContext.Provider value={colorMode}>
@@ -58,6 +60,10 @@ function App() {
 									<Route
 										path="analytics"
 										element={<Analytics />}
+									/>
+									<Route
+										path="stock-market"
+										element={<StockMarketPage />}
 									/>
 								</Route>
 

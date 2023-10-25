@@ -204,8 +204,11 @@ const Portfolio = () => {
   const colors = tokens(theme.palette.mode);
   const [cookie, removeCookie] = useCookies(["accessToken"]);
 
+  const { userData } = useAuth();
+
   // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
+  const [isLoading, setIsLoading] = useState(true); // Add a loading state
 
   // State to store portfolio data
   const [portfolioData, setPortfolioData] = useState({});
@@ -213,11 +216,32 @@ const Portfolio = () => {
 
   // Function to fetch portfolio data
   const fetchPortfolioData = async () => {
-    if (portfolioId) {
-      const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
-      const data = await response.json();
-      setPortfolioData(data);
-      console.log(data);
+    if (userData && portfolioId) {
+      if (userData.role === "ROLE_ADMIN") {
+        const response = await getAsync(`portfolios/${portfolioId}`, cookie.accessToken);
+        if (!response.ok) {
+          // Handle the case when the response is not OK, for example, show an error message.
+          setPortfolioData(null);
+          setIsLoading(false);
+          return;
+        }
+        const data = await response.json();
+        setPortfolioData(data);
+        setIsLoading(false); // Data is loaded, set isLoading to false
+        console.log(data);
+      } else if (userData.role === "ROLE_USER") {
+        const response = await getAsync(`portfolios/${userData.id}/${portfolioId}`, cookie.accessToken);
+        if (!response.ok) {
+          // Handle the case when the response is not OK, for example, show an error message.
+          setPortfolioData(null);
+          setIsLoading(false);
+          return;
+        }
+        const data = await response.json();
+        setPortfolioData(data);
+        setIsLoading(false); // Data is loaded, set isLoading to false
+        console.log(data);
+      }
     }
   };
 
@@ -258,9 +282,21 @@ const Portfolio = () => {
           autoplay={true} // Set to true to play the animation automatically
           style={{ width: 300, height: 300 }}
         />
-        <Typography variant="h4" fontWeight="600" color={colors.grey[100]} mb="20px">
-          Sorry, we couldn't find the portfolio you're looking for!
+        <Typography variant="h4" fontWeight="600" color={colors.grey[100]} mb="20px" textAlign={"center"}>
+          Sorry, we couldn't find the portfolio you're looking for! <br />Either this portfolio doesn't exist or you don't have access to it.
         </Typography>
+      </Box>
+    );
+  }
+  if (isLoading) {
+    return (
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="80%">
+        <Lottie
+          animationData={Loading}
+          loop={true} // Set to true for looping
+          autoplay={true} // Set to true to play the animation automatically
+          style={{ width: 300, height: 300 }}
+        />
       </Box>
     );
   }
@@ -344,7 +380,7 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            ${portfolioData && portfolioData['performanceMetrics']?.overallReturns || '-'}
+            $-
           </Typography>
 
         </Box>
@@ -355,7 +391,7 @@ const Portfolio = () => {
           // gridRow="span 2"
           backgroundColor={colors.primary[400]}
         >
-          <StocksTabs />
+          <StocksTabs stocks={portfolioData['portfolioStocks'] ? portfolioData['portfolioStocks'] : null} />
         </Box>
       </Box>
     </Box>

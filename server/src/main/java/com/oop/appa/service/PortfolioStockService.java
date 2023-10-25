@@ -1,7 +1,10 @@
 package com.oop.appa.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -222,6 +225,95 @@ public class PortfolioStockService {
 
     }
 
+    public Map<String, Map<String, Double>> calculateStockReturnsForPortfolio(Integer portfolioId) {
+        try {
+            List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
+    
+            // 1. Calculate the total buy price and total quantity for each unique stock
+            Map<String, Double> totalBuyPrices = new HashMap<>();
+            Map<String, Double> totalQuantities = new HashMap<>();
+    
+            for (PortfolioStock stock : allStocksInPortfolio) {
+                String stockSymbol = stock.getStock().getStockSymbol();
+                totalBuyPrices.merge(stockSymbol, (double) (stock.getBuyPrice() * stock.getQuantity()), Double::sum);
+                totalQuantities.merge(stockSymbol, (double) stock.getQuantity(), Double::sum);
+            }
+            
+    
+            // 2. Fetch the current stock prices and calculate the actual value and percentage return
+            Map<String, Double> currentPrices = new HashMap<>();
+            Map<String, Map<String, Double>> returnsByStock = new HashMap<>();
+    
+            for (String stockSymbol : totalBuyPrices.keySet()) {
+                double currentPrice = marketDataService.fetchCurrentData(stockSymbol)
+                        .path("Global Quote")
+                        .path("05. price").asDouble();
+                currentPrices.put(stockSymbol, currentPrice);
+    
+                double aggregatedBuyPrice = totalBuyPrices.get(stockSymbol);
+                double aggregatedQuantity = totalQuantities.get(stockSymbol);
+                double aggregatedCurrentValue = currentPrice * aggregatedQuantity;
+    
+                double actualValue = aggregatedCurrentValue - aggregatedBuyPrice;
+                double percentageReturn = (actualValue / aggregatedBuyPrice) * 100;
+    
+                // Rounding
+                BigDecimal bdActualValue = new BigDecimal(Double.toString(actualValue)).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal bdPercentageReturn = new BigDecimal(Double.toString(percentageReturn)).setScale(2, RoundingMode.HALF_UP);
+    
+                Map<String, Double> returnDetails = new HashMap<>();
+                returnDetails.put("actualValue", bdActualValue.doubleValue());
+                returnDetails.put("percentage", bdPercentageReturn.doubleValue());
+    
+                returnsByStock.put(stockSymbol, returnDetails);
+            }
+    
+            return returnsByStock;
+        } catch (Exception e) {
+            throw new RuntimeException("Error calculating stock returns: " + e.getMessage(), e);
+        }
+    }
+     
+    public Map<String, Double> calculateOverallPortfolioReturns(Integer portfolioId) {
+        try {
+            Map<String, Map<String, Double>> stockReturns = calculateStockReturnsForPortfolio(portfolioId);
+
+            System.out.println("Stock Returns: " + stockReturns);
+    
+            double totalPurchaseValue = 0.0;
+            double totalActualReturn = 0.0;
+    
+            for (Map.Entry<String, Map<String, Double>> entry : stockReturns.entrySet()) {
+                double actualValueForStock = entry.getValue().get("actualValue");
+
+                System.out.println("Processing stock: " + entry.getKey()); // Check which stock is being processed
+                System.out.println("Actual Value for " + entry.getKey() + ": " + actualValueForStock); // Check the actual value for current stock
+    
+                PortfolioStock stock = findByPortfolioIdAndStockSymbol(portfolioId, entry.getKey());
+                double purchaseValue = stock.getBuyPrice() * stock.getQuantity();
+    
+                totalPurchaseValue += purchaseValue;
+                totalActualReturn += actualValueForStock;
+            }
+    
+            double totalCurrentValue = totalActualReturn + totalPurchaseValue;
+            double overallReturn = totalCurrentValue - totalPurchaseValue;
+            double percentageReturn = (overallReturn / totalPurchaseValue) * 100;
+
+            BigDecimal bdPercentageReturn = new BigDecimal(percentageReturn).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal bdOverallReturn = new BigDecimal(overallReturn).setScale(2, RoundingMode.HALF_UP);
+
+    
+            Map<String, Double> returns = new HashMap<>();
+            returns.put("percentage", bdPercentageReturn.doubleValue());
+            returns.put("overalReturn", bdOverallReturn.doubleValue());
+            return returns;
+    
+        } catch (Exception e) {
+            throw new RuntimeException("Error calculating overall portfolio returns: " + e.getMessage(), e);
+        }
+    }
+    
     public Map<String, Map<String, Double>> calculateTotalPortfolioValueByGroup(Integer portfolioId, String groupBy) {
         try {
             List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
@@ -322,4 +414,42 @@ public class PortfolioStockService {
         double annualizedVolatility = monthlyVolatility * Math.sqrt(12); 
         return annualizedVolatility;
     }
+
+    public double getTotalPortfolioValue(Integer portfolioId) {
+        List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
+    
+        // Fetch the current prices of unique stocks only once to minimize API calls
+        Map<String, Double> currentPrices = new HashMap<>();
+        for (PortfolioStock stock : allStocksInPortfolio) {
+            String stockSymbol = stock.getStock().getStockSymbol();
+            if (!currentPrices.containsKey(stockSymbol)) {
+                double currentPrice = marketDataService.fetchCurrentData(stockSymbol)
+                        .path("Global Quote").path("05. price").asDouble();
+                currentPrices.put(stockSymbol, currentPrice);
+            }
+        }
+        // Calculate total portfolio value
+        double totalPortfolioValue = allStocksInPortfolio.stream()
+                .mapToDouble(stock -> stock.getQuantity() * currentPrices.get(stock.getStock().getStockSymbol()))
+                .sum();
+    
+        return totalPortfolioValue;
+    }
+    
+    private Map<String, Double> fetchCurrentPricesForPortfolio(Integer portfolioId) {
+        List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
+        Map<String, Double> stockPrices = new HashMap<>();
+
+        for (PortfolioStock stock : allStocksInPortfolio) {
+            String stockSymbol = stock.getStockSymbol();
+            if (!stockPrices.containsKey(stockSymbol)) {
+                double currentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
+                        .path("05. price").asDouble();
+                stockPrices.put(stockSymbol, currentPrice);
+            }
+        }
+        return stockPrices;
+    }
+
+
 }

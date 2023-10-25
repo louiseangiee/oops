@@ -116,4 +116,23 @@ public class MarketDataService {
         return response;
     }
 
+    public JsonNode fetchThreeMonthTreasuryYield() {
+        String apiKey = System.getenv("ALPHAVANTAGE_API_KEY"); // Make sure the API key is set as an environment variable
+        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=TREASURY_YIELD&interval=monthly&maturity=3month&apikey=" + apiKey;
+
+        JsonNode response = webClient.get()
+                .uri(apiUrl)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .block();
+
+        if (response == null || response.isEmpty()) {
+            throw new IllegalArgumentException("No data found for 3-month Treasury yield");
+        } else if (response.has("Information")) {
+            throw new RuntimeException("Error fetching data from service: " + response.get("Information").asText());
+        }
+
+        return response;
+    }
+
 }

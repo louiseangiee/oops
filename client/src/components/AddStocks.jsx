@@ -22,6 +22,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { FixedSizeList } from 'react-window';
 import dayjs from 'dayjs';
+import StockSelector from './StockSelectorDropdown';
 
 function renderRow(props) {
     const { index, style } = props;
@@ -65,6 +66,8 @@ function ButtonField(props) {
 
 function ButtonDatePicker(props) {
     const [open, setOpen] = React.useState(false);
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
 
     return (
         <DatePicker
@@ -74,6 +77,12 @@ function ButtonDatePicker(props) {
             open={open}
             onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
+            sx={{
+                '&.MuiButton-outlined': {
+                    // Apply your button outline styles here
+                    borderColor: colors.greenAccent[400], // Change the border color
+                }
+            }}
         />
     );
 }
@@ -87,6 +96,7 @@ export default function AddStocks() {
     const [stockQuantity, setStockQuantity] = useState(0);
     const [stockPrice, setStockPrice] = useState(0);
     const [date, setDate] = useState(null);
+    const [chosenStock, setChosenStock] = useState(null);
 
     const [open, setOpen] = React.useState(false);
 
@@ -97,6 +107,10 @@ export default function AddStocks() {
     const handleClose = () => {
         setOpen(false);
         setDate(null);
+    };
+
+    const handleStockChange = (newValue) => {
+        setChosenStock(newValue ? newValue : null);
     };
 
     const handleAddClick = () => {
@@ -132,7 +146,7 @@ export default function AddStocks() {
                 <DialogContent
                     sx={{ backgroundColor: colors.primary[400] }}>
                     {/* SEARCH BAR */}
-                    <Box
+                    {/* <Box
                         display="flex"
                         backgroundColor={theme.palette.mode === "dark" ? colors.primary[500] : colors.grey[900]}
                         borderRadius="3px"
@@ -141,12 +155,11 @@ export default function AddStocks() {
                         <IconButton type="button" sx={{ p: 1, color: colors.primary[300] }}>
                             <SearchIcon />
                         </IconButton>
-                    </Box>
+                    </Box> */}
                     <Box
-                        sx={{ width: '100%', height: 200, marginTop: "10px"}}
-                        backgroundColor={theme.palette.mode === "dark" ? colors.primary[500] : colors.grey[900]}
+                        sx={{ width: '100%', marginTop: "10px", borderRadius: "5px" }}
                     >
-                        <FixedSizeList
+                        {/* <FixedSizeList
                             height={200}
                             width="100%"
                             itemSize={40}
@@ -154,7 +167,11 @@ export default function AddStocks() {
                             overscanCount={5}
                         >
                             {renderRow}
-                        </FixedSizeList>
+                        </FixedSizeList> */}
+                        <StockSelector
+                            chosenStock={chosenStock}
+                            handleStockChange={handleStockChange}
+                        />
                     </Box>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <ButtonDatePicker
@@ -175,6 +192,18 @@ export default function AddStocks() {
                         sx={{ color: colors.grey[100] }}
                         value={stockPrice}
                         onChange={(e) => setStockPrice(e.target.value)}
+                        sx={{
+                            color: colors.grey[100],
+                            '& .MuiOutlinedInput-root': {
+                                // Apply your input styles here
+                                border: `2px solid colors.greenAccent[400]`, // Change the border color
+                            },
+                            '& .MuiInputLabel-root': {
+                                // Apply your label styles here
+                                color: colors.grey[100], // Change the label color
+                            },
+
+                        }}
                     />
 
                     <TextField
@@ -185,7 +214,18 @@ export default function AddStocks() {
                         placeholder="e.g. 5"
                         type="number"
                         fullWidth
-                        sx={{ color: colors.grey[100] }}
+                        sx={{
+                            color: colors.grey[100],
+                            '& .MuiOutlinedInput-root': {
+                                // Apply your input styles here
+                                border: `2px solid colors.greenAccent[400]`, // Change the border color
+                            },
+                            '& .MuiInputLabel-root': {
+                                // Apply your label styles here
+                                color: colors.grey[100], // Change the label color
+                            },
+
+                        }}
                         value={stockQuantity}
                         onChange={(e) => setStockQuantity(e.target.value)}
                     />

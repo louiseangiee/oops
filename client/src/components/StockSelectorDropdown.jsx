@@ -1,8 +1,12 @@
 import React from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { tokens } from "../theme";
+import { useTheme } from "@mui/material";
 
 const StockSelector = (props) => {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
     const { chosenStock, handleStockChange } = props;
 
     const stocks = [
@@ -25,12 +29,24 @@ const StockSelector = (props) => {
             }}
             options={stocks}
             getOptionLabel={(option) => option.name}
+            sx={{}}
             style={{ minWidth: 200, marginBottom: 20 }}
-            renderInput={(params) => 
-                <TextField 
-                    {...params} 
-                    variant="outlined" 
-                    label="Select Stock" 
+            renderInput={(params) =>
+                <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Select Stock"
+                    sx={{
+                        '& .MuiOutlinedInput-root': {
+                            // Apply your input styles here
+                            border: `2px solid colors.greenAccent[400]`, // Change the border color
+                        },
+                        '& .MuiInputLabel-root': {
+                            // Apply your label styles here
+                            color: colors.grey[100], // Change the label color
+                        },
+
+                    }}
                 />
             }
         />

@@ -36,26 +36,28 @@ const StockChart = ({ chosenStock }) => {
   }, [chosenStock, timeSpan]);
 
   const fetchData = async () => {
-    let endpoint = 'stocks/OneYearData';  // Default to 1 year data
+    let endpoint = 'stocks/oneYearData';  // Default to 1 year data
 
     switch (timeSpan) {
       case "1Y":
-        endpoint = 'stocks/OneYearData';
+        endpoint = 'stocks/oneYearData';
         break;
       case "1Q":
-        endpoint = 'stocks/OneQuarterData';
+        endpoint = 'stocks/oneQuarterData';
         break;
       case "1M":
-        endpoint = 'stocks/OneMonthData';
+        endpoint = 'stocks/oneMonthData';
         break;
       case "1W":
-        endpoint = 'stocks/OneWeekData';
+        endpoint = 'stocks/oneWeekData';
         break;
       default:
         endpoint = 'stocks';
     }
 
     try {
+      console.log(endpoint)
+      console.log(chosenStock.code)
       
       const response = await getAsync(`${endpoint}?symbol=${chosenStock.code}`, cookie.accessToken); // Use the accessToken from cookies
       console.log(response)
@@ -69,44 +71,46 @@ const StockChart = ({ chosenStock }) => {
         time: item.date,
         value: parseFloat(item["4. close"])
       }));
-      setChartData(data);
+      
+      setChartData(data.reverse());
     } catch (error) {
       console.error("Failed to fetch stock data:", error);
     }
   };
 
-  const getTicks = (data) => {
-    const values = data.map(item => item.value);
-    const dataMin = Math.min(...values) - 10;
-    const dataMax = Math.max(...values) + 10;
-    const interval = (dataMax - dataMin) / 5;
+  // const getTicks = (data) => {
+  //   const values = data.map(item => item.value);
+  //   const dataMin = Math.max(0,Math.min(...values) - 10);
+  //   const dataMax = Math.max(...values) + 10;
+  //   const interval = (dataMax - dataMin) / 5;
 
-    const ticks = [];
-    for (let i = 0; i <= 5; i++) {
-      ticks.push(Math.round(dataMin + interval * i));
-    }
+  //   const ticks = [];
+  //   for (let i = 0; i <= 5; i++) {
+  //     ticks.push(Math.round(dataMin + interval * i));
+  //   }
 
-    return ticks;
-  };
+  //   return ticks;
+  // };
 
-  const ticks = getTicks(chartData);
-  const domainMin = Math.min(...ticks) - 10;
-  const domainMax = Math.max(...ticks) + 10;
+  // const ticks = getTicks(chartData);
+  // const domainMin = Math.max(0,Math.min(...ticks) - 10);
+  // const domainMax = Math.max(...ticks) + 10;
 
   const [selectedPoint, setSelectedPoint] = useState(null);
 
-  const displayedData = chartData.reverse();  // Reverse the data
+  // const displayedData = chartData.reverse();  // Reverse the data
+  console.log(chartData)
 
   return (
     <div>
       <ButtonGroup
         variant="outlined"
-        style={{ borderColor: "white", alignContent: "center" }}
+        style={{ borderColor: "white", alignContent: "center", marginBottom:"20px"}}
         width="100%"
       >
         <Button
           style={{
-            color: timeSpan === "1Y" ? "white" : "white",
+            color: timeSpan === "1Y" ? colors.blueAccent[100] : colors.blueAccent[100] ,
             backgroundColor: timeSpan === "1Y" ? colors.greenAccent[600] : "transparent"
           }}
           onClick={() => setTimeSpan("1Y")}
@@ -115,7 +119,7 @@ const StockChart = ({ chosenStock }) => {
         </Button>
         <Button
           style={{
-            color: timeSpan === "1Q" ? "white" : "white",
+            color: timeSpan === "1Q" ? colors.blueAccent[100] : colors.blueAccent[100],
             backgroundColor: timeSpan === "1Q" ? colors.greenAccent[600] : "transparent"
           }}
           onClick={() => setTimeSpan("1Q")}
@@ -124,7 +128,7 @@ const StockChart = ({ chosenStock }) => {
         </Button>
         <Button
           style={{
-            color: timeSpan === "1M" ? "white" : "white",
+            color: timeSpan === "1M" ? colors.blueAccent[100] : colors.blueAccent[100],
             backgroundColor: timeSpan === "1M" ? colors.greenAccent[600] : "transparent"
           }}
           onClick={() => setTimeSpan("1M")}
@@ -133,7 +137,7 @@ const StockChart = ({ chosenStock }) => {
         </Button>
         <Button
           style={{
-            color: timeSpan === "1W" ? "white" : "white",
+            color: timeSpan === "1W" ? colors.blueAccent[100] : colors.blueAccent[100],
             backgroundColor: timeSpan === "1W" ? colors.greenAccent[600] : "transparent"
           }}
           onClick={() => setTimeSpan("1W")}
@@ -142,10 +146,10 @@ const StockChart = ({ chosenStock }) => {
         </Button>
       </ButtonGroup>
       <ResponsiveContainer width="100%" height={300}>
-        <AreaChart data={displayedData}>
+        <AreaChart data={chartData}>
           <CartesianGrid stroke="#f5f5f5" />
           <XAxis dataKey="time" />
-          <YAxis domain={[domainMin, domainMax]} ticks={ticks} />
+          <YAxis  />
           <Tooltip content={<CustomTooltip />} />
           <Area type="monotone" dataKey="value" stroke={colors.redAccent[400]} fill={colors.redAccent[500]} />
         </AreaChart>

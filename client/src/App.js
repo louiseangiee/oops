@@ -22,6 +22,7 @@ import Analytics from './pages/analytics_dashboard';
 import Profile from './pages/profile';
 import AccessLog from './pages/access_log';
 import AutoRefreshOnRouteChange from './AutoRefreshOnRouteChange';
+import StockMarketPage from './pages/stockMarketpage';
 
 function App() {
 	
@@ -52,6 +53,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="access_log" element={<AccessLog />} />
                   <Route path="analytics" element={<Analytics />} />
+                  <Route path="stock-market" element ={<StockMarketPage />} />
                 </Route>
 
 								<Route path="team" element={<Team />} />

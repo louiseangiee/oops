@@ -18,17 +18,40 @@ const AccessLog = () => {
   const [cookie] = useCookies(["accessToken"]);
   const [accessLogData, setAccessLogData] = useState(null);
 
-  const userData = useAuth().userData;
+  const { userData } = useAuth();
+  console.log(userData);
   // const accessLogs = userData.accessLogs;
   const userId = userData.id;
   // console.log(accessLogs);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getAsync("accessLogs/user/" + userId, cookie.accessToken);
-      const data = await response.json();
-      console.log(data?.content);
-      setAccessLogData(data?.content);
+      if (!userId) return;
+      if (userData.role === "ROLE_ADMIN") {
+        const response = await getAsync("accessLogs", cookie.accessToken);
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setAccessLogData(data);
+        } else {
+          console.log("Error fetching access logs");
+          console.log(response);
+          setAccessLogData(null);
+        }
+        return;
+      } else if (userData.role === "ROLE_USER") {
+        const response = await getAsync("accessLogs/user/" + userId, cookie.accessToken);
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setAccessLogData(data);
+        } else {
+          console.log("Error fetching access logs");
+          console.log(response);
+          setAccessLogData(null);
+        }
+        return;
+      }
     };
     fetchData();
   }, [useAuth, cookie.accessToken]);
@@ -104,7 +127,7 @@ const AccessLog = () => {
               style={{ width: 300, height: 300 }}
             />
           </Box>
-          ) : (
+        ) : (
           <DataGrid
             rows={accessLogData}
             columns={columns}

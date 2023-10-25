@@ -114,9 +114,9 @@ public class UserController {
         try {
             boolean isOtpValid = userService.verifyUserOtp(email, otp);
             if (isOtpValid) {
-                return ResponseEntity.ok().body("OTP verified successfully");
+                return ResponseEntity.ok().body("{\"message\": \"OTP verified successfully\"}");
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid OTP");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Invalid OTP\"}");
             }
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();

@@ -23,6 +23,7 @@ import Profile from './pages/profile';
 import AccessLog from './pages/access_log';
 import AutoRefreshOnRouteChange from './AutoRefreshOnRouteChange';
 import StockMarketPage from './pages/stockMarketpage';
+import ComparePortfolio from './pages/comparePortfolio';
 
 function App() {
 	
@@ -54,6 +55,7 @@ function App() {
                   <Route path="access_log" element={<AccessLog />} />
                   <Route path="analytics" element={<Analytics />} />
                   <Route path="stock-market" element ={<StockMarketPage />} />
+                  <Route path="compare-portfolio" element ={<ComparePortfolio />} />
                 </Route>
 
 								<Route path="team" element={<Team />} />

@@ -26,11 +26,11 @@ const Home = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!userData.id) return;
-      const response = await getAsync('portfolios/user/' + userData.id, cookie.accessToken);
-      const data = await response.json();
-      console.log(data);
-      setDataFetched(data);
+      if (userData.id) {
+        const response = await getAsync('portfolios/user/' + userData.id, cookie.accessToken);
+        const data = await response.json();
+        setDataFetched(data);
+      }
     }
     fetchData();
 
@@ -55,27 +55,27 @@ const Home = () => {
       </Box>
 
       {/* SEARCH BAR */}
-        <Box display="flex" marginBottom="20px">
-          <Box
-            display="flex"
-            backgroundColor={colors.primary[400]}
-            borderRadius="3px"
-            width="100%"
-          >
-            <InputBase 
-              sx={{ ml: 2, flex: 1 }} 
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <IconButton type="button" sx={{ p: 1 }}>
-              <SearchIcon />
-            </IconButton>
-          </Box>
+      <Box display="flex" marginBottom="20px">
+        <Box
+          display="flex"
+          backgroundColor={colors.primary[400]}
+          borderRadius="3px"
+          width="100%"
+        >
+          <InputBase
+            sx={{ ml: 2, flex: 1 }}
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <IconButton type="button" sx={{ p: 1 }}>
+            <SearchIcon />
+          </IconButton>
         </Box>
+      </Box>
 
 
-        {/* GRID & CHARTS */ }
+      {/* GRID & CHARTS */}
       {!filteredData ? (
         <Box display="flex" justifyContent="center" alignItems="center" height="100%">
           <Lottie
@@ -125,7 +125,7 @@ const Home = () => {
                   title={portfolio.name}
                   subtitle={portfolio.description}
                   capital={portfolio.totalCapital}
-                  returns={portfolio.performanceMetrics.overallReturns}
+                  returns={portfolio.performanceMetrics?.overallReturns}
                   stocks={portfolio.portfolioStocks}
                   portfolioId={portfolio.portfolioId}
                 />

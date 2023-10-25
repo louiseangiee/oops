@@ -143,7 +143,7 @@ export default function AddStocks() {
                         </IconButton>
                     </Box>
                     <Box
-                        sx={{ width: '100%', height: 200, marginTop: "10px"}}
+                        sx={{ width: '100%', height: 200, marginTop: "10px" }}
                         backgroundColor={theme.palette.mode === "dark" ? colors.primary[500] : colors.grey[900]}
                     >
                         <FixedSizeList

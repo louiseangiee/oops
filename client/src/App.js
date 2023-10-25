@@ -22,6 +22,7 @@ import Analytics from './pages/analytics_dashboard';
 import Profile from './pages/profile';
 import AccessLog from './pages/access_log';
 import AutoRefreshOnRouteChange from './AutoRefreshOnRouteChange';
+import OTP from './pages/otp';
 
 function App() {
 	// access to the theme and the color mode
@@ -37,6 +38,7 @@ function App() {
 							{/* <Route element={<AutoRefreshOnRouteChange />} /> */}
 							<Route path="/login" element={<Login />} />
 							<Route path="/profile" element={<Profile />} />
+							<Route path="/otp" element={<OTP />} />
 							<Route path="/" element={<Layout />}>
 								{/* Routes that require authentication */}
 								<Route element={<RequireAuth />}>

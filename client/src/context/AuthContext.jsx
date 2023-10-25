@@ -7,7 +7,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
 	const [userEmail, setUserEmail] = useState("");
 	const [userData, setUserData] = useState({});
-	const [cookie, setCookie] = useCookies();
+	const [cookie] = useCookies();
 
 
 	const signIn = async (email, password) => {
@@ -26,9 +26,8 @@ export const AuthProvider = ({ children }) => {
 		);
 		if (response.ok) {
 			const data = await response.json();
-			setCookie("accessToken", data.token, { path: "/", maxAge: 86400 });
-			setCookie("email", email, { path: "/", maxAge: 86400 });
-			return data;
+			const sentResponse = { accessToken: data.token, email: email }
+			return sentResponse;
 		}
 		else {
 			return null;

@@ -1,69 +1,76 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from "../theme";
+import { useCookies } from 'react-cookie';
+import { getAsync } from '../utils/utils';
+import StockSelector from './StockSelectorDropdown';
+import StockChart from './StockChart';
 
 function StockDetailsTable({ chosenStock }) {
-    console.log("chosenStock prop in StockDetailsTable:", chosenStock);
-    const [details, setDetails] = useState({});
+    const [overviewDetails, setOverviewDetails] = useState({});
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const [cookie] = useCookies();
 
     useEffect(() => {
-        console.log(chosenStock)
         if (!chosenStock || !chosenStock.code) return;
     
-            console.log("Fetching data for stock:", chosenStock.code);
-            import(`../data/${chosenStock.code}Data.json`)
-            .then(module => {
-                computeDetails(module.default);
-            })
-            .catch(err => {
-                console.error("Failed to load stock data:", err);
-            });
-        }, [chosenStock]);
-
-    const computeDetails = (data) => {
-        // console.log(data);
-        const today = data["Time Series (Daily)"]["2023-10-12"]; //dynamically Update later
-        console.log(data["Time Series (Daily)"]["2023-10-12"]);
-
-        const yesterday = data["Time Series (Daily)"]["2023-10-11"];
-        
-        const computedDetails = {
-            "Previous close": yesterday["4. close"],
-            "Day's range": `${today["3. low"]} - ${today["2. high"]}`,
-            "Open": today["1. open"],
-            // Assuming you will fetch data for 52 weeks, then calculate min and max for range.
-            "52-week range": "For now, static. Implement with full data.",
-            "Volume": today["5. volume"],
-            "Avg. volume": "For now, static. Calculate based on historical data."
+        const fetchOverviewData = async () => {
+            try {
+                const response = await getAsync(`stocks/overviewData?symbol=${chosenStock.code}`,cookie.accessToken);
+                const data = await response.json(); 
+                setOverviewDetails(data);
+            } catch (error) {
+                console.error("Failed to load stock overview data:", error);
+            }
         };
-        console.log(computedDetails)
-        setDetails(computedDetails);
+    
+        fetchOverviewData();
+    
+    }, [chosenStock]);
 
-        // return computedDetails;
-        
-    }
+    const name = overviewDetails.Name;
+    const description = overviewDetails.Description;
+    const sector = overviewDetails.Sector;
+    const Industry = overviewDetails.Industry;
+
+    const entriesToDisplay = [
+        ["Market Capitalization", overviewDetails.MarketCapitalization],
+        ["PE Ratio", overviewDetails.PERatio],
+        ["Dividend Yield", overviewDetails.DividendYield],
+        ["EPS", overviewDetails.EPS],
+        ["52 Week High", "$"+overviewDetails["52WeekHigh"]],
+        ["52 Week Low", "$"+overviewDetails["52WeekLow"]],
+    ];
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10%' }}>
-            <TableContainer style={{ width: '100%', height: '100%', marginLeft: '20px' }}>
-                <Table size="small">
-                    <TableBody>
-                        {Object.entries(details).map(([key, value]) => (
-                            <TableRow key={key}>
-                                <TableCell>{key}</TableCell>
-                                <TableCell align="right">{value}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </div>
+        
+            <Box display="flex" flexDirection="row" justifyContent="space-between" alignItems="center" marginTop={3}>
+                <Box style={{ width: '50%', marginRight: "30px" }}> 
+                    <Typography variant='h2' fontWeight="bold" marginBottom={2}> {name} </Typography>
+                    <Typography fontWeight="bold"> Sector: {sector} </Typography>
+                    <Typography fontWeight="bold" marginBottom={2}> Industry: {Industry} </Typography>
+                    <Typography fontStyle="italic"> {description}</Typography>
+                    
+                </Box>
+
+                <TableContainer flex={2}  style={{ width: '100%', height: '100%'}}>
+                    <Table size="small">
+                        <TableBody style={{padding: "10px"}}>
+                            {entriesToDisplay.map(([key, value]) => (
+                                <TableRow key={key} >
+                                    <TableCell>{key}</TableCell>
+                                    <TableCell align="right">{value}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
+            
+        
     );
-    
 }
 
 export default StockDetailsTable;
-

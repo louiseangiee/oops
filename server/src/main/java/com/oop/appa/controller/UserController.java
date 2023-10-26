@@ -114,6 +114,7 @@ public class UserController {
         try {
             boolean isOtpValid = userService.verifyUserOtp(email, otp);
             if (isOtpValid) {
+                userService.deleteOtp(email);
                 return ResponseEntity.ok().body("{\"message\": \"OTP verified successfully\"}");
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Invalid OTP\"}");

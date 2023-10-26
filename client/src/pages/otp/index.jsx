@@ -47,10 +47,12 @@ const OTP = () => {
 
     const verifyOTP = async () => {
         const finalotp = otp.join('');
+        console.log(finalotp)
         const response = await getAsync('users/verifyOTP?email=' + data.email + '&otp=' + finalotp);
         if (response.ok) {
             const data = await response.text();
-            if (data === "OTP verified successfully") {
+            console.log(data);
+            if (data === '{"message": "OTP verified successfully"}') {
                 await setRequiredCookie();
                 navigate('/')
             } else {

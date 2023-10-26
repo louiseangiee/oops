@@ -2,6 +2,9 @@ package com.oop.appa.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -25,6 +28,8 @@ public class UserService {
     private UserRepository userRepository;
     private JavaMailSender mailSender;
     private TemplateEngine templateEngine;
+
+    private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Autowired
     public UserService(UserRepository userRepository, JavaMailSender mailSender, TemplateEngine templateEngine) {
@@ -72,6 +77,11 @@ public class UserService {
             User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
             user.setOtp(otp);
             userRepository.save(user);
+
+            executor.schedule(() -> {
+               deleteOtp(email);
+            }, 5, TimeUnit.MINUTES);
+
         } catch (Exception e) {
             throw new RuntimeException("Error updating OTP service: " + e.getMessage(), e);
         }
@@ -161,6 +171,16 @@ public class UserService {
             return otp.equals(user.getOtp());
         } catch (Exception e) {
             throw new RuntimeException("Error verifying OTP service: " + e.getMessage(), e);
+        }
+    }
+
+    public void deleteOtp(String email){
+        try{
+            User user = findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+            user.setOtp(null);
+            save(user);
+        }catch(Exception e){
+            throw new RuntimeException("Error deleting OTP: " + e.getMessage());
         }
     }
 }

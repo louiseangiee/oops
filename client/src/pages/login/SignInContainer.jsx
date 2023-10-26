@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { tokens } from '../../theme.js';
 import { Grid, Box, Button, useTheme, Typography, Link } from '@mui/material';
@@ -8,70 +8,39 @@ import LockIcon from '@mui/icons-material/Lock';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
 import { getAsync } from "../../utils/utils";
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-
 
 
 const SignInContainer = (props) => {
     const { signIn } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [open, setOpen] = useState(false);
-    const [emailState, setEmailState] = useState("");
-    const [otp, setOtp] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [isAlertOpen, setIsAlertOpen] = useState(false);
 
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
 
     const handleSignIn = async () => {
         const response = await signIn(email, password);
         if (response != null) {
-            navigate('/');
+            generateOTP(response);
         }
         else {
             alert("Wrong email or password");
-            setOpen(false);
         }
     }
 
-    const generateOTP = async () => {
+    const generateOTP = async (data) => {
+        console.log(' generating OTP');
         const response = await getAsync('users/sendOTP?email=' + email);
         if (response.ok) {
-            setEmailState("Email has been sent");
+            navigate('/otp', { state: { data: data } })
+            console.log('OTP sent');
         }
         else {
             alert('Email not found')
-            setOpen(false);
-        }
-    }
-
-    const verifyOTP = async () => {
-        const response = await getAsync('users/verifyOTP?email=' + email + '&otp=' + otp);
-        if (response.ok) {
-            const data = await response.json();
-            data ? handleSignIn() : alert('wrong code');
-        }
-        else {
-            alert('error verifying')
         }
     }
 
@@ -79,102 +48,57 @@ const SignInContainer = (props) => {
     return (
         <>
             <Grid item
-                xs={12} md={8}
+                xs={12} md={4}
                 id="signInContainer"
-                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
+                sx={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', backgroundColor: 'white', height: '100%', width: '33%'
+                }}
             >
-                <Typography variant="h2" color={colors.grey[100]} fontWeight="bold" sx={{ m: "0 0 5px 0" }}>Sign In With Password</Typography>
+                <Typography variant="h2" color={'black'} fontWeight="bold" sx={{ m: "0 0 5px 0" }}>Sign in with Password</Typography>
                 <div>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'black', mb: 2 }}>
                         <AlternateEmailIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Email" type='email' required onChange={(e) => { setEmail(e.target.value) }} />
+                        <InputBase sx={{ ml: 2, flex: 1, color: 'black', border: `1px solid ${colors.grey[100]}`, p: '5px 10px', borderRadius: '5px' }} placeholder="Email" type='email' required onChange={(e) => { setEmail(e.target.value) }} />
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'black' }}>
                         <LockIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Password" type={showPassword ? 'text' : 'password'} onChange={(e) => setPassword(e.target.value)} />
+                        <InputBase sx={{ ml: 2, flex: 1, color: 'black', border: `1px solid ${colors.grey[100]}`, p: '5px 10px', borderRadius: '5px' }} placeholder="Password" type={showPassword ? 'text' : 'password'} onChange={(e) => setPassword(e.target.value)} />
                         <Button
                             sx={{ color: colors.grey[100] }}
                             id="seePasswordBtn"
                             onClick={() => setShowPassword(!showPassword)}
                         >
-                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            {showPassword ? <VisibilityOffIcon style={{ color: 'black' }} /> : <VisibilityIcon style={{ color: 'black' }} />}
                         </Button>
                     </Box>
                 </div>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <Typography variant="h6" mt={1}>Don't have an account?</Typography>
-                    <Typography variant="h6" mt={1}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'black' }}>
+                    <Typography variant="h6" mt={1} color={'black'}>Don't have an account?</Typography>
+                    <Typography variant="h6" mt={1} color={'black'}>
                         Register with us {" "}
                         <Link
                             onClick={props.handleSignIn}
-                            sx={{ color: colors.grey[100], cursor: 'pointer' }}
+                            sx={{ color: 'black', cursor: 'pointer' }}
                         >
                             here!
                         </Link>
                     </Typography>
                 </Box>
-                <Button sx={{ color: colors.grey[100], width: '100%' }} onClick={handleClickOpen}>Sign In</Button>
-            </Grid >
-
-
-            {/* OTP DIALOG */}
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle
-                    sx={{
-                        color: colors.greenAccent[600],
-                        backgroundColor: colors.primary[400],
-                        fontSize: "22px",
-                        fontWeight: "bold"
-                    }}
-                >
-                    Make sure that it's you!
-                </DialogTitle>
-                <DialogContent
-                    sx={{ backgroundColor: colors.primary[400] }}>
-                    <DialogContentText>
-                        Please check your email for OTP
-                    </DialogContentText>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="otp"
-                        label=""
-                        placeholder="Fill in OTP here"
-                        startAdornment="$"
-                        type="text"
+                <Box sx={{ width: "60%" }}>
+                    <Button
                         fullWidth
-                        variant="standard"
-                        sx={{ color: colors.grey[100] }}
-                        onChange={(e) => setOtp(e.target.value)}
-                    />
-                    <Typography sx={[{
-                        '&:hover': {
-                            textDecoration: 'underline',
-                        },
-                    }, { marginTop: "10px", cursor: 'pointer' }]} onClick={generateOTP}>Generate OTP</Typography>
-                    <Typography>{emailState}</Typography>
-                </DialogContent>
-                <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
-                    <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} onClick={verifyOTP}>Verify OTP</Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* <Snackbar
-                open={false}
-                autoHideDuration={5000} // Adjust the duration as needed
-                onClose={setIsAlertOpen(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-                <Alert
-                    elevation={6}
-                    variant="filled"
-                    severity="error"
-                    onClose={setIsAlertOpen(false)}
-                    sx={{ backgroundColor: colors.greenAccent[600] }}
-                >
-                </Alert>
-            </Snackbar> */}
+                        sx={{
+                            backgroundColor: "#326adf",
+                            '&:hover': { backgroundColor: colors.blueAccent[700] },
+                            color: colors.grey[100],
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            padding: "10px 20px",
+                            marginTop: "10px",
+                        }}
+                        onClick={handleSignIn}>Sign In</Button>
+                </Box>
+            </Grid >
         </>
     );
 };

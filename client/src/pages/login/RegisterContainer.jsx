@@ -38,91 +38,100 @@ const RegisterContainer = (props) => {
         setIsDisabled(false);
         if (!(password.match(pattern)) && password.length > 0) {
             setPasswordError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character');
-
         }
 
         if (password.length < 8 && password.length > 0) {
             setPasswordError('Password must be at least 8 characters long');
-
         }
         if (password.length >= 25) {
             setPasswordError('Password must be less than 25 characters long');
-
         }
 
         if (password !== confirmPassword && confirmPassword.length > 0) {
             setPasswordError('Passwords do not match');
-
         }
 
-        setIsDisabled(!passwordError.length > 0 || !(confirmPassword.length > 0) || !(password.length > 0))
+        if (fullName.length === 0 || email.length === 0 || password.length === 0 || confirmPassword.length === 0) {
+            setPasswordError('Please fill out all fields')
+        }
 
+        setIsDisabled(passwordError.length > 0)
     }
 
-    useEffect(() => {
-        checkPassword();
-    }, [password, confirmPassword]);
-
+    useEffect(() => { checkPassword() }, [passwordError, password, confirmPassword, fullName, email]);
     return (
         <>
             <Grid item
-                xs={12} md={8}
+                xs={12} md={4}
                 id="registerContainer"
-                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
+                sx={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', backgroundColor: 'white', height: '100%', width: '33%'
+                }}
             >
-                <Typography variant="h2" color={colors.grey[100]} fontWeight="bold" sx={{ m: "0 0 5px 0" }}>Register An Account</Typography>
+                <Typography variant="h2" color={'black'} fontWeight="bold" sx={{ m: "0 0 5px 0" }}>Register An Account</Typography>
                 <div>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'black', mb: 2 }}>
                         <AccountCircleIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Full Name" required onChange={(e) => setFullName(e.target.value)} />
+                        <InputBase sx={{ ml: 2, flex: 1, color: 'black', border: `1px solid ${colors.grey[100]}`, p: '5px 10px', borderRadius: '5px' }} placeholder="Full Name" required onChange={(e) => { setFullName(e.target.value); checkPassword() }} />
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'black', mb: 2 }}>
                         <AlternateEmailIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Email" type='email' required onChange={(e) => setEmail(e.target.value)} />
+                        <InputBase sx={{ ml: 2, flex: 1, color: 'black', border: `1px solid ${colors.grey[100]}`, p: '5px 10px', borderRadius: '5px' }} placeholder="Email" type='email' required onChange={(e) => { setEmail(e.target.value); checkPassword() }} />
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'black', mb: 2 }}>
                         <LockIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Password" type={showPassword ? 'text' : 'password'} onChange={(e) => setPassword(e.target.value)} />
+                        <InputBase sx={{ ml: 2, flex: 1, color: 'black', border: `1px solid ${colors.grey[100]}`, p: '5px 10px', borderRadius: '5px' }} placeholder="Password" type={showPassword ? 'text' : 'password'} onChange={(e) => { setPassword(e.target.value); checkPassword() }} />
                         <Button
                             sx={{ color: colors.grey[100] }}
                             id="seePasswordBtn"
                             onClick={() => setShowPassword(!showPassword)}
                         >
-                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            {showPassword ? <VisibilityOffIcon style={{ color: 'black' }} /> : <VisibilityIcon style={{ color: 'black' }} />}
                         </Button>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'black', mb: 2 }}>
                         <LockIcon />
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Confirm Password" type={showConfirmPassword ? 'text' : 'password'} onChange={(e) => setConfirmPassword(e.target.value)} />
+                        <InputBase sx={{ ml: 2, flex: 1, color: 'black', border: `1px solid ${colors.grey[100]}`, p: '5px 10px', borderRadius: '5px' }} placeholder="Confirm Password" type={showConfirmPassword ? 'text' : 'password'} onChange={(e) => { setConfirmPassword(e.target.value); checkPassword() }} />
                         <Button
                             sx={{ color: colors.grey[100] }}
                             id="seePasswordBtn"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         >
-                            {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            {showConfirmPassword ? <VisibilityOffIcon style={{ color: 'black' }} /> : <VisibilityIcon style={{ color: 'black' }} />}
                         </Button>
                     </Box>
                 </div>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                     <Typography sx={{ wordWrap: 'break-word', maxWidth: '70%', color: colors.redAccent[500] }} mt={2}>{passwordError}</Typography>
-                    <Typography variant="h6" mt={1}>Already have an account?</Typography>
-                    <Typography variant="h6" mt={1}>
+                    <Typography variant="h6" mt={1} color={'black'}>Already have an account?</Typography>
+                    <Typography variant="h6" mt={1} color={'black'}>
                         Login {" "}
                         <Link
                             onClick={props.handleSignIn}
-                            sx={{ color: colors.grey[100], cursor: 'pointer' }}
+                            sx={{ color: 'black', cursor: 'pointer' }}
                         >
                             here!
                         </Link>
                     </Typography>
                 </Box>
-                <Button
-                    sx={{ color: colors.grey[100], width: '100%' }}
-                    onClick={(e) => handleRegister(e)}
-                    disabled={isDisabled}
-                >
-                    Sign Up!
-                </Button>
+                <Box sx={{ width: "60%" }}>
+                    <Button
+                        fullWidth
+                        sx={{
+                            backgroundColor: "#326adf",
+                            '&:hover': { backgroundColor: colors.blueAccent[700] },
+                            color: colors.grey[100],
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            padding: "10px 20px",
+                            marginTop: "10px",
+                        }}
+                        onClick={(e) => handleRegister(e)}
+                        disabled={isDisabled}
+                    >
+                        Sign Up!
+                    </Button>
+                </Box>
             </Grid >
         </>
     );

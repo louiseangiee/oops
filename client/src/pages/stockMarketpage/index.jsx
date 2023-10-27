@@ -35,22 +35,26 @@ const StockMarketPage = () => {
 
 
             </Box>
-        </Box><Box m="20px">
+        </Box>
+        <Box m="20px">
                 <StockSelector
                     chosenStock={chosenStock}
                     handleStockChange={handleStockChange} />
-                <Box display="flex" justifyContent="space-between">
-                    {/* StockDetailstable */}
-                    <Box flex="1" paddingRight="10px">
-                        <StockDetailsTable chosenStock={chosenStock} />
-                    </Box>
-
+                
+                    
                     {/* Line chart for the chosen stock */}
-                    <Box flex="2">
-                        <StockChart chosenStock={chosenStock} />
-                    </Box>
+                    
+                
+
+                {/* StockDetailstable */}
+                <Box paddingX={5} marginBottom={3}>
+                    
+                    <StockDetailsTable chosenStock={chosenStock} />
                 </Box>
-            </Box></>
+                <Box paddingX={5}>
+                        <StockChart chosenStock={chosenStock} />
+                </Box>
+        </Box></>
     );
 
 }

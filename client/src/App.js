@@ -24,6 +24,7 @@ import AccessLog from './pages/access_log';
 import AutoRefreshOnRouteChange from './AutoRefreshOnRouteChange';
 import StockMarketPage from './pages/stockMarketpage';
 import OTP from './pages/otp';
+import ComparePortfolio from './pages/comparePortfolio';
 
 function App() {
 	// access to the theme and the color mode
@@ -65,6 +66,7 @@ function App() {
 										path="stock-market"
 										element={<StockMarketPage />}
 									/>
+                  <Route path="compare-portfolio" element ={<ComparePortfolio />} />
 								</Route>
 
 								<Route path="team" element={<Team />} />

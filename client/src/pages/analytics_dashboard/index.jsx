@@ -16,15 +16,7 @@ const Analytics = () => {
   const colors = tokens(theme.palette.mode);
 
   
-  // We will store the entire stock object instead of just the code
-  const [chosenStock, setChosenStock] = React.useState({
-    code: "AAPL",
-    name: "Apple Inc. (AAPL)",
-  });
-
-  const handleStockChange = (newValue) => {
-    setChosenStock(newValue ? newValue : null);
-  };
+  
 
 
   return (
@@ -105,27 +97,7 @@ const Analytics = () => {
           p={5}
         >
           <div className="stock-page">
-            <Typography variant="h2" fontWeight="bold" mb={5}>
-              Stocks Today
-            </Typography>
-            {/* Dropdown to choose the stock using MUI */}
-            <StockSelector
-              chosenStock={chosenStock}
-              handleStockChange={handleStockChange}
-            />
-            <Box display="flex" justifyContent="space-between">
-              {/* StockDetailstable */}
-              <Box flex="1" paddingRight="10px">
-                <StockDetailsTable chosenStock={chosenStock} />
-              </Box>
-
-              {/* Line chart for the chosen stock */}
-              <Box flex="2">
-                {/* Pass accessToken here if needed */}
-                <StockChart chosenStock={chosenStock} />
-              </Box>
-              
-            </Box>
+            
             <PorfolioBarChart />
 
             <PortfolioBreakdown />

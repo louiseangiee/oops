@@ -63,13 +63,14 @@ const StockSelector = (props) => {
                     variant="outlined"
                     label="Select Stock"
                     sx={{
+                        color: colors.grey[100],
                         '& .MuiOutlinedInput-root': {
                             // Apply your input styles here
-                            border: `2px solid colors.greenAccent[400]`, // Change the border color
+                            borderColor: `colors.grey[100] !important`, // Change the border color
                         },
                         '& .MuiInputLabel-root': {
                             // Apply your label styles here
-                            color: colors.grey[100], // Change the label color
+                            color: `colors.grey[100] !important`, // Change the label color
                         },
 
                     }}

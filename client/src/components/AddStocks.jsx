@@ -23,18 +23,10 @@ import ListItemText from '@mui/material/ListItemText';
 import { FixedSizeList } from 'react-window';
 import dayjs from 'dayjs';
 import StockSelector from './StockSelectorDropdown';
+import { putAsync } from '../utils/utils';
+import { useCookies } from "react-cookie";
+import { useAuth } from "../context/AuthContext";
 
-function renderRow(props) {
-    const { index, style } = props;
-
-    return (
-        <ListItem style={style} key={index} component="div" disablePadding>
-            <ListItemButton>
-                <ListItemText primary={`Stock ${index + 1}`} />
-            </ListItemButton>
-        </ListItem>
-    );
-}
 
 function ButtonField(props) {
     const {
@@ -91,6 +83,7 @@ export default function AddStocks() {
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const [cookie] = useCookies(["accessToken"]);
 
     // Initialize state variables for form fields
     const [stockQuantity, setStockQuantity] = useState(0);
@@ -114,6 +107,7 @@ export default function AddStocks() {
     };
 
     const handleAddClick = () => {
+        console.log(chosenStock);
     };
 
     return (
@@ -189,14 +183,13 @@ export default function AddStocks() {
                         startAdornment="$"
                         type="number"
                         fullWidth
-                        sx={{ color: colors.grey[100] }}
                         value={stockPrice}
                         onChange={(e) => setStockPrice(e.target.value)}
                         sx={{
                             color: colors.grey[100],
                             '& .MuiOutlinedInput-root': {
                                 // Apply your input styles here
-                                border: `2px solid colors.greenAccent[400]`, // Change the border color
+                                borderColor: colors.grey[100], // Change the border color
                             },
                             '& .MuiInputLabel-root': {
                                 // Apply your label styles here
@@ -218,7 +211,7 @@ export default function AddStocks() {
                             color: colors.grey[100],
                             '& .MuiOutlinedInput-root': {
                                 // Apply your input styles here
-                                border: `2px solid colors.greenAccent[400]`, // Change the border color
+                                borderColor: colors.grey[100], // Change the border color
                             },
                             '& .MuiInputLabel-root': {
                                 // Apply your label styles here

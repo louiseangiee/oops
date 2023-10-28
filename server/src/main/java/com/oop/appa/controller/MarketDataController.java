@@ -1,7 +1,6 @@
 package com.oop.appa.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oop.appa.exception.ErrorResponse;
 import com.oop.appa.service.MarketDataService;
 
@@ -116,4 +115,18 @@ public class MarketDataController {
         }
     }
 
+    @Operation(summary = "returns the closest stocks in the search ticker endpoint")
+    @Parameter(name = "search term", description = "stock symbol to be searched")
+    @GetMapping("/search")
+    public ResponseEntity<?> fetchSearchTicker(@RequestParam String searchTerm) {
+        try {
+            JsonNode data = marketDataService.fetchSearchTicker(searchTerm);
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching search ticker data");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
 }

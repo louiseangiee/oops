@@ -77,6 +77,47 @@ public class StockService {
         }
     }
 
+    public List<Map<String,String>> searchBar(String searchTerm){
+        try {
+            JsonNode searchResults = marketDataService.fetchSearchTicker(searchTerm).path("bestMatches");
+            List<Map<String, String>> results = new ArrayList<>();
+            
+            for (JsonNode node : searchResults) {
+                String symbol = node.path("1. symbol").asText();
+                String name = node.path("2. name").asText();
+                String type = node.path("3. type").asText();
+    
+                if (!symbol.isEmpty() && !name.isEmpty() && type.equals("Equity")) {
+                    Map<String, String> result = new HashMap<>();
+                    result.put("symbol", symbol);
+                    result.put("name", name);
+                    results.add(result);
+                }
+            }
+            return results;
+        } catch (Exception e) {
+            throw new RuntimeException("Error for search bar service: ", e);
+        }
+    }
+
+    public Stock saveByStockSymbol(String stockSymbol){
+        try {
+            JsonNode bestMatchStock =  marketDataService.fetchSearchTicker(stockSymbol).path("bestMatches").get(0);
+            String bestMatchStockSymbol = bestMatchStock.path("1. symbol").asText();
+            JsonNode stockInfo = marketDataService.fetchOverviewData(bestMatchStockSymbol);
+            Stock stock = new Stock();
+            stock.setStockSymbol(stockInfo.path("Symbol").asText());
+            stock.setName(stockInfo.path("Name").asText());
+            stock.setCountry(stockInfo.path("Country").asText());
+            stock.setSector(stockInfo.path("Sector").asText());
+            stock.setIndustry(stockInfo.path("Industry").asText());
+            stock.setExchange(stockInfo.path("Exchange").asText());
+            return stockRepository.save(stock);
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving stock by stock symbol service: ", e);
+        }
+    }
+
     // DELETE
     public void delete(Stock stock) {
         try {

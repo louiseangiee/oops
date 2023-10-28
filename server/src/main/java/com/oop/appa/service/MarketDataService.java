@@ -117,8 +117,10 @@ public class MarketDataService {
     }
 
     public JsonNode fetchThreeMonthTreasuryYield() {
-        String apiKey = System.getenv("ALPHAVANTAGE_API_KEY"); // Make sure the API key is set as an environment variable
-        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=TREASURY_YIELD&interval=monthly&maturity=3month&apikey=" + apiKey;
+        String apiKey = System.getenv("ALPHAVANTAGE_API_KEY"); // Make sure the API key is set as an environment
+                                                               // variable
+        String apiUrl = ALPHA_VANTAGE_BASE_URL
+                + "/query?function=TREASURY_YIELD&interval=monthly&maturity=3month&apikey=" + apiKey;
 
         JsonNode response = webClient.get()
                 .uri(apiUrl)
@@ -132,6 +134,28 @@ public class MarketDataService {
             throw new RuntimeException("Error fetching data from service: " + response.get("Information").asText());
         }
 
+        return response;
+    }
+
+    public JsonNode fetchSearchTicker(String searchTerm) {
+        String apiKey = System.getenv("ALPHAVANTAGE_API_KEY");
+        String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=SYMBOL_SEARCH&keywords=" + searchTerm + "&apikey="
+                + apiKey;
+        JsonNode response = webClient.get()
+                .uri(apiUrl)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .block();
+        if (response == null || response.isEmpty()) {
+            throw new IllegalArgumentException("No data found for word searched");
+        } else if (response.path("bestMatches").isEmpty()) {
+            JsonNode infoNode = response.get("Information");
+            if (infoNode != null) {
+                throw new RuntimeException("Error fetching data from service: " + infoNode.asText());
+            } else {
+                throw new RuntimeException("No matches found and no additional information provided");
+            }
+        }
         return response;
     }
 

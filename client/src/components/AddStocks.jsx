@@ -189,7 +189,6 @@ export default function AddStocks() {
                         startAdornment="$"
                         type="number"
                         fullWidth
-                        sx={{ color: colors.grey[100] }}
                         value={stockPrice}
                         onChange={(e) => setStockPrice(e.target.value)}
                         sx={{

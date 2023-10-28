@@ -31,26 +31,24 @@ const AccessLog = () => {
         const response = await getAsync("accessLogs", cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
-          setAccessLogData(data);
+          console.log(data.content);
+          setAccessLogData(data.content);
         } else {
           console.log("Error fetching access logs");
           console.log(response);
           setAccessLogData(null);
         }
-        return;
       } else if (userData.role === "ROLE_USER") {
         const response = await getAsync("accessLogs/user/" + userId, cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
-          setAccessLogData(data);
+          console.log(data.content);
+          setAccessLogData(data.content);
         } else {
           console.log("Error fetching access logs");
           console.log(response);
           setAccessLogData(null);
         }
-        return;
       }
     };
     fetchData();

@@ -103,6 +103,7 @@ public class PortfolioService {
             portfolio.setName(portfolioDto.getName());
             portfolio.setDescription(portfolioDto.getDescription());
             portfolio.setTotalCapital(portfolioDto.getTotalCapital());
+            portfolio.setRemainingCapital(portfolioDto.getTotalCapital());
             portfolio.setUser(user);
 
             Portfolio savedPortfolio = portfolioRepository.save(portfolio);

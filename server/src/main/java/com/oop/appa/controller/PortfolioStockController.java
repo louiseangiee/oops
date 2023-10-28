@@ -92,6 +92,23 @@ public class PortfolioStockController {
         }
     }
 
+    @Operation(summary = "Sell a portfolio stock by portfolio id and stock symbol and quantity to sell")
+    @Parameter(name = "portfolioId", description = "portfolio id")
+    @Parameter(name = "stockSymbol", description = "stock symbol")
+    @Parameter(name = "quantity", description = "quantity to sell")
+    @PutMapping("/{portfolioId}/stocks/{stockSymbol}/sell")
+    public ResponseEntity<?> sellStock(@PathVariable Integer portfolioId, @PathVariable String stockSymbol, @RequestParam Integer quantity) {
+        try {
+            portfolioStockService.sellPortfolioStock(portfolioId, stockSymbol, quantity);
+            return ResponseEntity.ok("Success in selling stocks");
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error selling portfolio stock by stock symbol");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
     //Delete
     @Operation(summary = "Delete a portfolio stock by id")
     @Parameter(name = "id", description = "portfolio id")
@@ -104,6 +121,24 @@ public class PortfolioStockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error deleting portfolio stock by id");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    @Operation(summary = "Drop a portfolio stock by portfolio id and stock symbol")
+    @Parameter(name = "portfolioId", description = "portfolio id")
+    @Parameter(name = "stockSymbol", description = "stock symbol")
+    @DeleteMapping("/{portfolioId}/stocks/{stockSymbol}/drop")
+    public ResponseEntity<?> deletePortfolioStockByPortfolioIdAndStockSymbol(@PathVariable Integer portfolioId,
+            @PathVariable String stockSymbol) {
+        try {
+            portfolioStockService.deleteByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
+            return ResponseEntity.ok("Portfolio stock with portfolio ID " + portfolioId + " and stock symbol " + stockSymbol + " was successfully deleted.");
+
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error deleting portfolio stock by portfolio id and stock symbol");
             error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }

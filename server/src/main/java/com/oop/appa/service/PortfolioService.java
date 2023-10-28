@@ -127,6 +127,7 @@ public class PortfolioService {
             existingPortfolio.setName(portfolio.getName());
             existingPortfolio.setDescription(portfolio.getDescription());
             existingPortfolio.setTotalCapital(portfolio.getTotalCapital());
+            existingPortfolio.setRemainingCapital(portfolio.getRemainingCapital());
 
             Portfolio updatedPortfolio = portfolioRepository.save(existingPortfolio);
 

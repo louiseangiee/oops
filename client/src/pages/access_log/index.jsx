@@ -56,17 +56,17 @@ const AccessLog = () => {
 
 
   const columns = [
-    { field: "logId", headerName: "ID" },
-    { field: "action", headerName: "Action", flex: 1 },
-    {
+    { field: "logId", headerName: "ID" }, {
       field: "timestamp",
       headerName: "Timestamp",
       type: "dateTime",
       headerAlign: "left",
       align: "left",
-      flex: 1,
+      flex: 0.2,
       valueGetter: (params) => new Date(params.value),
     },
+    { field: "action", headerName: "Action", flex: 1 },
+
   ];
 
   return (

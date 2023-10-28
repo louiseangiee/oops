@@ -197,7 +197,7 @@ public class PortfolioStockController {
 
     @Operation(summary = "Groups the portfolio stocks into a sector and returns a map of the Stock, its actual value and percentage of the portfolio")
     @Parameter(name = "portfolioId", description = "portfolio id")
-    @Parameter(name = "groupBy", description = "group by 'sector', 'industry' or 'exchange'" )
+    @Parameter(name = "groupBy", description = "group by 'sector', 'industry' or 'exchange' or 'country'" )
     @GetMapping("/{portfolioId}/stocks")
     public ResponseEntity<?> getPortfolioStocksByGroup(@PathVariable Integer portfolioId,
             @RequestParam String groupBy) {

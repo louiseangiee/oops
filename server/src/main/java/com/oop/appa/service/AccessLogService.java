@@ -1,9 +1,12 @@
 package com.oop.appa.service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -35,17 +38,50 @@ public class AccessLogService {
         } catch (Exception e) {
             throw new RuntimeException("Error fetching all AccessLogs with pagination service: " + e.getMessage(), e);
         }
- 
     }
 
-    public Page<AccessLog> findByUserId(Integer user_id, Pageable pageable) {
+    public List<AccessLog> findByUserId(Integer user_id) {
+        try {
+            return accessLogRepository.findByUserId(user_id);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Illegal argument", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching all AccessLogs with pagination service: " + e.getMessage(), e);
+        }
+    }
+
+    public Page<AccessLog> findByUserIdPaged(Integer user_id, Pageable pageable) {
         try {
             return accessLogRepository.findByUserId(user_id, pageable);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Illegal argument", e);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("Error fetching all AccessLogs with pagination service: " + e.getMessage(), e);
+        }
+    }
+
+    public Page<AccessLog> findByUserIdAndPortfolioIdPaged(Integer userId, Integer portfolioId, Pageable pageable) {
+        try {
+            List<AccessLog> accessLogs = findByUserId(userId);
+            List<AccessLog> filteredAccessLogs = accessLogs.stream()
+                    .filter(accessLog -> accessLog.getAction().contains("Portfolio #" + portfolioId))
+                    .collect(Collectors.toList());
+            long startItem = pageable.getOffset();
+            long endItem = Math.min(startItem + pageable.getPageSize(), filteredAccessLogs.size());
+
+            // Extract the sublist for the current page
+            List<AccessLog> pagedAccessLogs;
+            if (startItem <= endItem) {
+                pagedAccessLogs = filteredAccessLogs.subList((int) startItem, (int) endItem);
+            } else {
+                pagedAccessLogs = Collections.emptyList();
+            }
+            // Return the page
+            return new PageImpl<>(pagedAccessLogs, pageable, filteredAccessLogs.size());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Illegal argument", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching AccessLogs with pagination service: " + e.getMessage(), e);
         }
     }
 

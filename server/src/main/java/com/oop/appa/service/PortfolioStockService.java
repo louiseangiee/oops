@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,7 @@ public class PortfolioStockService {
         try {
             return portfolioStockRepository.findByPortfolioPortfolioId(portfolio_id);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all PortfolioStocks by portfolio ID service: " + portfolio_id,
+            throw new RuntimeException("Error fetching all PortfolioStocks by Portfolio ID service: " + portfolio_id,
                     e);
         }
     }
@@ -77,9 +78,9 @@ public class PortfolioStockService {
         try {
             return portfolioStockRepository.findByPortfolioPortfolioIdAndStockStockSymbol(portfolioId, stockSymbol)
                     .orElseThrow(() -> new EntityNotFoundException(
-                            "Stock " + stockSymbol + "not found in portfolio id" + portfolioId));
+                            "Stock " + stockSymbol + "not found in Portfolio id" + portfolioId));
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching PortfolioStock by portfolio ID: " + portfolioId
+            throw new RuntimeException("Error fetching PortfolioStock by Portfolio ID: " + portfolioId
                     + " and stock symbol: " + stockSymbol, e);
         }
     }
@@ -122,7 +123,7 @@ public class PortfolioStockService {
                         - (dto.getBuyPrice() * dto.getQuantity());
                 if (totalCapitalRemainingAfterPurchase < 0) {
                     action = String.format(
-                            "User attempted to drop and repurchase stock %s from portfolio ID: %d - %s with new price: %f and quantity: %d on %s, but insufficient capital",
+                            "User attempted to drop and repurchase stock %s from Portfolio #%d - %s with new price: %f and quantity: %d on %s, but insufficient capital",
                             stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                             dto.getQuantity(), dto.getBuyDate());
                     accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
@@ -133,7 +134,7 @@ public class PortfolioStockService {
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(
-                        "User succesfully dropped and repurchased stock %s in portfolio ID: %d - %s with new price: %f and quantity: %d on %s",
+                        "User succesfully dropped and repurchased stock %s in Portfolio #%d - %s with new price: %f and quantity: %d on %s",
                         stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                         dto.getQuantity(), dto.getBuyDate());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
@@ -144,7 +145,7 @@ public class PortfolioStockService {
                         - (dto.getBuyPrice() * dto.getQuantity());
                 if (totalCapitalRemainingAfterPurchase < 0) {
                     action = String.format(
-                            "User attempted to purchase stock %s in portfolio ID: %d Name: %s with new price: %f and quantity: %d on %s, but insufficient capital",
+                            "User attempted to purchase stock %s in Portfolio #%d - %s with new price: %f and quantity: %d on %s, but insufficient capital",
                             stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                             dto.getQuantity(), dto.getBuyDate());
                     accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
@@ -159,7 +160,7 @@ public class PortfolioStockService {
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(
-                        "User added new stock %s to portfolio ID: %d - %s, with price: %f and quantity: %d on %s",
+                        "User added new stock %s to Portfolio #%d - %s, with price: %f and quantity: %d on %s",
                         stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                         dto.getQuantity(), dto.getBuyDate());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
@@ -193,7 +194,7 @@ public class PortfolioStockService {
             } else {
                 portfolioStockRepository.save(portfolioStock);
             }
-            String action = String.format("User sells %d shares of stock %s from portfolio ID: %d, Portoflio Name: %s at price",
+            String action = String.format("User sells %d shares of stock %s from Portfolio #%d - %s at price",
                     quantity, stockSymbol, portfolioStock.getPortfolio().getPortfolioId(),
                     portfolioStock.getPortfolio().getName(), portfolioStockCurrentPrice);
             accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
@@ -218,7 +219,7 @@ public class PortfolioStockService {
             PortfolioStock portfolioStockRef = portfolioStockRepository.findById(portfolioStock.getId())
                     .orElseThrow(() -> new EntityNotFoundException("PortfolioStock not found"));
             portfolioStockRepository.delete(portfolioStockRef);
-            String action = String.format("User drops stock %s from portfolio ID: %d - %s",
+            String action = String.format("User drops stock %s from Portfolio #%d - %s",
                     portfolioStock.getStock().getStockSymbol(), portfolioStock.getPortfolio().getPortfolioId(),
                     portfolioStock.getPortfolio().getName());
             accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
@@ -235,10 +236,10 @@ public class PortfolioStockService {
             portfolioStockRepository.delete(portfolioStock);
             portfolio.setRemainingCapital(portfolio.getRemainingCapital()+ portfolioStock.getBuyPrice() * portfolioStock.getQuantity());
             portfolioService.updatePortfolio(portfolioId, portfolio);
-            String action = String.format("User deletes stock %s from Portfolio ID: %d - %s", stockSymbol, portfolioId, portfolioStock.getPortfolio().getName());
+            String action = String.format("User deletes stock %s from Portfolio #%d - %s", stockSymbol, portfolioId, portfolioStock.getPortfolio().getName());
             accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting PortfolioStock by portfolio id service: " + e.getMessage(), e);
+            throw new RuntimeException("Error deleting PortfolioStock by Portfolio id service: " + e.getMessage(), e);
         }
     }
 
@@ -250,7 +251,7 @@ public class PortfolioStockService {
             portfolioStockRepository.deleteById(portfolioStockId);
             Portfolio portfolio = portfolioStock.getPortfolio();
             portfolio.setRemainingCapital(portfolio.getRemainingCapital()+ portfolioStock.getBuyPrice() * portfolioStock.getQuantity());
-            String action = String.format("User deletes stock %s from portfolio ID: %d Name: %s",
+            String action = String.format("User deletes stock %s from  Portfolio #%d - %s",
                     portfolioStock.getStock().getStockSymbol(), portfolioStock.getPortfolio().getPortfolioId(),
                     portfolioStock.getPortfolio().getName());
             accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
@@ -418,7 +419,7 @@ public class PortfolioStockService {
     public Map<String, Map<String, Double>> calculateTotalPortfolioValueByGroup(Integer portfolioId, String groupBy) {
         try {
             List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
-
+            Double portfolioRemainingBalance = portfolioService.findById(portfolioId).get().getRemainingCapital();
             Map<String, Double> currentPrices = new HashMap<>();
             for (PortfolioStock stock : allStocksInPortfolio) {
                 String stockSymbol = stock.getStock().getStockSymbol();
@@ -429,9 +430,10 @@ public class PortfolioStockService {
                 }
             }
 
-            double totalPortfolioValue = allStocksInPortfolio.stream()
+            double totalPortfolioStockValue = allStocksInPortfolio.stream()
                     .mapToDouble(stock -> stock.getQuantity() * currentPrices.get(stock.getStock().getStockSymbol()))
                     .sum();
+            double totalPortfolioValue = totalPortfolioStockValue + portfolioRemainingBalance;
 
             Function<PortfolioStock, String> groupingFunction = getGroupingFunction(groupBy);
 
@@ -448,10 +450,14 @@ public class PortfolioStockService {
                             entry -> {
                                 Map<String, Double> details = new HashMap<>();
                                 details.put("actualValue", entry.getValue());
-                                details.put("percentage", (entry.getValue() / totalPortfolioValue) * 100);
+                                details.put("percentage", (entry.getValue() / totalPortfolioValue) * 100); 
                                 return details;
                             }));
-
+            Map<String, Double> cashAllocation = new HashMap<>();
+            cashAllocation.put("actualValue", portfolioRemainingBalance);
+            cashAllocation.put("percentage", (portfolioRemainingBalance / totalPortfolioValue) * 100);
+            result.put("Cash", cashAllocation);
+            result.put("currentPrices", currentPrices);
             return result;
 
         } catch (Exception e) {
@@ -482,6 +488,8 @@ public class PortfolioStockService {
                 return stock -> stock.getStock().getIndustry();
             case "exchange":
                 return stock -> stock.getStock().getExchange();
+            case "country":
+                return stock -> stock.getStock().getCountry();
             default:
                 throw new IllegalArgumentException("Unsupported groupBy value: " + groupBy);
         }
@@ -551,4 +559,30 @@ public class PortfolioStockService {
         }
         return stockPrices;
     }
+
+    // public List<PortfolioStock> rebalanceStocks (Map<String, Double> ratioMap, String rebalanceBy, Integer portfolioId){
+    //     try {
+    //         Portfolio portfolio = portfolioService.findById(portfolioId)
+    //                 .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
+    //         Map<String, Map<String, Double>> totalPortfolioValueByGroup = calculateTotalPortfolioValueByGroup(portfolioId, rebalanceBy);
+    //         List<PortfolioStock> rebalancedStocks = new ArrayList<>();
+    //         for (PortfolioStock stock : allStocksInPortfolio) {
+    //             String stockSymbol = stock.getStock().getStockSymbol();
+    //             double stockWeight = stockWeights.get(stockSymbol);
+    //             double stockPrice = currentPrices.get(stockSymbol);
+    //             double stockValue = stockWeight * totalPortfolioValue;
+    //             double stockQuantity = stockValue / stockPrice;
+    //             PortfolioStock rebalancedStock = new PortfolioStock();
+    //             rebalancedStock.setStock(stock.getStock());
+    //             rebalancedStock.setBuyPrice(stockPrice);
+    //             rebalancedStock.setQuantity(stockQuantity);
+    //             rebalancedStock.setBuyDate(LocalDate.now());
+    //             rebalancedStock.setPortfolio(stock.getPortfolio());
+    //             rebalancedStocks.add(rebalancedStock);
+    //         }
+    //         return rebalancedStocks;
+    //     } catch (Exception e) {
+    //         throw new RuntimeException("Error rebalancing stocks service: " + e.getMessage(), e);
+    //     }
+    // }
 }

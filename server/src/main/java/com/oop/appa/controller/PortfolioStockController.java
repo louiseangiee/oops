@@ -92,23 +92,6 @@ public class PortfolioStockController {
         }
     }
 
-    @Operation(summary = "Drop an existing portfolio stock")
-    @Parameter(name = "portfolioId", description = "portfolio id")
-    @Parameter(name = "stockSymbol", description = "stock symbol")
-    @DeleteMapping("/{portfolioId}/stocks/{stockSymbol}")
-    public ResponseEntity<?> dropStockFromPortfolio(@PathVariable Integer portfolioId,
-            @PathVariable String stockSymbol) {
-        try {
-            portfolioStockService.dropPortfolioStock(portfolioId, stockSymbol);
-            return ResponseEntity.ok("Stock with symbol " + stockSymbol + " was successfully dropped from portfolio with ID " + portfolioId);
-        } catch (Exception e) {
-            ErrorResponse error = new ErrorResponse();
-            error.setMessage("Error dropping stock from portfolio");
-            error.setDetails(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-
     //Delete
     @Operation(summary = "Delete a portfolio stock by id")
     @Parameter(name = "id", description = "portfolio id")

@@ -86,14 +86,14 @@ public class PortfolioStockService {
     // POST
     public PortfolioStock createPortfolioStock(PortfolioStockCreationDTO dto) {
         try {
-            //Validate DTO
-            if (dto.getQuantity() == 0 ){
+            // Validate DTO
+            if (dto.getQuantity() == 0) {
                 throw new IllegalArgumentException("Quantity cannot be 0");
-            } else if (dto.getBuyPrice() == 0){
+            } else if (dto.getBuyPrice() == 0) {
                 throw new IllegalArgumentException("Buy price cannot be 0");
-            } else if (dto.getBuyDate() == null){
+            } else if (dto.getBuyDate() == null) {
                 throw new IllegalArgumentException("Buy date cannot be null");
-            } 
+            }
             String action;
             Portfolio portfolio = portfolioService.findById(dto.getPortfolioId())
                     .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
@@ -110,17 +110,17 @@ public class PortfolioStockService {
                     .filter(ps -> ps.getStock().getStockSymbol().equals(stock.getStockSymbol()))
                     .findFirst()
                     .orElse(null);
-            double totalCapital = portfolio.getTotalCapital();
-            double portfolioStockTotalValue = portfolio.getPortfolioStocks().stream()
-                    .mapToDouble(ps -> ps.getBuyPrice() * ps.getQuantity())
-                    .sum();
+            double remainingCapital = portfolio.getRemainingCapital();
             if (existingPortfolioStock != null) {
-                double totalCapitalRemaining = totalCapital + existingPortfolioStock.getBuyPrice()
-                        * existingPortfolioStock.getQuantity();
-                double totalCapitalRemainingAfterPurchase = totalCapitalRemaining - (dto.getBuyPrice() * dto.getQuantity());
+                if (existingPortfolioStock.getBuyPrice() == dto.getBuyPrice()
+                        && existingPortfolioStock.getQuantity() == dto.getQuantity()) {
+                    throw new IllegalArgumentException("Stock quantity and price cannot be the same as before");
+                }
+                double totalCapitalRemainingAfterPurchase = remainingCapital + existingPortfolioStock.getBuyPrice()*existingPortfolioStock.getQuantity()
+                        - (dto.getBuyPrice() * dto.getQuantity());
                 if (totalCapitalRemainingAfterPurchase < 0) {
                     action = String.format(
-                            "User attempted to drop and purchase previously existing stock %s from portfolio ID: %d Name: %s with new price: %f and quantity: %d, but insufficient capital",
+                            "User attempted to drop and purchase previously existing stock %s from portfolio ID: %d, Portfolio name: %s with new price: %f and quantity: %d, but insufficient capital",
                             stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                             dto.getQuantity());
                     accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
@@ -128,16 +128,16 @@ public class PortfolioStockService {
                 }
                 existingPortfolioStock.setBuyPrice(dto.getBuyPrice());
                 existingPortfolioStock.setQuantity(dto.getQuantity());
+                portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 action = String.format(
-                        "User updated stock %s in portfolio ID: %d Name: %s with new price: %f and quantity: %d",
+                        "User updated stock %s in portfolio ID: %d, Portfolio name: %s with new price: %f and quantity: %d",
                         stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                         dto.getQuantity());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
                 return portfolioStockRepository.save(existingPortfolioStock);
             } else {
                 // check if portfolio has sufficient capital to purchase stock
-                double totalCapitalRemaining = totalCapital - portfolioStockTotalValue;
-                double totalCapitalRemainingAfterPurchase = totalCapitalRemaining
+                double totalCapitalRemainingAfterPurchase = remainingCapital
                         - (dto.getBuyPrice() * dto.getQuantity());
                 if (totalCapitalRemainingAfterPurchase < 0) {
                     action = String.format(
@@ -153,35 +153,13 @@ public class PortfolioStockService {
                 portfolioStock.setQuantity(dto.getQuantity());
                 portfolioStock.setBuyDate(dto.getBuyDate());
                 portfolioStock.setPortfolio(portfolio);
+                portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 action = String.format(
                         "User added new stock %s to portfolio ID: %d, Portfolio Name: %s, with price: %f and quantity: %d ",
                         stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                         dto.getQuantity());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
                 return portfolioStockRepository.save(portfolioStock);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating PortfolioStock service: " + e.getMessage(), e);
-        }
-    }
-
-    public void dropPortfolioStock(Integer portfolioId, String stockSymbol) {
-        try {
-            if (portfolioId == null || stockSymbol == null) {
-                throw new IllegalArgumentException("Portfolio ID or stock symbol cannot be null");
-            }
-            Portfolio portfolio = portfolioService.findById(portfolioId)
-                    .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
-            PortfolioStock portfolioStock = portfolio.getPortfolioStocks().stream().filter(ps -> ps.getStock().getStockSymbol().equals(stockSymbol)).findFirst().orElse(null);
-            if (portfolioStock == null) {
-                throw new EntityNotFoundException("PortfolioStock not found");
-            } else {
-                portfolioStockRepository.delete(portfolioStock);
-                String action = String.format("User drops stock %s from portfolio ID: %d Name: %s",
-                        portfolioStock.getStock().getStockSymbol(), portfolioStock.getPortfolio().getPortfolioId(),
-                        portfolioStock.getPortfolio().getName());
-                accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
-                return;
             }
         } catch (Exception e) {
             throw new RuntimeException("Error creating PortfolioStock service: " + e.getMessage(), e);
@@ -202,12 +180,7 @@ public class PortfolioStockService {
         try {
             PortfolioStock portfolioStockRef = portfolioStockRepository.findById(portfolioStock.getId())
                     .orElseThrow(() -> new EntityNotFoundException("PortfolioStock not found"));
-            portfolioStockRepository.delete(portfolioStock);
-            String action = String.format("User deletes stock %s from portfolio ID: %d Name: %s",
-                    portfolioStockRef.getStock().getStockSymbol(), portfolioStockRef.getPortfolio().getPortfolioId(),
-                    portfolioStockRef.getPortfolio().getName());
-            accessLogRepository.save(new AccessLog(portfolioStockRef.getPortfolio().getUser(), action));
-            return;
+            portfolioStockRepository.delete(portfolioStockRef);
         } catch (Exception e) {
             throw new RuntimeException("Error deleting PortfolioStock service: " + e.getMessage(), e);
         }

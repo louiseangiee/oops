@@ -5,6 +5,7 @@ public class PortfolioCreationDTO {
     private String name;
     private String description;
     private double totalCapital;
+    private double remainingCapital;
     private UserReference user;  // Nested UserReference
 
     // Default constructor
@@ -15,6 +16,7 @@ public class PortfolioCreationDTO {
         this.name = name;
         this.description = description;
         this.totalCapital = totalCapital;
+        this.remainingCapital = totalCapital;
         this.user = user;
     }
 
@@ -62,5 +64,13 @@ public class PortfolioCreationDTO {
         public void setId(int id) {
             this.id = id;
         }
+    }
+
+    public double getRemainingCapital() {
+        return remainingCapital;
+    }
+
+    public void setRemainingCapital(double remainingCapital) {
+        this.remainingCapital = remainingCapital;
     }
 }

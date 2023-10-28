@@ -17,4 +17,5 @@ public interface PortfolioStockRepository extends JpaRepository<PortfolioStock, 
     List<PortfolioStock> findByPortfolioPortfolioId(Integer portfolio_id);
     @EntityGraph(attributePaths = {"stock"})
     Optional<PortfolioStock> findByPortfolioPortfolioIdAndStockStockSymbol(Integer portfolioId, String stockSymbol);
+    void deleteById(Integer portfolioStockId);
 }

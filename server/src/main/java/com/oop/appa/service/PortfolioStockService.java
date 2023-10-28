@@ -116,7 +116,8 @@ public class PortfolioStockService {
                         && existingPortfolioStock.getQuantity() == dto.getQuantity()) {
                     throw new IllegalArgumentException("Stock quantity and price cannot be the same as before");
                 }
-                double totalCapitalRemainingAfterPurchase = remainingCapital + existingPortfolioStock.getBuyPrice()*existingPortfolioStock.getQuantity()
+                double totalCapitalRemainingAfterPurchase = remainingCapital
+                        + existingPortfolioStock.getBuyPrice() * existingPortfolioStock.getQuantity()
                         - (dto.getBuyPrice() * dto.getQuantity());
                 if (totalCapitalRemainingAfterPurchase < 0) {
                     action = String.format(
@@ -195,6 +196,8 @@ public class PortfolioStockService {
             PortfolioStock portfolioStock = portfolioStockRepository.findById(portfolioStockId)
                     .orElseThrow(() -> new EntityNotFoundException("PortfolioStock not found"));
             portfolioStockRepository.deleteById(portfolioStockId);
+            Portfolio portfolio = portfolioStock.getPortfolio();
+            portfolio.setRemainingCapital(portfolio.getRemainingCapital()+ portfolioStock.getBuyPrice() * portfolioStock.getQuantity());
             String action = String.format("User deletes stock %s from portfolio ID: %d Name: %s",
                     portfolioStock.getStock().getStockSymbol(), portfolioStock.getPortfolio().getPortfolioId(),
                     portfolioStock.getPortfolio().getName());
@@ -496,5 +499,4 @@ public class PortfolioStockService {
         }
         return stockPrices;
     }
-
 }

@@ -1,9 +1,16 @@
 package com.oop.appa.service;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import io.github.cdimascio.dotenv.Dotenv;
+import io.jsonwebtoken.io.IOException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Service
@@ -12,6 +19,7 @@ public class MarketDataService {
     private final WebClient webClient;
     private static final Dotenv dotenv = Dotenv.load();
     private static final String ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co";
+    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @Autowired
     public MarketDataService(WebClient webClient) {
@@ -157,6 +165,25 @@ public class MarketDataService {
             }
         }
         return response;
+    }
+
+    public InputStream fetchDailyDataStream(String stockSymbol, String outputSize) throws IOException {
+        try {
+            String apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
+            String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=TIME_SERIES_DAILY&symbol=" + stockSymbol
+                    + "&outputsize=" + outputSize
+                    + "&apikey=" + apiKey;
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .GET()
+                    .build();
+
+            HttpResponse<InputStream> response = httpClient.send(request, BodyHandlers.ofInputStream());
+            return response.body();
+        } catch (Exception e) {
+            throw new IOException("Error fetching daily data stream for " + stockSymbol, e);
+        }
     }
 
 }

@@ -91,7 +91,7 @@ public class StockController {
             return ResponseEntity.ok(stock);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
-            error.setMessage("Error adding stock by stock symbol");
+            error.setMessage("Error adding stock by stock symbol.");
             error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
@@ -324,16 +324,17 @@ public class StockController {
         }
     }
 
-    @Operation(summary = "Save a stock into stock db by stock symbol (EXACT FROM stocks/searchBar)")
-    @Parameter(name = "stockSymbol", description = "stock symbol")
-    @PostMapping("/saveByStockSymbol")
-    public ResponseEntity<?> saveByStockSymbol(@RequestParam String stockSymbol) {
+    @Operation(summary = "Get a stock's price at a specific date")
+    @Parameter(name = "symbol", description = "stock symbol")
+    @Parameter(name = "date", description = "date in yyyy-mm-dd format")
+    @GetMapping("/priceAtDate")
+    public ResponseEntity<?> fetchPriceAtDate(@RequestParam String symbol, @RequestParam String date) {
         try {
-            Stock stock = stockService.saveByStockSymbol(stockSymbol);
-            return ResponseEntity.ok(stock);
+            Map<String,Double> price = stockService.fetchStockPriceAtDate(symbol, date);
+            return ResponseEntity.ok(price);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
-            error.setMessage("Error in saving stock by stock symbol");
+            error.setMessage("Error in fetching price at date");
             error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }

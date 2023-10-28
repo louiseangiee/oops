@@ -181,6 +181,10 @@ public class PortfolioStockService {
             PortfolioStock portfolioStockRef = portfolioStockRepository.findById(portfolioStock.getId())
                     .orElseThrow(() -> new EntityNotFoundException("PortfolioStock not found"));
             portfolioStockRepository.delete(portfolioStockRef);
+            String action = String.format("User deletes stock %s from portfolio ID: %d Name: %s",
+                    portfolioStock.getStock().getStockSymbol(), portfolioStock.getPortfolio().getPortfolioId(),
+                    portfolioStock.getPortfolio().getName());
+            accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
         } catch (Exception e) {
             throw new RuntimeException("Error deleting PortfolioStock service: " + e.getMessage(), e);
         }

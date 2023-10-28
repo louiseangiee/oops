@@ -99,6 +99,14 @@ public class Stock {
         this.portfolioStocks = portfolioStocks;
     }
 
+    public String getExchange() {
+        return exchange;
+    }
+
+    public void setExchange(String exchange) {
+        this.exchange = exchange;
+    }
+
     // add convenience methods
     public void addPortfolioStock(PortfolioStock portfolioStock) {
 

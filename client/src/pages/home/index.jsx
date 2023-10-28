@@ -55,7 +55,7 @@ const Home = () => {
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="PORTFOLIOS" subtitle={role === "ROLE_USER" ? "Welcome to your portfolios page!" : "Welcome Admin!"} />
+        <Header title="PORTFOLIOS" subtitle={role === "ROLE_ADMIN" ? "Welcome Admin!" : "Welcome to your portfolios page!"} />
 
         <Box>
           <CreatePortfolio />

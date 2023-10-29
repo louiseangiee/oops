@@ -69,14 +69,12 @@ public class AccessLogService {
             long startItem = pageable.getOffset();
             long endItem = Math.min(startItem + pageable.getPageSize(), filteredAccessLogs.size());
 
-            // Extract the sublist for the current page
             List<AccessLog> pagedAccessLogs;
             if (startItem <= endItem) {
                 pagedAccessLogs = filteredAccessLogs.subList((int) startItem, (int) endItem);
             } else {
                 pagedAccessLogs = Collections.emptyList();
             }
-            // Return the page
             return new PageImpl<>(pagedAccessLogs, pageable, filteredAccessLogs.size());
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Illegal argument", e);

@@ -96,6 +96,7 @@ public class PortfolioStockController {
 
     @Operation(summary = "Get Rebalancing options for a portfolio by portfolio id")
     @Parameter(name = "portfolioId", description = "portfolio id")
+    @Parameter(name = "rebalanceType", description = "sector or exchange or industry or country")
     @PostMapping("/{portfolioId}/rebalance")
     public ResponseEntity<?> getRebalancingOptions(@PathVariable Integer portfolioId,
             @RequestParam String rebalanceType,

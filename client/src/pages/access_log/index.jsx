@@ -31,26 +31,24 @@ const AccessLog = () => {
         const response = await getAsync("accessLogs", cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
-          setAccessLogData(data);
+          console.log(data.content);
+          setAccessLogData(data.content);
         } else {
           console.log("Error fetching access logs");
           console.log(response);
           setAccessLogData(null);
         }
-        return;
       } else if (userData.role === "ROLE_USER") {
         const response = await getAsync("accessLogs/user/" + userId, cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
-          setAccessLogData(data);
+          console.log(data.content);
+          setAccessLogData(data.content);
         } else {
           console.log("Error fetching access logs");
           console.log(response);
           setAccessLogData(null);
         }
-        return;
       }
     };
     fetchData();
@@ -58,17 +56,17 @@ const AccessLog = () => {
 
 
   const columns = [
-    { field: "logId", headerName: "ID" },
-    { field: "action", headerName: "Action", flex: 1 },
-    {
+    { field: "logId", headerName: "ID" }, {
       field: "timestamp",
       headerName: "Timestamp",
       type: "dateTime",
       headerAlign: "left",
       align: "left",
-      flex: 1,
+      flex: 0.2,
       valueGetter: (params) => new Date(params.value),
     },
+    { field: "action", headerName: "Action", flex: 1 },
+
   ];
 
   return (

@@ -1,6 +1,8 @@
 package com.oop.appa.service;
 
+import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +35,8 @@ public class StockService {
     private final StockLookupRepository stockLookupRepository;
 
     @Autowired
-    public StockService(StockRepository stockRepository, MarketDataService marketDataService, StockLookupRepository stockLookupRepository) {
+    public StockService(StockRepository stockRepository, MarketDataService marketDataService,
+            StockLookupRepository stockLookupRepository) {
         this.stockRepository = stockRepository;
         this.marketDataService = marketDataService;
         this.stockLookupRepository = stockLookupRepository;
@@ -74,6 +77,45 @@ public class StockService {
             return stockRepository.save(stock);
         } catch (Exception e) {
             throw new RuntimeException("Error saving stock service: ", e);
+        }
+    }
+
+    public List<Map<String, String>> searchBar(String searchTerm) {
+        try {
+            JsonNode searchResults = marketDataService.fetchSearchTicker(searchTerm).path("bestMatches");
+            List<Map<String, String>> results = new ArrayList<>();
+
+            for (JsonNode node : searchResults) {
+                String symbol = node.path("1. symbol").asText();
+                String name = node.path("2. name").asText();
+                String type = node.path("3. type").asText();
+
+                if (!symbol.isEmpty() && !name.isEmpty() && type.equals("Equity")) {
+                    Map<String, String> result = new HashMap<>();
+                    result.put("symbol", symbol);
+                    result.put("name", name);
+                    results.add(result);
+                }
+            }
+            return results;
+        } catch (Exception e) {
+            throw new RuntimeException("Error for search bar service: ", e);
+        }
+    }
+
+    public Stock saveByStockSymbol(String stockSymbol) {
+        try {
+            JsonNode stockInfo = marketDataService.fetchOverviewData(stockSymbol);
+            Stock stock = new Stock();
+            stock.setStockSymbol(stockInfo.path("Symbol").asText());
+            stock.setName(stockInfo.path("Name").asText());
+            stock.setCountry(stockInfo.path("Country").asText());
+            stock.setSector(stockInfo.path("Sector").asText());
+            stock.setIndustry(stockInfo.path("Industry").asText());
+            stock.setExchange(stockInfo.path("Exchange").asText());
+            return stockRepository.save(stock);
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving stock by stock symbol service: ", e);
         }
     }
 
@@ -320,6 +362,32 @@ public class StockService {
         }
     }
 
+    public Map<String, Double> fetchStockPriceAtDate(String stockSymbol, String stringDate) {
+        try {
+            LocalDate date = LocalDate.parse(stringDate);
+
+            InputStream responseStream = marketDataService.fetchDailyDataStream(stockSymbol, "full");
+            JsonStreamProcessor processor = new JsonStreamProcessor();
+            Map<String, Double> stockPrices = processor.processJsonStream(responseStream);
+            Map<String, Double> result = new HashMap<>();
+
+            for (int i = 0; i < 10; i++) {
+                Double price = stockPrices.get(date.toString());
+                System.out.println(date.toString());
+                if (price != null) {
+                    result.put(date.toString(), price);
+                    return result;
+                }
+                date = date.plusDays(1);
+            }
+            throw new IllegalArgumentException("Price not found for " + stockSymbol + " around the date " + stringDate + ". Please try another date that is earlier.");
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format: " + stringDate, e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching PortfolioStock price at date service: " + e.getMessage(), e);
+        }
+    }
+
     public double calculateDailyVolatility(String stockSymbol) {
         try {
             List<Map<String, Object>> dataPoints = fetchOneMonthData(stockSymbol);
@@ -373,7 +441,7 @@ public class StockService {
 
             return Math.sqrt(variance);
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating monthly volatility service: "+ e.getMessage(), e);
+            throw new RuntimeException("Error calculating monthly volatility service: " + e.getMessage(), e);
         }
 
     }
@@ -404,13 +472,13 @@ public class StockService {
 
             return annualizedVolatility;
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating annualized volatility service: "+ e.getMessage(), e);
+            throw new RuntimeException("Error calculating annualized volatility service: " + e.getMessage(), e);
         }
 
     }
 
     // Helper functions
-    private String getDateOneYearAgo(boolean isEndOfMonth) {
+    String getDateOneYearAgo(boolean isEndOfMonth) {
         LocalDate oneYearAgo = LocalDate.now().minusYears(1);
         return isEndOfMonth ? oneYearAgo.with(TemporalAdjusters.lastDayOfMonth()).toString() : oneYearAgo.toString();
     }
@@ -431,9 +499,9 @@ public class StockService {
         return oneWeekAgo.toString();
     }
 
-    //unused
+    // unused
     // private static String getCurrentDate() {
-    //     LocalDate today = LocalDate.now();
-    //     return today.toString();
+    // LocalDate today = LocalDate.now();
+    // return today.toString();
     // }
 }

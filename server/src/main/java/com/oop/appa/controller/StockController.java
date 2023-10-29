@@ -82,6 +82,21 @@ public class StockController {
         }
     }
 
+    @Operation(summary = "Retrieve a stock by stock symbol")
+    @Parameter(name = "stockSymbol", description = "stock symbol")
+    @PostMapping("/addByStockSymbol")
+    public ResponseEntity<?> addByStockSymbol(@RequestParam String stockSymbol) {
+        try {
+            Stock stock = stockService.saveByStockSymbol(stockSymbol);
+            return ResponseEntity.ok(stock);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error adding stock by stock symbol.");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
     // PUT endpoint for updating an existing stock
     @Operation(summary = "Updating an existing stock")
     @Parameter(name = "stock", description = "stock object")
@@ -293,4 +308,36 @@ public class StockController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
+
+    @Operation(summary = "Search bar end point")
+    @Parameter(name = "searchTerm", description = "search term")
+    @GetMapping("/search")
+    public ResponseEntity<?> searchBar(@RequestParam String searchTerm) {
+        try {
+            List<Map<String, String>> data = stockService.searchBar(searchTerm);
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error in fetching search ticker data");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    @Operation(summary = "Get a stock's price at a specific date")
+    @Parameter(name = "symbol", description = "stock symbol")
+    @Parameter(name = "date", description = "date in yyyy-mm-dd format")
+    @GetMapping("/priceAtDate")
+    public ResponseEntity<?> fetchPriceAtDate(@RequestParam String symbol, @RequestParam String date) {
+        try {
+            Map<String,Double> price = stockService.fetchStockPriceAtDate(symbol, date);
+            return ResponseEntity.ok(price);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error in fetching price at date");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+    
 }

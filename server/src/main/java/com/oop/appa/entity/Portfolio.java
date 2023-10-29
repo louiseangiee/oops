@@ -32,6 +32,9 @@ public class Portfolio {
     @Column(name="total_capital")
     private double totalCapital;
 
+    @Column(name = "remaining_capital")
+    private double remainingCapital;
+
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
     @JsonManagedReference(value = "portfolio-portfoliostock")
     private List<PortfolioStock> portfolioStocks;
@@ -44,11 +47,12 @@ public class Portfolio {
     public Portfolio(){
     }
 
-    public Portfolio(User user, String name, String description, double totalCapital) {
+    public Portfolio(User user, String name, String description, double totalCapital, double remainingCapital) {
         this.user = user;
         this.name = name;
         this.description = description;
         this.totalCapital = totalCapital;
+        this.remainingCapital = remainingCapital;
     }
 
     public Integer getPortfolioId() {
@@ -89,6 +93,14 @@ public class Portfolio {
 
     public void setTotalCapital(double totalCapital) {
         this.totalCapital = totalCapital;
+    }
+
+    public double getRemainingCapital() {
+        return remainingCapital;
+    }
+
+    public void setRemainingCapital(double remainingCapital) {
+        this.remainingCapital = remainingCapital;
     }
 
      public List<PortfolioStock> getPortfolioStocks() {

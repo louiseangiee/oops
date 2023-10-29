@@ -71,11 +71,31 @@ public class AccessLogController {
             @RequestParam(defaultValue = "10") int size) {
         try {
             Pageable pageable = PageRequest.of(page, size);
-            Page<AccessLog> accessLogs = accessLogService.findByUserId(user_id, pageable);
+            Page<AccessLog> accessLogs = accessLogService.findByUserIdPaged(user_id, pageable);
             return ResponseEntity.ok(accessLogs);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error fetching all access logs by user id with pagination");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    @Operation(summary = "Retrieve all AccessLogs by user id and portfolio id")
+    @Parameter(name = "user_id", description = "user id")
+    @Parameter(name = "portfolio_id", description = "portfolio id")
+    @Parameter(name="page", description = "page number for pagination")
+    @Parameter(name="size", description = "number of records per page for pagination")
+    @GetMapping("/user/{user_id}/portfolio/{portfolio_id}")
+    public ResponseEntity<?> findByUserIdAndPortfolioId(@PathVariable Integer user_id,
+            @PathVariable Integer portfolio_id, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<AccessLog> accessLogs = accessLogService.findByUserIdAndPortfolioIdPaged(user_id, portfolio_id, pageable);
+            return ResponseEntity.ok(accessLogs);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error fetching all access logs by user id and portfolio id");
             error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
@@ -94,7 +114,7 @@ public class AccessLogController {
             error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
-        
+
     }
 
     // PUT endpoint for updating an existing AccessLog

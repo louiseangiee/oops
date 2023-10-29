@@ -108,7 +108,7 @@ public class PortfolioService {
 
             Portfolio savedPortfolio = portfolioRepository.save(portfolio);
 
-            String action = String.format("User creates portfolio ID: %d Name: %s", savedPortfolio.getPortfolioId(),
+            String action = String.format("User creates Portfolio #%d - %s", savedPortfolio.getPortfolioId(),
                     savedPortfolio.getName());
             accessLogRepository.save(new AccessLog(user, action));
             return savedPortfolio;
@@ -127,10 +127,11 @@ public class PortfolioService {
             existingPortfolio.setName(portfolio.getName());
             existingPortfolio.setDescription(portfolio.getDescription());
             existingPortfolio.setTotalCapital(portfolio.getTotalCapital());
+            existingPortfolio.setRemainingCapital(portfolio.getRemainingCapital());
 
             Portfolio updatedPortfolio = portfolioRepository.save(existingPortfolio);
 
-            String action = String.format("User updates portfolio ID: %d Name: %s", portfolio.getPortfolioId(),
+            String action = String.format("User updates portfolio #%d - %s", portfolio.getPortfolioId(),
                     portfolio.getName());
             accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
             return updatedPortfolio;
@@ -149,7 +150,7 @@ public class PortfolioService {
             Integer deletedPortfolioId = existingPortfolio.getPortfolioId();
             String portfolioName = existingPortfolio.getName();
             portfolioRepository.deleteById(id);
-            String action = String.format("User deletes portfolio ID: %d Name: %s", deletedPortfolioId, portfolioName);
+            String action = String.format("User deletes portfolio #%d - %s", deletedPortfolioId, portfolioName);
             accessLogRepository.save(new AccessLog(deletedPortfolioUser, action));
         } catch (Exception e) {
             throw new RuntimeException("Error deleting portfolio service: " + e.getMessage(), e);

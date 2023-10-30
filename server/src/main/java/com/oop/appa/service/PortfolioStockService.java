@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +19,16 @@ import org.springframework.stereotype.Service;
 
 import com.oop.appa.dao.AccessLogRepository;
 import com.oop.appa.dao.PortfolioStockRepository;
+import com.oop.appa.dto.PortfolioGroupingSummary;
 import com.oop.appa.dto.PortfolioStockCreationDTO;
+import com.oop.appa.dto.RebalancingTargetPercentagesDTO;
 import com.oop.appa.entity.AccessLog;
 import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.PortfolioStock;
 import com.oop.appa.entity.Stock;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class PortfolioStockService {
@@ -67,7 +71,7 @@ public class PortfolioStockService {
         try {
             return portfolioStockRepository.findByPortfolioPortfolioId(portfolio_id);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching all PortfolioStocks by portfolio ID service: " + portfolio_id,
+            throw new RuntimeException("Error fetching all PortfolioStocks by Portfolio ID service: " + portfolio_id,
                     e);
         }
     }
@@ -76,9 +80,9 @@ public class PortfolioStockService {
         try {
             return portfolioStockRepository.findByPortfolioPortfolioIdAndStockStockSymbol(portfolioId, stockSymbol)
                     .orElseThrow(() -> new EntityNotFoundException(
-                            "Stock " + stockSymbol + "not found in portfolio id" + portfolioId));
+                            "Stock " + stockSymbol + "not found in Portfolio id" + portfolioId));
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching PortfolioStock by portfolio ID: " + portfolioId
+            throw new RuntimeException("Error fetching PortfolioStock by Portfolio ID: " + portfolioId
                     + " and stock symbol: " + stockSymbol, e);
         }
     }
@@ -121,19 +125,20 @@ public class PortfolioStockService {
                         - (dto.getBuyPrice() * dto.getQuantity());
                 if (totalCapitalRemainingAfterPurchase < 0) {
                     action = String.format(
-                            "User attempted to drop and purchase previously existing stock %s from portfolio ID: %d, Portfolio name: %s with new price: %f and quantity: %d, but insufficient capital",
+                            "User attempted to drop and repurchase stock %s from Portfolio #%d - %s with new price: %f and quantity: %d on %s, but insufficient capital",
                             stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
-                            dto.getQuantity());
+                            dto.getQuantity(), dto.getBuyDate());
                     accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
                     throw new IllegalArgumentException("Insufficient funds to purchase stock");
                 }
                 existingPortfolioStock.setBuyPrice(dto.getBuyPrice());
                 existingPortfolioStock.setQuantity(dto.getQuantity());
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
+                portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(
-                        "User updated stock %s in portfolio ID: %d, Portfolio name: %s with new price: %f and quantity: %d",
+                        "User succesfully dropped and repurchased stock %s in Portfolio #%d - %s with new price: %f and quantity: %d on %s",
                         stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
-                        dto.getQuantity());
+                        dto.getQuantity(), dto.getBuyDate());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
                 return portfolioStockRepository.save(existingPortfolioStock);
             } else {
@@ -142,9 +147,9 @@ public class PortfolioStockService {
                         - (dto.getBuyPrice() * dto.getQuantity());
                 if (totalCapitalRemainingAfterPurchase < 0) {
                     action = String.format(
-                            "User attempted to purchase stock %s in portfolio ID: %d Name: %s with new price: %f and quantity: %d, but insufficient capital",
+                            "User attempted to purchase stock %s in Portfolio #%d - %s with new price: %f and quantity: %d on %s, but insufficient capital",
                             stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
-                            dto.getQuantity());
+                            dto.getQuantity(), dto.getBuyDate());
                     accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
                     throw new IllegalArgumentException("Insufficient funds to purchase stock");
                 }
@@ -155,15 +160,49 @@ public class PortfolioStockService {
                 portfolioStock.setBuyDate(dto.getBuyDate());
                 portfolioStock.setPortfolio(portfolio);
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
+                portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(
-                        "User added new stock %s to portfolio ID: %d, Portfolio Name: %s, with price: %f and quantity: %d ",
+                        "User added new stock %s to Portfolio #%d - %s, with price: %f and quantity: %d on %s",
                         stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
-                        dto.getQuantity());
+                        dto.getQuantity(), dto.getBuyDate());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
                 return portfolioStockRepository.save(portfolioStock);
             }
         } catch (Exception e) {
             throw new RuntimeException("Error creating PortfolioStock service: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    public void sellPortfolioStock(Integer portfolioId, String stockSymbol, Integer quantity) {
+        // add when all stocks sold, delete from portfolio stocks
+        try {
+            if (quantity < 0) {
+                throw new IllegalArgumentException("Quantity to sell must be positive");
+            }
+            PortfolioStock portfolioStock = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
+            Portfolio portfolio = portfolioService.findById(portfolioId)
+                    .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
+            if (portfolioStock.getQuantity() < quantity) {
+                throw new IllegalArgumentException("Quantity to sell exceeds quantity owned");
+            }
+            double portfolioStockCurrentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
+                    .path("05. price").asDouble();
+            portfolio.setRemainingCapital(portfolio.getRemainingCapital() + (portfolioStockCurrentPrice * quantity));
+            portfolioStock.setQuantity(portfolioStock.getQuantity() - quantity);
+            portfolioService.updatePortfolio(portfolioId, portfolio);
+            if (portfolioStock.getQuantity() == 0) {
+                portfolioStockRepository.delete(portfolioStock);
+            } else {
+                portfolioStockRepository.save(portfolioStock);
+            }
+            String action = String.format("User sells %d shares of stock %s from Portfolio #%d - %s at price",
+                    quantity, stockSymbol, portfolioStock.getPortfolio().getPortfolioId(),
+                    portfolioStock.getPortfolio().getName(), portfolioStockCurrentPrice);
+            accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
+            return;
+        } catch (Exception e) {
+            throw new RuntimeException("Error selling PortfolioStock service: " + e.getMessage(), e);
         }
     }
 
@@ -182,7 +221,7 @@ public class PortfolioStockService {
             PortfolioStock portfolioStockRef = portfolioStockRepository.findById(portfolioStock.getId())
                     .orElseThrow(() -> new EntityNotFoundException("PortfolioStock not found"));
             portfolioStockRepository.delete(portfolioStockRef);
-            String action = String.format("User deletes stock %s from portfolio ID: %d Name: %s",
+            String action = String.format("User drops stock %s from Portfolio #%d - %s",
                     portfolioStock.getStock().getStockSymbol(), portfolioStock.getPortfolio().getPortfolioId(),
                     portfolioStock.getPortfolio().getName());
             accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
@@ -191,14 +230,34 @@ public class PortfolioStockService {
         }
     }
 
+    public void deleteByPortfolioIdAndStockSymbol(Integer portfolioId, String stockSymbol) {
+        try {
+            PortfolioStock portfolioStock = portfolioStockRepository
+                    .findByPortfolioPortfolioIdAndStockStockSymbol(portfolioId, stockSymbol)
+                    .orElseThrow(() -> new EntityNotFoundException("PortfolioStock not found"));
+            Portfolio portfolio = portfolioStock.getPortfolio();
+            portfolioStockRepository.delete(portfolioStock);
+            portfolio.setRemainingCapital(
+                    portfolio.getRemainingCapital() + portfolioStock.getBuyPrice() * portfolioStock.getQuantity());
+            portfolioService.updatePortfolio(portfolioId, portfolio);
+            String action = String.format("User deletes stock %s from Portfolio #%d - %s", stockSymbol, portfolioId,
+                    portfolioStock.getPortfolio().getName());
+            accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting PortfolioStock by Portfolio id service: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
     public void deleteById(int portfolioStockId) {
         try {
             PortfolioStock portfolioStock = portfolioStockRepository.findById(portfolioStockId)
                     .orElseThrow(() -> new EntityNotFoundException("PortfolioStock not found"));
             portfolioStockRepository.deleteById(portfolioStockId);
             Portfolio portfolio = portfolioStock.getPortfolio();
-            portfolio.setRemainingCapital(portfolio.getRemainingCapital()+ portfolioStock.getBuyPrice() * portfolioStock.getQuantity());
-            String action = String.format("User deletes stock %s from portfolio ID: %d Name: %s",
+            portfolio.setRemainingCapital(
+                    portfolio.getRemainingCapital() + portfolioStock.getBuyPrice() * portfolioStock.getQuantity());
+            String action = String.format("User deletes stock %s from  Portfolio #%d - %s",
                     portfolioStock.getStock().getStockSymbol(), portfolioStock.getPortfolio().getPortfolioId(),
                     portfolioStock.getPortfolio().getName());
             accessLogRepository.save(new AccessLog(portfolioStock.getPortfolio().getUser(), action));
@@ -363,47 +422,53 @@ public class PortfolioStockService {
         }
     }
 
-    public Map<String, Map<String, Double>> calculateTotalPortfolioValueByGroup(Integer portfolioId, String groupBy) {
+    public PortfolioGroupingSummary calculateTotalPortfolioValueByGroup(Integer portfolioId, String groupBy) {
         try {
             List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
+            Double portfolioRemainingBalance = portfolioService.findById(portfolioId).get().getRemainingCapital();
+            Map<String, PortfolioGroupingSummary.StockInfo> portfolioStocksInfo = new HashMap<>();
 
-            Map<String, Double> currentPrices = new HashMap<>();
             for (PortfolioStock stock : allStocksInPortfolio) {
                 String stockSymbol = stock.getStock().getStockSymbol();
-                if (!currentPrices.containsKey(stockSymbol)) {
+                if (!portfolioStocksInfo.containsKey(stockSymbol)) {
                     double currentPrice = marketDataService.fetchCurrentData(stockSymbol)
                             .path("Global Quote").path("05. price").asDouble();
-                    currentPrices.put(stockSymbol, currentPrice);
+                    Stock stockInformation = stockService.findBySymbol(stockSymbol).get();
+                    portfolioStocksInfo.put(stockSymbol,
+                            new PortfolioGroupingSummary.StockInfo(stock.getQuantity(), currentPrice,
+                                    stockInformation.getSector(), stockInformation.getIndustry(),
+                                    stockInformation.getExchange(), stockInformation.getCountry()));
                 }
             }
 
-            double totalPortfolioValue = allStocksInPortfolio.stream()
-                    .mapToDouble(stock -> stock.getQuantity() * currentPrices.get(stock.getStock().getStockSymbol()))
+            double totalPortfolioStockValue = allStocksInPortfolio.stream()
+                    .mapToDouble(stock -> stock.getQuantity()
+                            * portfolioStocksInfo.get(stock.getStock().getStockSymbol()).getCurrentPrice())
                     .sum();
+            double totalPortfolioValue = totalPortfolioStockValue + portfolioRemainingBalance;
 
             Function<PortfolioStock, String> groupingFunction = getGroupingFunction(groupBy);
-
             Map<String, Double> valueByGroup = allStocksInPortfolio.stream()
                     .collect(Collectors.groupingBy(
                             groupingFunction,
                             Collectors.summingDouble(stock -> stock.getQuantity()
-                                    * currentPrices.get(stock.getStock().getStockSymbol()))));
+                                    * portfolioStocksInfo.get(stock.getStock().getStockSymbol()).getCurrentPrice())));
 
-            // Construct the result
-            Map<String, Map<String, Double>> result = valueByGroup.entrySet().stream()
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            entry -> {
-                                Map<String, Double> details = new HashMap<>();
-                                details.put("actualValue", entry.getValue());
-                                details.put("percentage", (entry.getValue() / totalPortfolioValue) * 100);
-                                return details;
-                            }));
+            PortfolioGroupingSummary summary = new PortfolioGroupingSummary();
+            summary.setTotalPortfolioValue(totalPortfolioValue);
+            summary.setPortfolioStocks(portfolioStocksInfo);
 
-            return result;
+            Map<String, PortfolioGroupingSummary.Allocation> allocations = new HashMap<>();
+            valueByGroup.forEach((key, value) -> allocations.put(key,
+                    new PortfolioGroupingSummary.Allocation(value, (value / totalPortfolioValue) * 100)));
+            allocations.put("CASH", new PortfolioGroupingSummary.Allocation(portfolioRemainingBalance,
+                    (portfolioRemainingBalance / totalPortfolioValue) * 100));
+            summary.setAllocations(allocations);
+
+            return summary;
 
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating total portfolio value by sector: " + e.getMessage(), e);
+            throw new RuntimeException("Error calculating total portfolio value by group: " + e.getMessage(), e);
         }
     }
 
@@ -430,6 +495,8 @@ public class PortfolioStockService {
                 return stock -> stock.getStock().getIndustry();
             case "exchange":
                 return stock -> stock.getStock().getExchange();
+            case "country":
+                return stock -> stock.getStock().getCountry();
             default:
                 throw new IllegalArgumentException("Unsupported groupBy value: " + groupBy);
         }
@@ -499,4 +566,131 @@ public class PortfolioStockService {
         }
         return stockPrices;
     }
+
+    public Map<String, Object> rebalancePortfolio(Integer portfolioId, String rebalancingBy,
+            RebalancingTargetPercentagesDTO rebalancingTargetPercentagesDTO) {
+        // Fetch current portfolio
+        PortfolioGroupingSummary currentPortfolio = calculateTotalPortfolioValueByGroup(portfolioId, rebalancingBy);
+        double totalPortfolioValue = currentPortfolio.getTotalPortfolioValue();
+
+        // Initialize maps to store the final allocation values and percentages
+        Map<String, Double> finalAllocationValues = new HashMap<>();
+        Map<String, Double> finalAllocationPercentages = new HashMap<>();
+
+        // Calculate the target value for each group
+        Map<String, Double> groupTargetValues = new HashMap<>();
+        for (Map.Entry<String, Double> entry : rebalancingTargetPercentagesDTO.getTargetPercentages().entrySet()) {
+            groupTargetValues.put(entry.getKey(), totalPortfolioValue * entry.getValue() / 100.0);
+            finalAllocationValues.put(entry.getKey(), 0.0); // Initialize final allocation values
+        }
+
+        // Calculate adjustments required for each stock
+        Map<String, Double> stockAdjustments = new HashMap<>();
+        double projectedTotalPortfolioValue = totalPortfolioValue;
+
+        for (Map.Entry<String, PortfolioGroupingSummary.StockInfo> stockEntry : currentPortfolio.getPortfolioStocks()
+                .entrySet()) {
+            String stockSymbol = stockEntry.getKey();
+            PortfolioGroupingSummary.StockInfo stockInfo = stockEntry.getValue();
+            double currentStockValue = stockInfo.getQuantity() * stockInfo.getCurrentPrice();
+
+            // Determine the group of the stock
+            String stockGroup;
+            if (rebalancingBy.equals("country")) {
+                stockGroup = stockInfo.getCountry();
+            } else if (rebalancingBy.equals("exchange")) {
+                stockGroup = stockInfo.getExchange();
+            } else if (rebalancingBy.equals("industry")) {
+                stockGroup = stockInfo.getIndustry();
+            } else if (rebalancingBy.equals("sector")) {
+                stockGroup = stockInfo.getSector();
+            } else {
+                throw new IllegalArgumentException("Unsupported rebalancingBy value: " + rebalancingBy);
+            }
+            double groupTargetValue = groupTargetValues.getOrDefault(stockGroup, 0.0);
+
+            // Calculate target stock value based on its proportion in the group
+            double stockProportionInGroup = currentStockValue
+                    / currentPortfolio.getAllocations().get(stockGroup).getActualValue();
+            double targetStockValue = groupTargetValue * stockProportionInGroup;
+
+            // Calculate and store the number of shares to adjust for this stock
+            int sharesToAdjust = (int) Math.round((targetStockValue - currentStockValue) / stockInfo.getCurrentPrice());
+            stockAdjustments.put(stockSymbol, (double) sharesToAdjust);
+
+            // Update projected portfolio value and final allocation values
+            double adjustedStockValue = currentStockValue + (sharesToAdjust * stockInfo.getCurrentPrice());
+            projectedTotalPortfolioValue += sharesToAdjust * stockInfo.getCurrentPrice();
+            finalAllocationValues.put(stockGroup, finalAllocationValues.get(stockGroup) + adjustedStockValue);
+        }
+
+        // Handling cash adjustments
+        if (groupTargetValues.containsKey("CASH")) {
+            double targetCash = groupTargetValues.getOrDefault("CASH", 0.0);
+            double actualCash = currentPortfolio.getAllocations()
+                    .getOrDefault("CASH", new PortfolioGroupingSummary.Allocation(0.0, 0.0)).getActualValue();
+            double cashAdjustment = targetCash - actualCash;
+
+            // Debugging logs (or use logger.info(...) if using a logger)
+            System.out.println("Target CASH: " + targetCash);
+            System.out.println("Actual CASH: " + actualCash);
+            System.out.println("CASH Adjustment: " + cashAdjustment);
+
+            stockAdjustments.put("CASH", cashAdjustment);
+            double finalCashValue = actualCash + cashAdjustment;
+            finalAllocationValues.put("CASH", finalCashValue);
+
+            System.out.println("Final CASH Value: " + finalCashValue);
+        }
+
+        // Calculate the final allocation percentages based on the updated values
+        for (Map.Entry<String, Double> finalAllocation : finalAllocationValues.entrySet()) {
+            String group = finalAllocation.getKey();
+            double value = finalAllocation.getValue();
+            finalAllocationPercentages.put(group, (value / projectedTotalPortfolioValue) * 100.0);
+        }
+
+        // Return stock adjustments, projected portfolio value, and final allocations
+
+        for (Map.Entry<String, Double> finalAllocation : finalAllocationValues.entrySet()) {
+            String group = finalAllocation.getKey();
+            double value = finalAllocation.getValue();
+            finalAllocationPercentages.put(group, (value / projectedTotalPortfolioValue) * 100.0);
+        }
+
+        Map<String, Object> adjustments = new HashMap<>();
+        adjustments.put("stockAdjustments", stockAdjustments);
+        adjustments.put("projectedTotalPortfolioValue", projectedTotalPortfolioValue);
+        adjustments.put("finalAllocations", finalAllocationPercentages.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Map.of("actualValue",
+                        finalAllocationValues.get(entry.getKey()), "percentage", entry.getValue()))));
+
+        Map<String, Double> groupTargetValues2 = new HashMap<>();
+        for (Map.Entry<String, Double> entry : rebalancingTargetPercentagesDTO.getTargetPercentages().entrySet()) {
+            groupTargetValues2.put(entry.getKey(), totalPortfolioValue * entry.getValue() / 100.0);
+            finalAllocationValues.put(entry.getKey(), 0.0); // Initialize final allocation values
+        }
+
+        Map<String, Integer> finalStockQuantities = new HashMap<>();
+
+        // Iterate over the current stocks and apply adjustments
+        for (Map.Entry<String, PortfolioGroupingSummary.StockInfo> stockEntry : currentPortfolio.getPortfolioStocks()
+                .entrySet()) {
+            String stockSymbol = stockEntry.getKey();
+            PortfolioGroupingSummary.StockInfo stockInfo = stockEntry.getValue();
+
+            // Calculate final quantity
+            int currentQuantity = stockInfo.getQuantity();
+            double adjustment = stockAdjustments.getOrDefault(stockSymbol, 0.0);
+            int finalQuantity = currentQuantity + (int) Math.round(adjustment);
+
+            // Store in finalStockQuantities
+            finalStockQuantities.put(stockSymbol, finalQuantity);
+        }
+
+        adjustments.put("finalStocks", finalStockQuantities);
+
+        return adjustments;
+    }
+
 }

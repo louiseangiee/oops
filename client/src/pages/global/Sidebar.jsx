@@ -8,6 +8,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import EqualizerIcon from '@mui/icons-material/Equalizer';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import RestoreIcon from '@mui/icons-material/Restore';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -122,6 +123,7 @@ const Sidebar = () => {
             <Item
               title="Stock Market Today"
               to="/stock-market"
+              icon={<ShowChartIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -168,7 +170,7 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             > */}
-              {/* Charts
+            {/* Charts
             </Typography>
             <Item
               title="Bar Chart"

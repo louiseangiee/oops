@@ -133,6 +133,7 @@ public class PortfolioStockService {
                 }
                 existingPortfolioStock.setBuyPrice(dto.getBuyPrice());
                 existingPortfolioStock.setQuantity(dto.getQuantity());
+                existingPortfolioStock.setBuyDate(dto.getBuyDate());
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(
@@ -159,6 +160,7 @@ public class PortfolioStockService {
                 portfolioStock.setQuantity(dto.getQuantity());
                 portfolioStock.setBuyDate(dto.getBuyDate());
                 portfolioStock.setPortfolio(portfolio);
+                portfolioStock.setBuyDate(dto.getBuyDate());
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(

@@ -9,13 +9,15 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
 import { getAsync } from "../../utils/utils";
-
+import Lottie from 'lottie-react';
+import loadingLight from "../../components/lotties/loading_light.json"
 
 const SignInContainer = (props) => {
     const { signIn } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -23,12 +25,14 @@ const SignInContainer = (props) => {
 
 
     const handleSignIn = async () => {
+        setIsLoading(true);
         const response = await signIn(email, password);
         if (response != null) {
             generateOTP(response);
         }
         else {
             alert("Wrong email or password");
+            setIsLoading(false);
         }
     }
 
@@ -36,6 +40,7 @@ const SignInContainer = (props) => {
         console.log(' generating OTP');
         const response = await getAsync('users/sendOTP?email=' + email);
         if (response.ok) {
+            setIsLoading(false);
             navigate('/otp', { state: { data: data } })
             console.log('OTP sent');
         }
@@ -86,6 +91,7 @@ const SignInContainer = (props) => {
                 </Box>
                 <Box sx={{ width: "60%" }}>
                     <Button
+                        disabled={isLoading}
                         fullWidth
                         sx={{
                             backgroundColor: "#326adf",
@@ -93,10 +99,18 @@ const SignInContainer = (props) => {
                             color: colors.grey[100],
                             fontSize: "14px",
                             fontWeight: "bold",
-                            padding: "10px 20px",
+                            padding: isLoading ? 0 : "10px 20px",
                             marginTop: "10px",
                         }}
-                        onClick={handleSignIn}>Sign In</Button>
+                        onClick={handleSignIn}>
+                        {isLoading ?
+                            <Lottie
+                                animationData={loadingLight}
+                                loop={true} // Set to true for looping
+                                autoplay={true} // Set to true to play the animation automatically
+                                style={{ width: '50px', height: '50px', padding: 0 }} // Customize the dimensions
+                            /> : <> Sign In </>}
+                    </Button>
                 </Box>
             </Grid >
         </>

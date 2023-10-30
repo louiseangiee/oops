@@ -9,6 +9,8 @@ import LockIcon from '@mui/icons-material/Lock';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useAuth } from '../../context/AuthContext.jsx';
+import Lottie from 'lottie-react';
+import loadingLight from "../../components/lotties/loading_light.json"
 
 
 
@@ -23,13 +25,16 @@ const RegisterContainer = (props) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [isDisabled, setIsDisabled] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const theme = useTheme();
     const { register } = useAuth();
     const colors = tokens(theme.palette.mode);
 
     async function handleRegister(e) {
+        setIsLoading(true);
         e.preventDefault();
         await register(fullName, email, password)
+        setIsLoading(false);
         navigate('/')
     }
 
@@ -123,13 +128,19 @@ const RegisterContainer = (props) => {
                             color: colors.grey[100],
                             fontSize: "14px",
                             fontWeight: "bold",
-                            padding: "10px 20px",
+                            padding: isLoading ? 0 : "10px 20px",
                             marginTop: "10px",
                         }}
                         onClick={(e) => handleRegister(e)}
-                        disabled={isDisabled}
+                        disabled={isDisabled || isLoading}
                     >
-                        Sign Up!
+                        {isLoading ?
+                            <Lottie
+                                animationData={loadingLight}
+                                loop={true} // Set to true for looping
+                                autoplay={true} // Set to true to play the animation automatically
+                                style={{ width: '50px', height: '50px', padding: 0 }} // Customize the dimensions
+                            /> : <> Sign Up! </>}
                     </Button>
                 </Box>
             </Grid >

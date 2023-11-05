@@ -2,6 +2,7 @@ package com.oop.appa.controller;
 
 import com.oop.appa.dto.PortfolioGroupingSummary;
 import com.oop.appa.dto.PortfolioStockCreationDTO;
+import com.oop.appa.dto.PortfolioStockRebalancingDTO;
 import com.oop.appa.dto.RebalancingTargetPercentagesDTO;
 import com.oop.appa.entity.PortfolioStock;
 import com.oop.appa.exception.ErrorResponse;
@@ -108,6 +109,21 @@ public class PortfolioStockController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error fetching rebalancing options");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    @Operation(summary="Execute rebalancing transactions, body consists of the changes to the portfolio stocks (eg. + or - qty)")
+    @Parameter(name="portfolioId", description="PortfolioId")
+    @PostMapping("/{portfolioId}/executeRebalance")
+    public ResponseEntity<?> executeRebalance(@PathVariable Integer portfolioId, @RequestBody PortfolioStockRebalancingDTO portfolioStockRebalancingDTO){
+        try {
+            portfolioStockService.executeRebalancePortfolioTransactions(portfolioStockRebalancingDTO);
+            return ResponseEntity.ok("Rebalancing was successfully completed");
+        } catch (Exception e){
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error executing rebalancing");
             error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }

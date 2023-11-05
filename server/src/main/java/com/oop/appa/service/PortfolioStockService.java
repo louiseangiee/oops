@@ -21,6 +21,7 @@ import com.oop.appa.dao.AccessLogRepository;
 import com.oop.appa.dao.PortfolioStockRepository;
 import com.oop.appa.dto.PortfolioGroupingSummary;
 import com.oop.appa.dto.PortfolioStockCreationDTO;
+import com.oop.appa.dto.PortfolioStockRebalancingDTO;
 import com.oop.appa.dto.RebalancingTargetPercentagesDTO;
 import com.oop.appa.entity.AccessLog;
 import com.oop.appa.entity.Portfolio;
@@ -133,6 +134,7 @@ public class PortfolioStockService {
                 }
                 existingPortfolioStock.setBuyPrice(dto.getBuyPrice());
                 existingPortfolioStock.setQuantity(dto.getQuantity());
+                existingPortfolioStock.setBuyDate(dto.getBuyDate());
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(
@@ -159,6 +161,7 @@ public class PortfolioStockService {
                 portfolioStock.setQuantity(dto.getQuantity());
                 portfolioStock.setBuyDate(dto.getBuyDate());
                 portfolioStock.setPortfolio(portfolio);
+                portfolioStock.setBuyDate(dto.getBuyDate());
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(
@@ -570,6 +573,13 @@ public class PortfolioStockService {
     public Map<String, Object> rebalancePortfolio(Integer portfolioId, String rebalancingBy,
             RebalancingTargetPercentagesDTO rebalancingTargetPercentagesDTO) {
         // Fetch current portfolio
+        double totalPercentage = 0.0;
+        for (Map.Entry<String, Double> entry : rebalancingTargetPercentagesDTO.getTargetPercentages().entrySet()) {
+            totalPercentage += entry.getValue();
+        }
+        if (totalPercentage != 100) {
+            throw new IllegalArgumentException("Total allocation doesnt add up to 100%");
+        }
         PortfolioGroupingSummary currentPortfolio = calculateTotalPortfolioValueByGroup(portfolioId, rebalancingBy);
         double totalPortfolioValue = currentPortfolio.getTotalPortfolioValue();
 
@@ -691,6 +701,73 @@ public class PortfolioStockService {
         adjustments.put("finalStocks", finalStockQuantities);
 
         return adjustments;
+    }
+
+    @Transactional
+    public void executeRebalancePortfolioTransactions(PortfolioStockRebalancingDTO portfolioStocksToBeAdjusted) {
+        Portfolio portfolio = portfolioService.findById(portfolioStocksToBeAdjusted.getPortfolioId())
+                .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
+
+        // Process Sells
+        for (Map.Entry<String, Integer> entry : portfolioStocksToBeAdjusted.getPortfolioStocks().entrySet()) {
+            if ("CASH".equals(entry.getKey())) {
+                continue; // Skip processing for "CASH"
+            }
+            if (entry.getValue() < 0) { // Selling stocks
+                processStockTransaction(portfolio, entry.getKey(), entry.getValue());
+            }
+        }
+
+        // Update the portfolio after sells
+        portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
+
+        // Process Buys
+        for (Map.Entry<String, Integer> entry : portfolioStocksToBeAdjusted.getPortfolioStocks().entrySet()) {
+            if ("CASH".equals(entry.getKey())) {
+                continue; // Skip processing for "CASH"
+            }
+            if (entry.getValue() > 0) { // Buying stocks
+                processStockTransaction(portfolio, entry.getKey(), entry.getValue());
+            }
+        }
+
+        // Final portfolio update after buys
+        portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
+    }
+
+    private void processStockTransaction(Portfolio portfolio, String stockSymbol, int quantity) {
+        PortfolioStock portfolioStock = portfolioStockRepository
+                .findByPortfolioPortfolioIdAndStockStockSymbol(portfolio.getPortfolioId(), stockSymbol)
+                .orElseThrow(() -> new EntityNotFoundException("Portfolio stock not found in the portfolio"));
+
+        double stockPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
+                .path("05. price").asDouble();
+
+        double transactionAmount = stockPrice * quantity;
+
+        // Check for sufficient capital if it's a buy transaction
+        if (quantity > 0 && portfolio.getRemainingCapital() < transactionAmount) {
+            throw new IllegalArgumentException("Insufficient funds to purchase stock");
+        }
+
+        portfolioStock.setBuyPrice((float) stockPrice);
+        portfolioStock.setQuantity(portfolioStock.getQuantity() + quantity);
+        portfolioStock.setBuyDate(LocalDate.now());
+
+        // Update remaining capital
+        if (quantity < 0) { // Sell transaction
+            portfolio.setRemainingCapital(portfolio.getRemainingCapital() + (-transactionAmount));
+        } else { // Buy transaction
+            portfolio.setRemainingCapital(portfolio.getRemainingCapital() - transactionAmount);
+        }
+
+        String action = String.format(
+                "User successfully %s stock %s in Portfolio #%d - %s with new price: %f and quantity: %d on %s",
+                (quantity < 0) ? "sold" : "bought",
+                stockSymbol, portfolio.getPortfolioId(), portfolio.getName(), stockPrice, quantity, LocalDate.now());
+
+        accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
+        portfolioStockRepository.save(portfolioStock);
     }
 
 }

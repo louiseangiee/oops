@@ -64,7 +64,7 @@ const PortfolioSelector = (props) => {
 
                 const data = await response.json();
                 setPortfolios(data);
-
+                
             } catch (err) {
                 console.error('There was an error fetching the portfolios:', err);
                 setError(err);
@@ -84,6 +84,7 @@ const PortfolioSelector = (props) => {
             renderInput={(params) => <TextField {...params} label="Choose a Portfolio" variant="outlined" />}
             onChange={(event, newValue) => handlePortfolioChange(newValue)}
         />
+        
     );
 }
 

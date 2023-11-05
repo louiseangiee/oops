@@ -5,8 +5,7 @@ import { useCookies } from "react-cookie";
 import PortfolioSelector from "./AvailablePortfoliosDropdown";
 
 const ComparePortfolioComponent = () => {
-    const [chartData, setChartData] = useState([]); 
-    const [timeSpan, setTimeSpan] = useState("1Y");
+    
     const [cookie] = useCookies()
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -18,6 +17,7 @@ const ComparePortfolioComponent = () => {
     const handlePortfolioChange1 = (newValue) => {
         setChosenPortfolio1(newValue || null);
     };
+    console.log(chosenPortfolio1)
 
     //FOR THE SECOND PORTFOLIO
     const [chosenPortfolio2, setChosenPortfolio2] = useState([]);
@@ -32,13 +32,13 @@ const ComparePortfolioComponent = () => {
             <Box marginX={2}>
                 <PortfolioSelector
                     chosenPortfolio={chosenPortfolio1}
-                    handlePortfolioChange1={handlePortfolioChange1} />
+                    handlePortfolioChange={handlePortfolioChange1} />
             </Box>
 
             <Box marginX={2}>
                 <PortfolioSelector
                     chosenPortfolio={chosenPortfolio2}
-                    handlePortfolioChange2={handlePortfolioChange2} />
+                    handlePortfolioChange={handlePortfolioChange2} />
             </Box>
         </Box>
 

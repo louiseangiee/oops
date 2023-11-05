@@ -204,6 +204,8 @@ const Portfolio = () => {
 
   // State to store portfolio data
   const [portfolioData, setPortfolioData] = useState({});
+  const [overallReturns, setOverallReturns] = useState(0);
+  const [percentageReturns, setPercentageReturns] = useState(0);
   const [refreshIntervalId, setRefreshIntervalId] = useState(null); // Store the interval ID
 
   // Function to fetch portfolio data
@@ -237,22 +239,32 @@ const Portfolio = () => {
     }
   };
 
+  const fetchPortfolioSummaryData = async () => {
+    setIsLoading(true);
+    const portfolioSummaryResponse = await getAsync(`portfolioStocks/${portfolioId}/summary`, cookie.accessToken);
+    const portfolioSummaryData = await portfolioSummaryResponse.json();
+    console.log(portfolioSummaryData);
+    setOverallReturns(portfolioSummaryData.overallReturns.overalReturn);
+    setPercentageReturns(portfolioSummaryData.overallReturns.percentage);
+    setIsLoading(false);
+  }
+
   // Fetch data on initial component load
   useEffect(() => {
     fetchPortfolioData();
+    fetchPortfolioSummaryData();
     console.log("Cleared interval " + refreshIntervalId);
     // Set up an interval to periodically fetch data (e.g., every 30 seconds)
-    const intervalId = setInterval(fetchPortfolioData, 30000); // Adjust the interval as needed
+    const intervalId = setInterval(fetchPortfolioData, 10000); // Adjust the interval as needed
     setRefreshIntervalId(intervalId);
 
-    // Clear the interval when the component unmounts
     return () => {
       if (refreshIntervalId) {
         clearInterval(refreshIntervalId);
 
       }
     };
-  }, [portfolioId, cookie.accessToken]);
+  }, [portfolioId, userData]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href="/" sx={{ fontSize: "22px" }}>
@@ -321,7 +333,7 @@ const Portfolio = () => {
       >
         {/* ROW 1 */}
         <Box
-          gridColumn="span 6"
+          gridColumn="span 4"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="flex-start"
@@ -348,7 +360,7 @@ const Portfolio = () => {
 
         </Box>
         <Box
-          gridColumn="span 6"
+          gridColumn="span 4"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="flex-start"
@@ -368,9 +380,39 @@ const Portfolio = () => {
           <Typography
             variant="h1"
             fontWeight="bold"
+            sx={{ color: overallReturns > 0 ? 'green' : 'red' }}
+          >
+            {overallReturns > 0 ? '+' : '-'}
+            ${overallReturns !== 0 ? Math.abs(overallReturns) : '-'}
+            /
+            {percentageReturns !== 0 ? Math.abs(percentageReturns) : '-'}%
+          </Typography>
+
+        </Box>
+        <Box
+          gridColumn="span 4"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="flex-start"
+          justifyContent="center"
+          flexDirection="column"
+          gap="5px"
+          pl="20px"
+          borderRadius="10px"
+        >
+          <Typography
+            variant="h6"
+            fontStyle="italic"
+            sx={{ color: colors.grey[300] }}
+          >
+            Remaning Capital
+          </Typography>
+          <Typography
+            variant="h1"
+            fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            $-
+            ${portfolioData && portfolioData['remainingCapital'] ? portfolioData['remainingCapital'] : '-'}
           </Typography>
 
         </Box>

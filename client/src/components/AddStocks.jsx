@@ -19,18 +19,7 @@ import ListItemText from '@mui/material/ListItemText';
 import StockSelector from './StockSelectorDropdown';
 import { getAsync, postAsync } from '../utils/utils';
 import { useCookies } from 'react-cookie';
-
-function renderRow(props) {
-    const { index, style } = props;
-
-    return (
-        <ListItem style={style} key={index} component="div" disablePadding>
-            <ListItemButton>
-                <ListItemText primary={`Stock ${index + 1}`} />
-            </ListItemButton>
-        </ListItem>
-    );
-}
+import { isAHoliday } from '@18f/us-federal-holidays';
 
 function ButtonField(props) {
     const {
@@ -84,6 +73,7 @@ function ButtonDatePicker(props) {
 }
 
 export default function AddStocks({ portfolioId }) {
+
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -97,6 +87,12 @@ export default function AddStocks({ portfolioId }) {
     const [loading, setLoading] = useState(false);
 
     const [open, setOpen] = React.useState(false);
+
+    const isWeekend = (date) => {
+        const day = date.day();
+
+        return day === 0 || day === 6;
+    };
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -114,14 +110,22 @@ export default function AddStocks({ portfolioId }) {
         }
     };
     const handleStockPriceChange = async (symbol, date) => {
-        if (date == null || symbol == null) return;
-        var dateChosen = date.format('YYYY-MM-DD');
-        console.log(dateChosen)
-        const response = await getAsync(`stocks/priceAtDate?symbol=${symbol}&date=${dateChosen}`, cookie.accessToken);
-        const data = await response.json();
-        console.log(data);
-        console.log(data[dateChosen]);
-        setStockPrice(data[dateChosen]);
+        if (date == null || chosenStock == null) return;
+        else {
+            setLoading(true);
+            var dateChosen = date.format('YYYY-MM-DD');
+            if (isAHoliday(new Date(dateChosen))) {
+                alert("Stock market is closed on this date. Please choose another date.");
+                setDate(null);
+                setStockPrice(0);
+            }
+            const response = await getAsync(`stocks/priceAtDate?symbol=${symbol}&date=${dateChosen}`, cookie.accessToken);
+            const data = await response.json();
+            console.log(data);
+            console.log(data[dateChosen]);
+            setStockPrice(data[dateChosen]);
+            setLoading(false);
+        }
     }
 
 
@@ -139,7 +143,7 @@ export default function AddStocks({ portfolioId }) {
         if (response.ok) {
             setLoading(false);
             alert("Stock added successfully!");
-            navigate(`/portfolio/${portfolioId}`);
+            handleClose();
         }
         else {
             alert("Failed to add stock. Please try again.")
@@ -176,29 +180,9 @@ export default function AddStocks({ portfolioId }) {
                 </DialogTitle>
                 <DialogContent
                     sx={{ backgroundColor: colors.primary[400] }}>
-                    {/* SEARCH BAR */}
-                    {/* <Box
-                        display="flex"
-                        backgroundColor={theme.palette.mode === "dark" ? colors.primary[500] : colors.grey[900]}
-                        borderRadius="3px"
-                    >
-                        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-                        <IconButton type="button" sx={{ p: 1, color: colors.primary[300] }}>
-                            <SearchIcon />
-                        </IconButton>
-                    </Box> */}
                     <Box
                         sx={{ width: '100%', marginTop: "10px", borderRadius: "5px" }}
                     >
-                        {/* <FixedSizeList
-                            height={200}
-                            width="100%"
-                            itemSize={40}
-                            itemCount={200}
-                            overscanCount={5}
-                        >
-                            {renderRow}
-                        </FixedSizeList> */}
                         <StockSelector
                             chosenStock={chosenStock}
                             handleStockChange={handleStockChange}
@@ -206,9 +190,11 @@ export default function AddStocks({ portfolioId }) {
                     </Box>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <ButtonDatePicker
+                            disableFuture
                             label={date == null ? null : date.format('DD-MM-YYYY')}
                             value={date}
-                            onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock.code, newValue) }}
+                            shouldDisableDate={isWeekend}
+                            onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock.code, newValue); console.log(newValue); }}
                         />
                     </LocalizationProvider>
                     <TextField
@@ -261,7 +247,7 @@ export default function AddStocks({ portfolioId }) {
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
                     <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} onClick={handleAddClick}>Add</Button>
+                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} disabled={loading} onClick={handleAddClick}>Add</Button>
                 </DialogActions>
             </Dialog>
         </div>

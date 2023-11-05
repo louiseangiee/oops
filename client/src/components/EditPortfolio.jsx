@@ -21,7 +21,7 @@ export default function EditPortfolio({ portfolioId, small }) {
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [cookie, removeCookie] = useCookies(["accessToken"]);
+    const [cookie] = useCookies();
     const [portfolioData, setPortfolioData] = useState(null);
     const [updatedName, setUpdatedName] = useState('');
     const [updatedDescription, setUpdatedDescription] = useState('');
@@ -47,7 +47,7 @@ export default function EditPortfolio({ portfolioId, small }) {
         }
         fetchData();
 
-        if (!/^\d*\.?\d*$/.test(updatedCapital) || updatedCapital === '' || parseFloat(updatedCapital) <=0) {
+        if (!/^\d*\.?\d*$/.test(updatedCapital) || updatedCapital === '' || parseFloat(updatedCapital) <= 0) {
             setCapitalError(true);
             setIsButtonDisabled(true);
             return; // Prevent form submission
@@ -55,18 +55,6 @@ export default function EditPortfolio({ portfolioId, small }) {
             setIsButtonDisabled(false);
             setCapitalError(false);
         }
-
-        // if (capitalError) {
-        //     setIsButtonDisabled(true);
-        // } else {
-        //     setIsButtonDisabled(false);
-        // }
-
-        // if (updatedName === portfolioData?.name && updatedDescription === portfolioData?.description && updatedCapital === portfolioData?.totalCapital) {
-        //     setIsButtonDisabled(true);
-        // } else {
-        //     setIsButtonDisabled(false);
-        // }
 
     }, [portfolioId, updatedCapital]);
 
@@ -280,18 +268,18 @@ export default function EditPortfolio({ portfolioId, small }) {
                     </Button>
                     <Button
                         type="submit"
-                        sx={{ backgroundColor: loading ? colors.greenAccent[600] : colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold", width: "150px", height: "40px", "&:hover": { backgroundColor: colors.greenAccent[600]}}}
+                        sx={{ backgroundColor: loading ? colors.greenAccent[600] : colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold", width: "150px", height: "40px", "&:hover": { backgroundColor: colors.greenAccent[600] } }}
                         onClick={handleChanges}
-                        disabled={ !isNameEdited && !isDescriptionEdited && (capitalError || !isCapitalEdited) }
+                        disabled={!isNameEdited && !isDescriptionEdited && (capitalError || !isCapitalEdited)}
                     >
-                        {loading ?  
+                        {loading ?
                             <Lottie
                                 animationData={loadingLight}
                                 loop={true} // Set to true for looping
                                 autoplay={true} // Set to true to play the animation automatically
                                 style={{ width: '80px', height: '80px' }} // Customize the dimensions
-                            /> 
-                            : 
+                            />
+                            :
                             "Confirm Changes"
                         }
                     </Button>

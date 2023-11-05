@@ -203,15 +203,6 @@ export default function StocksTabs({ stocks, portfolioId }) {
                                                 }
                                             }}
                                         />
-
-                                        <img
-                                            src={"../../stocks_logos/" + "apple.png"}
-                                            width="50px"
-                                            height="50px"
-                                            sx={{ borderRadius: "50%" }}
-                                            alt='apple'
-                                        />
-
                                         <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">
                                             <Typography
                                                 variant="h4"
@@ -220,6 +211,7 @@ export default function StocksTabs({ stocks, portfolioId }) {
                                             >
                                                 {stock.stockSymbol}
                                             </Typography>
+
                                             <Typography
                                                 variant="h6"
                                                 sx={{ color: colors.grey[100] }}

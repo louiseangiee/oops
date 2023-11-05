@@ -1,17 +1,13 @@
 import { } from "@mui/material";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Box, Button, Typography, useTheme, Link, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../../theme";
-import { mockTransactions } from "../../data/mockData";
-import Header from "../../components/Header";
-import PortfolioCard from "../../components/PortfolioCard";
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import EditPortfolio from "../../components/EditPortfolio";
-import StatBox from "../../components/StatBox";
 import StocksTabs from "../../components/StocksTabs";
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useCookies } from "react-cookie";
-import { deleteAsync, getAsync, putAsync } from "../../utils/utils";
+import { deleteAsync, getAsync } from "../../utils/utils";
 import { useAuth } from "../../context/AuthContext";
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { useNavigate } from 'react-router-dom';
@@ -29,8 +25,6 @@ function DeletePortfolio() {
   const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
   const navigate = useNavigate();
 
-
-  // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
   const [portfolioData, setPortfolioData] = useState({}); // [portfolioData, setPortfolioData
   const [cookie] = useCookies();
@@ -202,11 +196,9 @@ function DeletePortfolio() {
 const Portfolio = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [cookie, removeCookie] = useCookies(["accessToken"]);
+  const [cookie] = useCookies();
 
   const { userData } = useAuth();
-
-  // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
   const [isLoading, setIsLoading] = useState(true); // Add a loading state
 
@@ -314,8 +306,6 @@ const Portfolio = () => {
           </Typography>
         </Box>
 
-        {/* <Header title={"Portfolio > "+formData['portfolioName']} subtitle={formData['portfolioDescription']} /> */}
-
         <Box display="flex" gap="5px">
           <EditPortfolio portfolioId={portfolioId} />
           <DeletePortfolio />
@@ -393,7 +383,7 @@ const Portfolio = () => {
         >
           <StocksTabs
             stocks={portfolioData['portfolioStocks'] ? portfolioData['portfolioStocks'] : null}
-            portfolio_id={portfolioId}
+            portfolioId={portfolioId}
           />
         </Box>
       </Box>

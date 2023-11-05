@@ -94,6 +94,7 @@ export default function AddStocks({ portfolioId }) {
     const [stockPrice, setStockPrice] = useState(0);
     const [date, setDate] = useState(null);
     const [chosenStock, setChosenStock] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const [open, setOpen] = React.useState(false);
 
@@ -125,6 +126,7 @@ export default function AddStocks({ portfolioId }) {
 
 
     const handleAddClick = async () => {
+        setLoading(true);
         const data = {
             "portfolioId": portfolioId,
             "symbol": chosenStock.code,
@@ -132,9 +134,16 @@ export default function AddStocks({ portfolioId }) {
             "quantity": stockQuantity,
             "buyDate": date.format('YYYY-MM-DD')
         }
+        console.log(data);
         const response = await postAsync(`portfolioStocks/${portfolioId}`, data, cookie.accessToken);
         if (response.ok) {
+            setLoading(false);
             alert("Stock added successfully!");
+            navigate(`/portfolio/${portfolioId}`);
+        }
+        else {
+            alert("Failed to add stock. Please try again.")
+            handleClose();
         }
     };
 

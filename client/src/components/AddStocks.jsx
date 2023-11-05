@@ -4,25 +4,21 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Box, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
-import SearchIcon from '@mui/icons-material/Search';
-import InputBase from '@mui/material/InputBase';
-import IconButton from '@mui/material/IconButton';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { FixedSizeList } from 'react-window';
-import dayjs from 'dayjs';
 import StockSelector from './StockSelectorDropdown';
+import { getAsync, postAsync } from '../utils/utils';
+import { useCookies } from 'react-cookie';
 
 function renderRow(props) {
     const { index, style } = props;
@@ -87,10 +83,11 @@ function ButtonDatePicker(props) {
     );
 }
 
-export default function AddStocks() {
+export default function AddStocks({ portfolioId }) {
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const [cookie] = useCookies()
 
     // Initialize state variables for form fields
     const [stockQuantity, setStockQuantity] = useState(0);
@@ -109,11 +106,36 @@ export default function AddStocks() {
         setDate(null);
     };
 
-    const handleStockChange = (newValue) => {
+    const handleStockChange = async (newValue) => {
         setChosenStock(newValue ? newValue : null);
+        if (newValue != null) {
+            handleStockPriceChange(newValue.code, date);
+        }
     };
+    const handleStockPriceChange = async (symbol, date) => {
+        if (date == null || symbol == null) return;
+        var dateChosen = date.format('YYYY-MM-DD');
+        console.log(dateChosen)
+        const response = await getAsync(`stocks/priceAtDate?symbol=${symbol}&date=${dateChosen}`, cookie.accessToken);
+        const data = await response.json();
+        console.log(data);
+        console.log(data[dateChosen]);
+        setStockPrice(data[dateChosen]);
+    }
 
-    const handleAddClick = () => {
+
+    const handleAddClick = async () => {
+        const data = {
+            "portfolioId": portfolioId,
+            "symbol": chosenStock.code,
+            "buyPrice": stockPrice,
+            "quantity": stockQuantity,
+            "buyDate": date.format('YYYY-MM-DD')
+        }
+        const response = await postAsync(`portfolioStocks/${portfolioId}`, data, cookie.accessToken);
+        if (response.ok) {
+            alert("Stock added successfully!");
+        }
     };
 
     return (
@@ -175,22 +197,21 @@ export default function AddStocks() {
                     </Box>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <ButtonDatePicker
-                            label={date == null ? null : date.format('DD/MM/YYYY')}
+                            label={date == null ? null : date.format('DD-MM-YYYY')}
                             value={date}
-                            onChange={(newValue) => setDate(newValue)}
+                            onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock.code, newValue) }}
                         />
                     </LocalizationProvider>
                     <TextField
-                        autoFocus
                         margin="dense"
                         id="price"
-                        label="Stock Price"
+                        InputProps={
+                            { readOnly: true }
+                        }
                         placeholder="e.g. 20"
                         startAdornment="$"
-                        type="number"
                         fullWidth
-                        value={stockPrice}
-                        onChange={(e) => setStockPrice(e.target.value)}
+                        value={'Stock price: $' + stockPrice}
                         sx={{
                             color: colors.grey[100],
                             '& .MuiOutlinedInput-root': {

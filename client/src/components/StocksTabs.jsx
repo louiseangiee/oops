@@ -44,7 +44,7 @@ function a11yProps(index) {
     };
 }
 
-export default function StocksTabs({ stocks }) {
+export default function StocksTabs({ stocks, portfolioId }) {
     const [value, setValue] = React.useState(0);
     const theme = useTheme();
     console.log(stocks);
@@ -169,7 +169,7 @@ export default function StocksTabs({ stocks }) {
                             autoplay={true} // Set to true to play the animation automatically
                             style={{ width: '200px', height: '200px' }} // Customize the dimensions
                         />
-                        <AddStocks />
+                        <AddStocks portfolioId={portfolioId} />
                     </Box>)
                 }
             </CustomTabPanel>

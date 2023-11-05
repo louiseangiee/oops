@@ -33,7 +33,7 @@ function DeletePortfolio() {
   // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
   const [portfolioData, setPortfolioData] = useState({}); // [portfolioData, setPortfolioData
-  const [cookie, removeCookie] = useCookies(["accessToken"]);
+  const [cookie] = useCookies();
   const [loading, setLoading] = useState(false); // Add a loading state
 
   // Fetch the portfolio data based on portfolioId
@@ -391,7 +391,7 @@ const Portfolio = () => {
           // gridRow="span 2"
           backgroundColor={colors.primary[400]}
         >
-          <StocksTabs stocks={portfolioData['portfolioStocks'] ? portfolioData['portfolioStocks'] : null} />
+          <StocksTabs stocks={portfolioData['portfolioStocks'] ? portfolioData['portfolioStocks'] : null} portfolioId={portfolioId} />
         </Box>
       </Box>
     </Box>

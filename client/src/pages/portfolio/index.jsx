@@ -391,7 +391,10 @@ const Portfolio = () => {
           // gridRow="span 2"
           backgroundColor={colors.primary[400]}
         >
-          <StocksTabs stocks={portfolioData['portfolioStocks'] ? portfolioData['portfolioStocks'] : null} portfolioId={portfolioId} />
+          <StocksTabs
+            stocks={portfolioData['portfolioStocks'] ? portfolioData['portfolioStocks'] : null}
+            portfolio_id={portfolioId}
+          />
         </Box>
       </Box>
     </Box>

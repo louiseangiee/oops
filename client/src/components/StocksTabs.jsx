@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
+import Checkbox from '@mui/material/Checkbox';
 import Tab from '@mui/material/Tab';
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
@@ -8,6 +9,9 @@ import Button from '@mui/material/Button';
 import Lottie from 'lottie-react';
 import AddStocks from './AddStocks';
 import noDataDark from './lotties/no_data_dark.json';
+import { deleteAsync } from '../utils/utils';
+import { useCookies } from "react-cookie";
+import { useAuth } from '../context/AuthContext';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -31,6 +35,47 @@ function CustomTabPanel(props) {
     );
 }
 
+function DeleteStock({ isVisible, checkedItems, onStocksDeleted, portfolio_id }) {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const [cookie, removeCookie] = useCookies(["accessToken"]);
+    const { userData } = useAuth()
+
+    const handleDelete = async () => {
+        for (let stockSymbol of checkedItems) {
+            const response = await deleteAsync(`portfolioStocks/${portfolio_id}/stocks/${stockSymbol}/drop`, cookie.accessToken);
+            // Check for a successful response and handle any errors as needed
+            if (response.ok) {
+                console.log("Stock deleted successfully");
+            } else {
+                console.log("Error deleting stock(s)");
+
+            }
+        }
+
+        onStocksDeleted(checkedItems); // Notify parent component that stocks have been deleted
+    }
+
+    return (
+        isVisible ? (
+            <Button
+                sx={{
+                    color: colors.grey[100],
+                    backgroundColor: colors.redAccent[600],
+                    borderColor: colors.redAccent[600],
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    padding: "10px 20px",
+                }}
+                onClick={handleDelete}
+            >
+                Delete Stocks
+            </Button>
+        ) : null
+    );
+
+}
+
 CustomTabPanel.propTypes = {
     children: PropTypes.node,
     index: PropTypes.number.isRequired,
@@ -44,11 +89,34 @@ function a11yProps(index) {
     };
 }
 
-export default function StocksTabs({ stocks, portfolioId }) {
+export default function StocksTabs({ stocks, portfolio_id }) {
     const [value, setValue] = React.useState(0);
     const theme = useTheme();
     console.log(stocks);
     const colors = tokens(theme.palette.mode);
+
+    const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+    const [checkedItems, setCheckedItems] = React.useState([]);
+
+    const onStocksDeleted = (deletedStockSymbols) => {
+        // Filter out the deleted stocks from the current stocks list
+        const updatedStocks = stocks.filter(stock => !deletedStockSymbols.includes(stock.stockSymbol));
+
+        // Update the state (You'll need to lift the stocks state up if it's coming from a parent or fetched within this component)
+        // setStocks(updatedStocks); // Uncomment this line if you have a setStocks function
+
+        // Clear the checked items list
+        setCheckedItems([]);
+    };
+
+    const handleCheckboxChange = (event, stockSymbol) => {
+        if (event.target.checked) {
+            setCheckedItems((prev) => [...prev, stockSymbol]);
+        } else {
+            setCheckedItems((prev) => prev.filter((item) => item !== stockSymbol));
+        }
+    };
+
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -101,7 +169,14 @@ export default function StocksTabs({ stocks, portfolioId }) {
                             <Typography variant="h3" fontWeight="bold" color={colors.grey[100]}>
                                 Stocks
                             </Typography>
-                            <AddStocks />
+                            <Box display="flex" gap="20px">
+                                <AddStocks />
+                                <DeleteStock isVisible={checkedItems.length > 0} checkedItems={checkedItems}
+                                    portfolio_id={portfolio_id}
+                                    onStocksDeleted={onStocksDeleted}
+                                />
+                            </Box>
+
                         </Box>
                         <Box display="flex" flexDirection="column" gap="20px" mb="10px">
                             <Box display="flex" justifyContent="space-between">
@@ -117,6 +192,18 @@ export default function StocksTabs({ stocks, portfolioId }) {
                             {stocks.map((stock, index) => (
                                 <Box display="flex" justifyContent="space-between" mb="20px" key={index}>
                                     <Box display="flex" gap="10px">
+
+                                        <Checkbox
+                                            {...label}
+                                            checked={checkedItems.includes(stock.stockSymbol)}
+                                            onChange={(e) => handleCheckboxChange(e, stock.stockSymbol)}
+                                            sx={{
+                                                '&.Mui-checked': {
+                                                    color: colors.blueAccent[400],
+                                                }
+                                            }}
+                                        />
+
                                         <img
                                             src={"../../stocks_logos/" + "apple.png"}
                                             width="50px"
@@ -169,7 +256,7 @@ export default function StocksTabs({ stocks, portfolioId }) {
                             autoplay={true} // Set to true to play the animation automatically
                             style={{ width: '200px', height: '200px' }} // Customize the dimensions
                         />
-                        <AddStocks portfolioId={portfolioId} />
+                        <AddStocks portfolioId={portfolio_id} />
                     </Box>)
                 }
             </CustomTabPanel>

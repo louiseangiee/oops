@@ -71,6 +71,7 @@ export default function CreatePortfolio() {
             name: portfolioName,
             description: portfolioDescription,
             totalCapital: parseFloat(portfolioCapital), // Convert to a number
+            remainingCapital: parseFloat(portfolioCapital), // Convert to a number
         };
         setLoading(true);
         async function createPortfolio() {

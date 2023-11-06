@@ -39,10 +39,6 @@ public class Portfolio {
     @JsonManagedReference(value = "portfolio-portfoliostock")
     private List<PortfolioStock> portfolioStocks;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "portfolio_performance_id")
-    private PerformanceMetrics performanceMetrics;
-
     // constructors
     public Portfolio(){
     }
@@ -109,18 +105,6 @@ public class Portfolio {
 
     public void setPortfolioStocks(List<PortfolioStock> portfolioStocks) {
         this.portfolioStocks = portfolioStocks;
-    }
-
-    public PerformanceMetrics getPerformanceMetrics() {
-        return performanceMetrics;
-    }
-
-    public void setPerformanceMetrics(PerformanceMetrics performanceMetrics) {
-        this.performanceMetrics = performanceMetrics;
-
-        if (performanceMetrics != null) {
-            performanceMetrics.setPortfolio(this);
-        }
     }
 
     // add a convenience method

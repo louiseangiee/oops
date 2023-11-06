@@ -1,17 +1,13 @@
 import { } from "@mui/material";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Box, Button, Typography, useTheme, Link, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../../theme";
-import { mockTransactions } from "../../data/mockData";
-import Header from "../../components/Header";
-import PortfolioCard from "../../components/PortfolioCard";
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import EditPortfolio from "../../components/EditPortfolio";
-import StatBox from "../../components/StatBox";
 import StocksTabs from "../../components/StocksTabs";
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useCookies } from "react-cookie";
-import { deleteAsync, getAsync, putAsync } from "../../utils/utils";
+import { deleteAsync, getAsync } from "../../utils/utils";
 import { useAuth } from "../../context/AuthContext";
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { useNavigate } from 'react-router-dom';
@@ -29,8 +25,6 @@ function DeletePortfolio() {
   const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
   const navigate = useNavigate();
 
-
-  // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
   const [portfolioData, setPortfolioData] = useState({}); // [portfolioData, setPortfolioData
   const [cookie] = useCookies();
@@ -202,16 +196,16 @@ function DeletePortfolio() {
 const Portfolio = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [cookie, removeCookie] = useCookies(["accessToken"]);
+  const [cookie] = useCookies();
 
   const { userData } = useAuth();
-
-  // Access the portfolio_id parameter from the URL
   const { portfolioId } = useParams();
   const [isLoading, setIsLoading] = useState(true); // Add a loading state
 
   // State to store portfolio data
   const [portfolioData, setPortfolioData] = useState({});
+  const [overallReturns, setOverallReturns] = useState(0);
+  const [percentageReturns, setPercentageReturns] = useState(0);
   const [refreshIntervalId, setRefreshIntervalId] = useState(null); // Store the interval ID
 
   // Function to fetch portfolio data
@@ -245,22 +239,32 @@ const Portfolio = () => {
     }
   };
 
+  const fetchPortfolioSummaryData = async () => {
+    setIsLoading(true);
+    const portfolioSummaryResponse = await getAsync(`portfolioStocks/${portfolioId}/summary`, cookie.accessToken);
+    const portfolioSummaryData = await portfolioSummaryResponse.json();
+    console.log(portfolioSummaryData);
+    setOverallReturns(portfolioSummaryData.overallReturns.overalReturn);
+    setPercentageReturns(portfolioSummaryData.overallReturns.percentage);
+    setIsLoading(false);
+  }
+
   // Fetch data on initial component load
   useEffect(() => {
     fetchPortfolioData();
+    fetchPortfolioSummaryData();
     console.log("Cleared interval " + refreshIntervalId);
     // Set up an interval to periodically fetch data (e.g., every 30 seconds)
-    const intervalId = setInterval(fetchPortfolioData, 30000); // Adjust the interval as needed
+    const intervalId = setInterval(fetchPortfolioData, 10000); // Adjust the interval as needed
     setRefreshIntervalId(intervalId);
 
-    // Clear the interval when the component unmounts
     return () => {
       if (refreshIntervalId) {
         clearInterval(refreshIntervalId);
 
       }
     };
-  }, [portfolioId, cookie.accessToken]);
+  }, [portfolioId, userData]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href="/" sx={{ fontSize: "22px" }}>
@@ -314,8 +318,6 @@ const Portfolio = () => {
           </Typography>
         </Box>
 
-        {/* <Header title={"Portfolio > "+formData['portfolioName']} subtitle={formData['portfolioDescription']} /> */}
-
         <Box display="flex" gap="5px">
           <EditPortfolio portfolioId={portfolioId} />
           <DeletePortfolio />
@@ -331,7 +333,7 @@ const Portfolio = () => {
       >
         {/* ROW 1 */}
         <Box
-          gridColumn="span 6"
+          gridColumn="span 4"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="flex-start"
@@ -358,7 +360,7 @@ const Portfolio = () => {
 
         </Box>
         <Box
-          gridColumn="span 6"
+          gridColumn="span 4"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="flex-start"
@@ -378,9 +380,39 @@ const Portfolio = () => {
           <Typography
             variant="h1"
             fontWeight="bold"
+            sx={{ color: overallReturns > 0 ? 'green' : 'red' }}
+          >
+            {overallReturns > 0 ? '+' : '-'}
+            ${overallReturns !== 0 ? Math.abs(overallReturns) : '-'}
+            /
+            {percentageReturns !== 0 ? Math.abs(percentageReturns) : '-'}%
+          </Typography>
+
+        </Box>
+        <Box
+          gridColumn="span 4"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="flex-start"
+          justifyContent="center"
+          flexDirection="column"
+          gap="5px"
+          pl="20px"
+          borderRadius="10px"
+        >
+          <Typography
+            variant="h6"
+            fontStyle="italic"
+            sx={{ color: colors.grey[300] }}
+          >
+            Remaning Capital
+          </Typography>
+          <Typography
+            variant="h1"
+            fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            $-
+            ${portfolioData && portfolioData['remainingCapital'] ? portfolioData['remainingCapital'] : '-'}
           </Typography>
 
         </Box>
@@ -393,7 +425,7 @@ const Portfolio = () => {
         >
           <StocksTabs
             stocks={portfolioData['portfolioStocks'] ? portfolioData['portfolioStocks'] : null}
-            portfolio_id={portfolioId}
+            portfolioId={portfolioId}
           />
         </Box>
       </Box>

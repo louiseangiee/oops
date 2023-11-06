@@ -35,15 +35,15 @@ function CustomTabPanel(props) {
     );
 }
 
-function DeleteStock({ isVisible, checkedItems, onStocksDeleted, portfolio_id }) {
+function DeleteStock({ isVisible, checkedItems, onStocksDeleted, portfolioId }) {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [cookie, removeCookie] = useCookies(["accessToken"]);
+    const [cookie] = useCookies();
     const { userData } = useAuth()
 
     const handleDelete = async () => {
         for (let stockSymbol of checkedItems) {
-            const response = await deleteAsync(`portfolioStocks/${portfolio_id}/stocks/${stockSymbol}/drop`, cookie.accessToken);
+            const response = await deleteAsync(`portfolioStocks/${portfolioId}/stocks/${stockSymbol}/drop`, cookie.accessToken);
             // Check for a successful response and handle any errors as needed
             if (response.ok) {
                 console.log("Stock deleted successfully");
@@ -89,7 +89,7 @@ function a11yProps(index) {
     };
 }
 
-export default function StocksTabs({ stocks, portfolio_id }) {
+export default function StocksTabs({ stocks, portfolioId }) {
     const [value, setValue] = React.useState(0);
     const theme = useTheme();
     console.log(stocks);
@@ -170,9 +170,9 @@ export default function StocksTabs({ stocks, portfolio_id }) {
                                 Stocks
                             </Typography>
                             <Box display="flex" gap="20px">
-                                <AddStocks />
+                                <AddStocks portfolioId={portfolioId} />
                                 <DeleteStock isVisible={checkedItems.length > 0} checkedItems={checkedItems}
-                                    portfolio_id={portfolio_id}
+                                    portfolioId={portfolioId}
                                     onStocksDeleted={onStocksDeleted}
                                 />
                             </Box>
@@ -203,15 +203,6 @@ export default function StocksTabs({ stocks, portfolio_id }) {
                                                 }
                                             }}
                                         />
-
-                                        <img
-                                            src={"../../stocks_logos/" + "apple.png"}
-                                            width="50px"
-                                            height="50px"
-                                            sx={{ borderRadius: "50%" }}
-                                            alt='apple'
-                                        />
-
                                         <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">
                                             <Typography
                                                 variant="h4"
@@ -220,6 +211,7 @@ export default function StocksTabs({ stocks, portfolio_id }) {
                                             >
                                                 {stock.stockSymbol}
                                             </Typography>
+
                                             <Typography
                                                 variant="h6"
                                                 sx={{ color: colors.grey[100] }}
@@ -256,7 +248,7 @@ export default function StocksTabs({ stocks, portfolio_id }) {
                             autoplay={true} // Set to true to play the animation automatically
                             style={{ width: '200px', height: '200px' }} // Customize the dimensions
                         />
-                        <AddStocks portfolioId={portfolio_id} />
+                        <AddStocks portfolioId={portfolioId} />
                     </Box>)
                 }
             </CustomTabPanel>

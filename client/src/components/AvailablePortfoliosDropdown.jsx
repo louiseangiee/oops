@@ -47,14 +47,15 @@ const PortfolioSelector = (props) => {
     const { chosenPortfolio, handlePortfolioChange } = props;
     const [cookie] = useCookies();
     const [portfolios, setPortfolios] = useState([]);
-    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true); // Added loading state to indicate data fetching
 
-    const userId = useUserID();  // Using the custom hook here
+    const userId = useUserID(); // Using the custom hook here
 
     useEffect(() => {
         if (!userId) return; // If userId is not set yet, do not fetch portfolios
 
         const fetchData = async() => {
+            setLoading(true); // Begin loading
             try {
                 const response = await getAsync(`portfolios/user/${userId}`, cookie.accessToken);
 
@@ -64,27 +65,41 @@ const PortfolioSelector = (props) => {
 
                 const data = await response.json();
                 setPortfolios(data);
-                
+                // Set the chosen portfolio to the first one if not already set
+                if (!chosenPortfolio && data.length > 0) {
+                    handlePortfolioChange(data[0]);
+                }
             } catch (err) {
                 console.error('There was an error fetching the portfolios:', err);
-                setError(err);
+            } finally {
+                setLoading(false); // Finish loading whether there was an error or not
             }
         };
 
         fetchData();
-
-    }, [userId, cookie]);
+    }, [userId, cookie]); // useEffect dependency array
 
     return (
         <Autocomplete
             id="portfolio-dropdown"
             options={portfolios}
+            
             getOptionLabel={(option) => option.name}
-            style={{ width: 300 }}
-            renderInput={(params) => <TextField {...params} label="Choose a Portfolio" variant="outlined" />}
+            fullWidth
+            value={chosenPortfolio} // Set the selected value here
             onChange={(event, newValue) => handlePortfolioChange(newValue)}
+            renderInput={(params) => (
+                <TextField 
+                    {...params} 
+                    label="Choose a Portfolio" 
+                    variant="outlined" 
+                    // Display a loading indicator or placeholder if still loading
+                    placeholder={loading ? "Loading..." : "Select a Portfolio"}
+                />
+            )}
+            // Disable the input if there are no portfolios or still loading
+            disabled={loading || portfolios.length === 0}
         />
-        
     );
 }
 

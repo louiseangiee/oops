@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
-import PortfolioSelector from "../../components/AvailablePortfoliosDropdown";
+
 import ComparePortfolioComponent from "../../components/ComparePortfolioComponent";
 
 const ComparePortfolio = () => {
@@ -16,6 +16,7 @@ const ComparePortfolio = () => {
                     <Header title="Compare Portfolio" subtitle="Compare Portfolio Performance" />
                 </Box>
                 <ComparePortfolioComponent />
+                
             </Box>
             
         </>

@@ -11,6 +11,7 @@ import { getAsync } from "../../utils/utils";
 import PorfolioBarChart from "../../components/OverallReturnsBarChart";
 import PortfolioBreakdown from "../../components/UserPortfoliosBreakdown";
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import OverviewPortfolioValue from "../../components/OverviewPortfolioValue";
 
 const Analytics = () => {
   const theme = useTheme();
@@ -62,6 +63,7 @@ const Analytics = () => {
           justifyContent="left"
           p={5}
         >
+          <OverviewPortfolioValue />
         
         </Box>
 

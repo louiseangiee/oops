@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme, Chip, Button } from "@mui/material";
-import { tokens } from "../../theme";
-import Header from "../../components/Header";
-import CreatePortfolio from "../../components/CreatePortfolioForm";
-import StockChart from "../../components/StockChart";
-import StockSelector from "../../components/StockSelectorDropdown";
-import StockDetailsTable from "../../components/StockDetailsTable";
+import { tokens } from "../theme";
+import Header from "../components/Header";
+import CreatePortfolio from "../components/CreatePortfolioForm";
+import StockChart from "../components/StockChart";
+import StockSelector from "../components/StockSelectorDropdown";
+import StockDetailsTable from "../components/StockDetailsTable";
 import { useCookies } from "react-cookie"; // If you decide to use cookies again in the future
-import { getAsync } from "../../utils/utils";
+import { getAsync } from "../utils/utils";
 
 // This is now a custom hook
 const useUserID = () => {
     const [cookie] = useCookies();
     const [userId, setUserId] = useState(null);
     const [error, setError] = useState(null);
+    const [portfolioSummary, setPortfolioSummary] = useState(null);
     
     useEffect(() => {
         const fetchData = async() => {
@@ -50,9 +51,6 @@ const OverviewPortfolioValue = () => {
     const colors = tokens(theme.palette.mode);
 
     
-
-    
-
     return (
        <>
        <Typography
@@ -61,7 +59,7 @@ const OverviewPortfolioValue = () => {
             fontWeight="bold"
             color={colors.greenAccent[400]}
         >
-            Overall Value from all Portfolios
+            Total Portfolio Value
         </Typography>
         <Box height="15px" />
 
@@ -92,4 +90,4 @@ const OverviewPortfolioValue = () => {
     );
 };
 
-return OverviewPortfolioValue;
+export default OverviewPortfolioValue;

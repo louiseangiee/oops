@@ -14,12 +14,10 @@ const useUserID = () => {
     const [cookie] = useCookies();
     const [userId, setUserId] = useState(null);
     const [error, setError] = useState(null);
-    const [portfolioSummary, setPortfolioSummary] = useState(null);
     
     useEffect(() => {
         const fetchData = async() => {
             try {
-                console.log(cookie.email)
                 const response = await getAsync(`users/user?email=${cookie.email}`, cookie.accessToken);
 
                 if (!response.ok) {
@@ -27,6 +25,7 @@ const useUserID = () => {
                 }
 
                 const data = await response.json();
+                // console.log(data);
 
                 if (data && data.id) {
                     setUserId(data.id);
@@ -39,6 +38,7 @@ const useUserID = () => {
         };
 
         fetchData();
+        // console.log(userId);
 
     }, [cookie]);
 
@@ -46,10 +46,69 @@ const useUserID = () => {
 };
 
 
-const OverviewPortfolioValue = () => {
+const OverviewPortfolioValue = ({portfolioId}) => {
+    const [portfolioSummary, setPortfolioSummary] = useState(null);
+    const [cookie] = useCookies();
     const theme = useTheme();
+    const userId = useUserID();
     const colors = tokens(theme.palette.mode);
 
+    useEffect(() => {
+        if (!userId) return;
+
+        const fetchPortfolioSummary = async () => {
+          try {
+            console.log(userId);
+            
+            // Get the list of portfolio ids for the user
+            const portfolioResponse = await getAsync(`portfolios/user/${userId}`, cookie.accessToken);
+            if (!portfolioResponse.ok) {
+                throw new Error('Failed to fetch portfolio ids');
+            }
+
+            const portfoliosData = await portfolioResponse.json();
+            console.log(portfoliosData);
+
+            // Map through each portfolio and fetch their summaries
+            const summariesPromises = portfoliosData.map(async (portfolio) => {
+                const summaryResponse = await getAsync(`portfolioStocks/${portfolio.id}/summary`, cookie.accessToken);
+                if (!summaryResponse .ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return await summaryResponse.json();
+            });
+
+            const summaries = await Promise.all(summariesPromises);
+            // setPortfolioSummaries(summaries);
+
+            } catch (error) {
+                console.error('Failed to fetch portfolio summaries:', error);
+            }
+        };
+
+        //     const response = await getAsync(`portfolioStocks/11/summary`, cookie.accessToken);
+        //     if (!response.ok) {
+        //       throw new Error('Network response was not ok');
+        //     }
+        //     const data = await response.json();
+        //     console.log(data);
+        //     setPortfolioSummary(data);
+        //   } catch (error) {
+        //     console.error('Failed to fetch portfolio summary:', error);
+        //   }
+        // };
+    
+        fetchPortfolioSummary();
+    },[userId, cookie.accessToken]);
+
+    // Assuming you want to display the total portfolio value and overall return percentage
+    const totalPortfolioValue = portfolioSummary?.totalPortfolioValue?.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    });
+
+    const overallReturnPercentage = portfolioSummary?.overallReturns?.percentage.toFixed(2);
+    // console.log(overallReturnPercentage);
     
     return (
        <>
@@ -64,12 +123,12 @@ const OverviewPortfolioValue = () => {
         <Box height="15px" />
 
         <Typography variant="h1" fontWeight="bold">
-            S$ 10000
+           {totalPortfolioValue || "Loading..."}
         </Typography>
 
         <Box height="10px" />
         <Chip
-            label="+ 13.4%"
+            label={`${overallReturnPercentage}%`}
             fontWeight="bold"
             p={2}
             sx={{

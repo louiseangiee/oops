@@ -16,8 +16,9 @@ const useUserID = () => {
     useEffect(() => {
         const fetchData = async() => {
             try {
-                console.log(cookie.email)
+                console.log(cookie.email);
                 const response = await getAsync(`users/user?email=${cookie.email}`, cookie.accessToken);
+                console.log(response);
 
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -45,7 +46,8 @@ const useUserID = () => {
 const ComparePortfolioComponent = () => {
 
     const userId = useUserID();
-    const [cookie] = useCookies()
+    console.log(userId);
+    const [cookie] = useCookies();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     

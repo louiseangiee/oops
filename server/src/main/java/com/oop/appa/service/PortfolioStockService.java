@@ -38,16 +38,18 @@ public class PortfolioStockService {
     private StockService stockService;
     private PortfolioService portfolioService;
     private AccessLogRepository accessLogRepository;
+    private UserService userService;
 
     @Autowired
     public PortfolioStockService(PortfolioStockRepository portfolioStockRepository, MarketDataService marketDataService,
             StockService stockService, PortfolioService portfolioService,
-            AccessLogRepository accessLogRepository) {
+            AccessLogRepository accessLogRepository, UserService userService) {
         this.portfolioStockRepository = portfolioStockRepository;
         this.marketDataService = marketDataService;
         this.stockService = stockService;
         this.portfolioService = portfolioService;
         this.accessLogRepository = accessLogRepository;
+        this.userService = userService;
     }
 
     // GET

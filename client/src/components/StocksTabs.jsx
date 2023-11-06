@@ -226,7 +226,7 @@ export default function StocksTabs({ stocks, portfolioId }) {
                                             fontWeight="bold"
                                             sx={{ color: colors.grey[100] }}
                                         >
-                                            ${stock.buyPrice}
+                                            ${stock.buyPrice && stock.quantity ? (stock.buyPrice * stock.quantity).toFixed(2) : 'N/A'}
                                         </Typography>
                                         <Typography
                                             variant="h6"

@@ -15,7 +15,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const Home = () => {
   const theme = useTheme();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
   const [dataFetched, setDataFetched] = useState(null);
   const [cookie] = useCookies();
@@ -28,28 +28,50 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!userData.id) return;
+      
+      let portfolios = [];
+
       if (role === "ROLE_ADMIN") {
         const response = await getAsync('portfolios', cookie.accessToken);
-        const data = await response.json();
-        setDataFetched(data);
-        console.log(data);
+        portfolios = await response.json();
       } else if (role === "ROLE_USER") {
         const response = await getAsync('portfolios/user/' + userData.id, cookie.accessToken);
-        const data = await response.json();
-        setDataFetched(data);
-        console.log(data);
+        portfolios = await response.json();
       }
-    }
-    fetchData();
 
-    // Filter data based on the search query
+      // Fetch and add the overall returns for each portfolio
+      const portfoliosWithReturns = await Promise.all(portfolios.map(async (portfolio) => {
+        try {
+          const summaryResponse = await getAsync(`portfolioStocks/${portfolio.portfolioId}/summary`, cookie.accessToken);
+          if (!summaryResponse.ok) {
+            // If the response is not OK, throw an error
+            throw new Error(`HTTP error! status: ${summaryResponse.status}`);
+          }
+          const summaryData = await summaryResponse.json();
+          console.log(summaryData);
+
+          const overallReturn = summaryData.overallReturns.overalReturn;
+
+          return { ...portfolio, overallReturn: overallReturn };
+        } catch (error) {
+          console.error('Failed to fetch overall returns for portfolio:', portfolio.portfolioId, error);
+          return { ...portfolio, overallReturn: null }; // Handle the error case
+        }
+      }));
+
+      setDataFetched(portfoliosWithReturns);
+    };
+    
+    fetchData();
+  }, [userData.id, role, cookie.accessToken]);
+
+  useEffect(() => {
     const filteredResults = dataFetched?.filter((portfolio) =>
       portfolio.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       portfolio.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredData(filteredResults);
-
-  }, [searchQuery, userData, dataFetched]);
+  }, [searchQuery, dataFetched]);
 
   return (
     <Box m="20px">
@@ -133,7 +155,7 @@ const Home = () => {
                   title={portfolio.name}
                   subtitle={portfolio.description}
                   capital={portfolio.totalCapital}
-                  returns={portfolio.performanceMetrics?.overallReturns}
+                  returns={portfolio.overallReturn}
                   stocks={portfolio.portfolioStocks}
                   portfolioId={portfolio.portfolioId}
                 />

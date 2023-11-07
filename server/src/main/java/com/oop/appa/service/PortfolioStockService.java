@@ -94,12 +94,14 @@ public class PortfolioStockService {
     public PortfolioStock createPortfolioStock(PortfolioStockCreationDTO dto) {
         try {
             // Validate DTO
-            if (dto.getQuantity() == 0) {
-                throw new IllegalArgumentException("Quantity cannot be 0");
-            } else if (dto.getBuyPrice() == 0) {
-                throw new IllegalArgumentException("Buy price cannot be 0");
+            if (dto.getQuantity() <= 0) {
+                throw new IllegalArgumentException("Quantity cannot be 0 or negative");
+            } else if (dto.getBuyPrice() <= 0) {
+                throw new IllegalArgumentException("Buy price cannot be 0 or negative");
             } else if (dto.getBuyDate() == null) {
                 throw new IllegalArgumentException("Buy date cannot be null");
+            } else if (dto.getBuyDate().isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException("Buy date cannot be in the future");
             }
             String action;
             Portfolio portfolio = portfolioService.findById(dto.getPortfolioId())

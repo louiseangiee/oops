@@ -40,11 +40,6 @@ const StockMarketPage = () => {
                 <StockSelector
                     chosenStock={chosenStock}
                     handleStockChange={handleStockChange} />
-                
-                    
-                    {/* Line chart for the chosen stock */}
-                    
-                
 
                 {/* StockDetailstable */}
                 <Box paddingX={5} marginBottom={3}>

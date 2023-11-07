@@ -7,13 +7,19 @@ const ReturnsTable = ({ stockReturns }) => {
   const [orderDirection, setOrderDirection] = useState('asc');
 
   const sortedStockReturns = useMemo(() => {
-    // Convert stockReturns object into an array and sort
-    const returnsArray = Object.entries(stockReturns).map(([key, value]) => ({
-      name: key,
-      percentage: value.percentage,
-      actualValue: value.actualValue
+    // Ensure stockReturns is not null/undefined and is an object
+    if (!stockReturns || typeof stockReturns !== 'object') {
+      return [];
+    }
+  
+    // Convert the object to an array of objects with key 'name' added
+    const entries = Object.entries(stockReturns).map(([name, data]) => ({
+      name,
+      ...data
     }));
-    return returnsArray.sort((a, b) => {
+  
+    // Now you can sort the entries array
+    return entries.sort((a, b) => {
       if (orderDirection === 'asc') {
         return a.percentage - b.percentage;
       } else {
@@ -21,6 +27,7 @@ const ReturnsTable = ({ stockReturns }) => {
       }
     });
   }, [stockReturns, orderDirection]);
+  
 
   const handleSortRequest = () => {
     setOrderDirection(orderDirection === 'asc' ? 'desc' : 'asc');
@@ -42,22 +49,25 @@ const ReturnsTable = ({ stockReturns }) => {
                 Return (%)
               </TableSortLabel>
             </TableCell>
-            <TableCell align="right">Value</TableCell>
+            <TableCell align="right">Returns</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {sortedStockReturns.map((row) => (
-            <TableRow key={row.name}>
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right" style={{ color: row.percentage < 0 ? 'red' : 'green' }}>
-                {row.percentage.toFixed(2)}%
-              </TableCell>
-              <TableCell align="right">{row.actualValue.toFixed(2)}</TableCell>
-            </TableRow>
-          ))}
+            {sortedStockReturns.map((row) => (
+                <TableRow key={row.name}>
+                <TableCell component="th" scope="row">
+                    {row.name}
+                </TableCell>
+                <TableCell align="right" style={{ color: row.percentage < 0 ? 'red' : 'green' }}>
+                    {typeof row.percentage === 'number' ? row.percentage.toFixed(2) : 'N/A'}%
+                </TableCell>
+                <TableCell align="right">
+                    {typeof row.actualValue === 'number' ? row.actualValue.toFixed(2) : 'N/A'}
+                </TableCell>
+                </TableRow>
+            ))}
         </TableBody>
+
       </Table>
     </TableContainer>
   );

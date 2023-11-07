@@ -6,6 +6,7 @@ import { getAsync } from '../utils/utils';
 import { Typography, Box, Table, Divider } from '@mui/material';
 import { tokens } from "../theme";
 import PortfolioBreakdown from './UserPortfoliosBreakdown';
+import ReturnsTable from './StocksPerformanceTable';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -165,9 +166,27 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
     return portfolioSummaries.overallReturns;
   }
 
+  function getStockReturns(portfolioSummaries) {
+    // Check if the portfolioSummaries object exists
+    if (!portfolioSummaries) {
+      console.error("Error: portfolioSummaries is not defined.");
+      return ''; // or you can return a default value or throw an error
+    }
+
+    // Check if the overallReturn property exists
+    if (!portfolioSummaries.stockReturns) {
+      console.error("Error: stockReturns is not defined in the portfolioSummaries object.");
+      return ''; // or you can return a default value or throw an error
+    }
+
+    // If everything checks out, return the overallReturn value
+    return portfolioSummaries.stockReturns;
+  }
+
   // Usage:
-  const summary1 = getOverallReturn(portfolioSummaries1);
-  const summary2 = getOverallReturn(portfolioSummaries2);
+  const summary1 = getStockReturns(portfolioSummaries1);
+  const summary2 = getStockReturns(portfolioSummaries2);
+  
   const overallReturn1 = getOverallReturn(portfolioSummaries1).overalReturn;
   const overallReturn2 = getOverallReturn(portfolioSummaries2).overalReturn;
   const overallReturn1Percentage = getOverallReturn(portfolioSummaries1).percentage;
@@ -281,6 +300,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <br />
           <Divider />
           <br />
+          <ReturnsTable stockReturns={summary2} />
           
           
         </Box>

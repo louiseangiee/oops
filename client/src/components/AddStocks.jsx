@@ -122,9 +122,11 @@ export default function AddStocks({ portfolioId }) {
             const response = await getAsync(`stocks/priceAtDate?symbol=${symbol}&date=${dateChosen}`, cookie.accessToken);
             const data = await response.json();
             console.log(data);
-            console.log(data[dateChosen]);
-            setStockPrice(data[dateChosen]);
+            console.log(data["price"]);
+            console.log(date.format('YYYY-MM-DD'));
+            setStockPrice(data["price"]);
             setLoading(false);
+            
         }
     }
 

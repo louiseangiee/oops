@@ -278,59 +278,6 @@ public class PortfolioStockController {
         }
     }
 
-    // @Operation(summary = "Retrieve the total value of a given portfolio")
-    // @Parameter(name = "portfolioId", description = "portfolio id")
-    // @GetMapping("/{portfolioId}/value")
-    // public ResponseEntity<?> getPortfolioTotalValue(@PathVariable Integer
-    // portfolioId) {
-    // try {
-    // double portfolioValue =
-    // portfolioStockService.getTotalPortfolioValue(portfolioId);
-    // return ResponseEntity.ok(portfolioValue);
-    // } catch (Exception e) {
-    // ErrorResponse error = new ErrorResponse();
-    // error.setMessage("Error calculating total portfolio value");
-    // error.setDetails(e.getMessage());
-    // return ResponseEntity.internalServerError().body(error);
-    // }
-    // }
-
-    // @Operation(summary = "Retrieve the stock returns for a given portfolio in
-    // actual value and percentage")
-    // @Parameter(name = "portfolioId", description = "portfolio id")
-    // @GetMapping("/{portfolioId}/stock-returns")
-    // public ResponseEntity<?> getStockReturnsForPortfolio(@PathVariable Integer
-    // portfolioId) {
-    // try {
-    // Map<String, Map<String, Double>> stockReturns =
-    // portfolioStockService.calculateStockReturnsForPortfolio(portfolioId);
-    // return ResponseEntity.ok(stockReturns);
-    // } catch (Exception e) {
-    // ErrorResponse error = new ErrorResponse();
-    // error.setMessage("Error calculating stock returns for the portfolio");
-    // error.setDetails(e.getMessage());
-    // return ResponseEntity.internalServerError().body(error);
-    // }
-    // }
-
-    // @Operation(summary = "Retrieve the overall returns for a given portfolio in
-    // actual value and percentage")
-    // @Parameter(name = "portfolioId", description = "portfolio id")
-    // @GetMapping("/{portfolioId}/overall-returns")
-    // public ResponseEntity<?> getPortfolioOverallReturns(@PathVariable Integer
-    // portfolioId) {
-    // try {
-    // Map<String, Double> overallReturns =
-    // portfolioStockService.calculateOverallPortfolioReturns(portfolioId);
-    // return ResponseEntity.ok(overallReturns);
-    // } catch (Exception e) {
-    // ErrorResponse error = new ErrorResponse();
-    // error.setMessage("Error calculating overall portfolio returns");
-    // error.setDetails(e.getMessage());
-    // return ResponseEntity.internalServerError().body(error);
-    // }
-    // }
-
     @GetMapping("/{portfolioId}/summary")
     public ResponseEntity<?> getPortfolioSummary(@PathVariable Integer portfolioId) {
         try {

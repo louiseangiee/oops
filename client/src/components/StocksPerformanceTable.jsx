@@ -32,10 +32,12 @@ const ReturnsTable = ({ stockReturns }) => {
   const handleSortRequest = () => {
     setOrderDirection(orderDirection === 'asc' ? 'desc' : 'asc');
   };
+  // Set the height for the visible area of the table
+  const maxTableBodyHeight = 'calc(5 * 53px)'; 
 
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="simple table">
+    <TableContainer component={Paper} style={{ maxHeight: 'calc(5 * 53px + 52px)' }}> {/* additional height for the header */}
+      <Table aria-label="simple table" stickyHeader>
         <TableHead>
           <TableRow>
             <TableCell>Stock</TableCell>
@@ -49,25 +51,24 @@ const ReturnsTable = ({ stockReturns }) => {
                 Return (%)
               </TableSortLabel>
             </TableCell>
-            <TableCell align="right">Returns</TableCell>
+            <TableCell align="right">Value</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-            {sortedStockReturns.map((row) => (
-                <TableRow key={row.name}>
-                <TableCell component="th" scope="row">
-                    {row.name}
-                </TableCell>
-                <TableCell align="right" style={{ color: row.percentage < 0 ? 'red' : 'green' }}>
-                    {typeof row.percentage === 'number' ? row.percentage.toFixed(2) : 'N/A'}%
-                </TableCell>
-                <TableCell align="right">
-                    {typeof row.actualValue === 'number' ? row.actualValue.toFixed(2) : 'N/A'}
-                </TableCell>
-                </TableRow>
-            ))}
+        <TableBody style={{ overflow: 'auto', maxHeight: maxTableBodyHeight }}>
+          {sortedStockReturns.map((row) => (
+            <TableRow key={row.name}>
+              <TableCell component="th" scope="row">
+                {row.name}
+              </TableCell>
+              <TableCell align="right" style={{ color: row.percentage < 0 ? 'red' : 'green' }}>
+                {typeof row.percentage === 'number' ? row.percentage.toFixed(2) : 'N/A'}%
+              </TableCell>
+              <TableCell align="right">
+                {typeof row.actualValue === 'number' ? row.actualValue.toFixed(2) : 'N/A'}
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
-
       </Table>
     </TableContainer>
   );

@@ -148,6 +148,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   const volAnnual2 = toFixedSafe(portfolioVolatility2Annual);
   const vol1 = toFixedSafe(portfolioVolatility1);
   const vol2 = toFixedSafe(portfolioVolatility2);
+  console.log(vol2)
 
   function getOverallReturn(portfolioSummaries) {
     // Check if the portfolioSummaries object exists
@@ -232,6 +233,8 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <Typography mt={1} variant="h5" fontStyle="italic">
             {portfolioData2.description}
           </Typography>
+
+          
 
           {/* Include description for portfolioData2 here */}
           <Box display="flex"

@@ -28,6 +28,8 @@ import com.oop.appa.dao.StockRepository;
 import com.oop.appa.entity.Stock;
 import com.oop.appa.entity.StockLookup;
 
+import lombok.experimental.var;
+
 @Service
 @Transactional // Adding @Transactional annotation to handle transactions at the service layer.
 public class StockService {
@@ -289,21 +291,6 @@ public class StockService {
 
     }
 
-    // Unused?
-    // private String getClosestAvailableDate(JsonNode dailyTimeSeries, String
-    // initialDate) {
-    // LocalDate targetDate = LocalDate.parse(initialDate);
-    // for (int i = 0; i < 10; i++) { // 10 is just an arbitrary limit to avoid
-    // infinite loops
-    // if (dailyTimeSeries.has(targetDate.toString())) {
-    // return targetDate.toString(); // Found a valid data point
-    // }
-    // targetDate = targetDate.plusDays(1); // Move to the next day
-    // }
-    // return initialDate; // Return the initial date if no valid date is found
-    // within the limit
-    // }
-
     public List<Map<String, Object>> fetchOneMonthData(String stockSymbol) {
         try {
             JsonNode monthlyJson = marketDataService.fetchDailyData(stockSymbol, "compact");
@@ -411,34 +398,6 @@ public class StockService {
             throw new RuntimeException("Error fetching stock price at date service: " + e.getMessage(), e);
         }
     }
-    
-    public double calculateDailyVolatility(String stockSymbol) {
-        try {
-            List<Map<String, Object>> dataPoints = fetchOneMonthData(stockSymbol);
-
-            // Extract closing prices from the data
-            List<Double> closingPrices = dataPoints.stream()
-                    .map(dataPoint -> Double.parseDouble(dataPoint.get("4. close").toString()))
-                    .collect(Collectors.toList());
-
-            // Calculate daily returns
-            List<Double> dailyReturns = new ArrayList<>();
-            for (int i = 1; i < closingPrices.size(); i++) {
-                double dailyReturn = (closingPrices.get(i) - closingPrices.get(i - 1)) / closingPrices.get(i - 1);
-                dailyReturns.add(dailyReturn);
-            }
-
-            // Calculate standard deviation of daily returns
-            double mean = dailyReturns.stream().mapToDouble(val -> val).average().orElse(0.0);
-            double variance = dailyReturns.stream().mapToDouble(val -> Math.pow(val - mean, 2)).sum()
-                    / dailyReturns.size();
-            double volatility = Math.sqrt(variance);
-            return volatility;
-        } catch (Exception e) {
-            throw new RuntimeException("Error calculating daily volatility service: " + e.getMessage(), e);
-        }
-
-    }
 
     public double calculateMonthlyVolatility(String stockSymbol) {
         try {
@@ -474,24 +433,29 @@ public class StockService {
         try {
             List<Map<String, Object>> monthlyData = fetchOneYearData(stockSymbol);
 
-            // Calculate monthly returns
-            List<Double> monthlyReturns = new ArrayList<>();
-            for (int i = 1; i < monthlyData.size(); i++) {
-                double previousClose = Double.parseDouble((String) monthlyData.get(i - 1).get("4. close"));
-                double currentClose = Double.parseDouble((String) monthlyData.get(i).get("4. close"));
+            int dataSize = monthlyData.size();
+            List<Double> monthlyReturns = new ArrayList<>(dataSize);
+            
+            double sum = 0.0;
+            double currentClose, previousClose = Double.parseDouble((String) monthlyData.get(0).get("4. close"));
+            
+            for (int i = 1; i < dataSize; i++) {
+                currentClose = Double.parseDouble((String) monthlyData.get(i).get("4. close"));
                 double monthlyReturn = (currentClose - previousClose) / previousClose;
                 monthlyReturns.add(monthlyReturn);
+                sum += monthlyReturn;
+                previousClose = currentClose;
             }
 
-            // Calculate standard deviation of monthly returns
-            double mean = monthlyReturns.stream().mapToDouble(val -> val).average().orElse(0.0);
-            double variance = monthlyReturns.stream().mapToDouble(val -> Math.pow(val - mean, 2)).sum()
-                    / monthlyReturns.size();
-            double monthlyVolatility = Math.sqrt(variance);
+            double mean = sum / dataSize;
+            double variance = 0.0;
 
-            // Annualize the volatility
-            // Since we're using monthly data and there are roughly 12 months in a year, the
-            // sqrt value changes to 12.
+            for (double monthlyReturn : monthlyReturns) {
+                variance += Math.pow(monthlyReturn - mean, 2);
+            }
+            variance /= dataSize;
+
+            double monthlyVolatility = Math.sqrt(variance);
             double annualizedVolatility = monthlyVolatility * Math.sqrt(12);
 
             return annualizedVolatility;
@@ -522,10 +486,4 @@ public class StockService {
         LocalDate oneWeekAgo = LocalDate.now().minusWeeks(1);
         return oneWeekAgo.toString();
     }
-
-    // unused
-    // private static String getCurrentDate() {
-    // LocalDate today = LocalDate.now();
-    // return today.toString();
-    // }
 }

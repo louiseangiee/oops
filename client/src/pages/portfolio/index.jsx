@@ -380,9 +380,11 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: overallReturns > 0 ? 'green' : overallReturns < 0 ? 'red' : colors.grey[100] }}
           >
-            {overallReturns < 0 ? '-' : ''}
-            ${Math.abs(overallReturns)}/
-            {percentageReturns}%
+            {overallReturns && percentageReturns ? (
+              `${overallReturns < 0 ? '-' : overallReturns > 0 ? '+' : ''}${Math.abs(overallReturns)}/${percentageReturns}%`
+            ) : (
+              "Loading..."
+            )}
           </Typography>
 
 

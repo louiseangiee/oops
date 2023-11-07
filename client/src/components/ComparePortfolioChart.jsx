@@ -127,6 +127,9 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
     }
   };
 
+  
+  
+
   const mergeChartData = () => {
     // Implement your chart data merging logic here
   };
@@ -205,7 +208,53 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
     fetchOverallPortfolio();
     fetchPortfolioSummaries();
     fetchPortfolioVolalities();
+
+    
   }, [chosenPortfolio1, chosenPortfolio2]);
+
+  // useEffect(() => {
+  //   const fetchPortfolioData = async () => {
+  //     if (!chosenPortfolio1 || !chosenPortfolio2) return;
+  
+  //     // Prepare endpoints for all required data
+  //     const endpoints = [
+  //       `portfolios/${chosenPortfolio1.portfolioId}`,
+  //       `portfolios/${chosenPortfolio2.portfolioId}`,
+  //       `portfolioStocks/${chosenPortfolio1.portfolioId}/summary`,
+  //       `portfolioStocks/${chosenPortfolio2.portfolioId}/summary`,
+  //       `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility`,
+  //       `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility/annualized`,
+  //       `portfolioStocks/${chosenPortfolio2.portfolioId}/volatility`,
+  //       `portfolioStocks/${chosenPortfolio2.portfolioId}/volatility/annualized`,
+  //     ];
+  
+  //     try {
+  //       const results = await fetchAllEndpoints(endpoints, cookies.accessToken);
+  //       console.log(results);
+  
+  //       // Extract the responses and set state or handle data accordingly
+  //       const [portfolioData1, portfolioData2, portfolioSummaries1, portfolioSummaries2, 
+  //              portfolioVolatility1, portfolioVolatility1Annual, 
+  //              portfolioVolatility2, portfolioVolatility2Annual] = results;
+        
+  //       // Update the state or perform further actions with the fetched data
+  //       setPortfolioData1(portfolioData1);
+  //       setPortfolioData2(portfolioData2);
+  //       setPortfolioSummaries1(portfolioSummaries1);
+  //       setPortfolioSummaries2(portfolioSummaries2);
+  //       setPortfolioVolatility1(portfolioVolatility1);
+  //       setPortfolioVolatility1Annual(portfolioVolatility1Annual);
+  //       setPortfolioVolatility2(portfolioVolatility2);
+  //       setPortfolioVolatility2Annual(portfolioVolatility2Annual);
+  //     } catch (error) {
+  //       console.error('There was an error fetching the portfolio data:', error);
+  //       // Handle the error by setting fallback states or showing messages
+  //     }
+  //   };
+  
+  //   fetchPortfolioData();
+  // }, [chosenPortfolio1, chosenPortfolio2, cookies.accessToken]); // Add dependencies for useEffect here
+  
 
   // Render the chart or a loading indicator
   return (

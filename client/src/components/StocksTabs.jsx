@@ -123,7 +123,7 @@ export default function StocksTabs({ stocks, portfolioId }) {
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: colors.primary[400] }} >
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" TabIndicatorProps={{
                     style: {
@@ -188,7 +188,15 @@ export default function StocksTabs({ stocks, portfolioId }) {
                                 </Typography>
                             </Box>
                         </Box>
-                        <Box>
+                        <Box
+                            sx={{
+                                maxHeight: '200px', // Set a maximum height for the box
+                                overflowY: 'auto',
+                                '&::-webkit-scrollbar': { display: 'none' },
+                                msOverflowStyle: 'none',  // IE and Edge
+                                scrollbarWidth: 'none',  // Firefox
+                            }}
+                        >
                             {stocks.map((stock, index) => (
                                 <Box display="flex" justifyContent="space-between" mb="20px" key={index}>
                                     <Box display="flex" gap="10px">

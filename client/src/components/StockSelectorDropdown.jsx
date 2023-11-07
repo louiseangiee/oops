@@ -47,6 +47,7 @@ const StockSelector = ({ chosenStock, handleStockChange }) => {
 
     return (
         <Autocomplete
+            disabled={stocks.length === 0}
             value={chosenStock}
             onChange={(event, newValue) => {
                 const stockExists = stocks.some(stock => stock.code === (newValue && newValue.code));
@@ -60,7 +61,7 @@ const StockSelector = ({ chosenStock, handleStockChange }) => {
                 <TextField
                     {...params}
                     variant="outlined"
-                    label="Select Stock"
+                    label={stocks.length === 0 ? "Loading..." : "Select Stock"}
                     sx={{
                         '& .MuiOutlinedInput-root': {
                             // Apply your input styles here

@@ -106,8 +106,8 @@ const Sidebar = () => {
               Data
             </Typography> */}
             <Item
-              title="Analytics"
-              to="/analytics"
+              title="Compare Portfolio"
+              to="/compare-portfolio"
               icon={<EqualizerIcon />}
               selected={selected}
               setSelected={setSelected}

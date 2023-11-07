@@ -2,9 +2,15 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 const BreakdownTable = ({ data, totalValue }) => {
+  // Define a style for the TableContainer to make it scrollable
+  const scrollableStyle = {
+    maxHeight: '400px', // Adjust the height as needed
+    overflow: 'auto'
+  };
+
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="simple table">
+    <TableContainer component={Paper} style={scrollableStyle}>
+      <Table stickyHeader aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>

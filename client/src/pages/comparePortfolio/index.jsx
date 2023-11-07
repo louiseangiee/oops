@@ -15,7 +15,8 @@ const ComparePortfolio = () => {
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Header title="Compare Portfolio" subtitle="Compare Portfolio Performance" />
                 </Box>
-                <ComparePortfolioComponent />
+                
+                    <ComparePortfolioComponent />
                 
             </Box>
             

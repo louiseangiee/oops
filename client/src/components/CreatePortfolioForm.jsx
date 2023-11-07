@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -6,17 +6,14 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import EditIcon from '@mui/icons-material/Edit';
-import { Box, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from "react";
 import { postAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
 import { useAuth } from "../context/AuthContext";
 import InputAdornment from '@mui/material/InputAdornment';
-import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import loadingLight from "./lotties/loading_light.json";
 import Lottie from 'lottie-react';
 
@@ -24,7 +21,7 @@ export default function CreatePortfolio() {
     const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [cookie, removeCookie] = useCookies(["accessToken"]);
+    const [cookie] = useCookies();
     const { userData } = useAuth();
     const [capitalError, setCapitalError] = useState(false);
     const [loading, setLoading] = useState(false); // Add a loading state
@@ -36,7 +33,7 @@ export default function CreatePortfolio() {
     const [portfolioCapital, setPortfolioCapital] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -80,7 +77,6 @@ export default function CreatePortfolio() {
             if (response.ok) {
                 setLoading(false);
                 navigate("/portfolio/" + data["portfolioId"]);
-                console.log(data);
             } else {
                 setLoading(false);
                 setOpen(false);
@@ -176,9 +172,9 @@ export default function CreatePortfolio() {
                             backgroundColor: loading ? colors.greenAccent[600] : colors.blueAccent[700],
                             color: colors.grey[100],
                             fontWeight: "bold",
-                            width: "80px", 
+                            width: "80px",
                             height: "40px",
-                            ":hover": { backgroundColor: colors.greenAccent[600]}
+                            ":hover": { backgroundColor: colors.greenAccent[600] }
                         }}
                         onClick={handleCreate}
                         disabled={isButtonDisabled}
@@ -186,9 +182,9 @@ export default function CreatePortfolio() {
                         {loading ?
                             <Lottie
                                 animationData={loadingLight}
-                                loop={true} // Set to true for looping
-                                autoplay={true} // Set to true to play the animation automatically
-                                style={{ width: '80px', height: '80px' }} // Customize the dimensions
+                                loop={true}
+                                autoplay={true}
+                                style={{ width: '80px', height: '80px' }}
                             />
                             :
                             "Create"

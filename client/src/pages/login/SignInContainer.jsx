@@ -37,12 +37,10 @@ const SignInContainer = (props) => {
     }
 
     const generateOTP = async (data) => {
-        console.log(' generating OTP');
         const response = await getAsync('users/sendOTP?email=' + email);
         if (response.ok) {
             setIsLoading(false);
             navigate('/otp', { state: { data: data } })
-            console.log('OTP sent');
         }
         else {
             alert('Email not found')

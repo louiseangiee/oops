@@ -9,11 +9,10 @@ import { useCookies } from "react-cookie";
 
 const OTP = () => {
     const theme = useTheme();
-    const [cookie, setCookie] = useCookies();
+    const [, setCookie] = useCookies();
     const location = useLocation();
     const navigate = useNavigate();
     const data = location.state.data;
-    console.log(data);
     const colors = tokens(theme.palette.mode);
     const [status, setStatus] = useState(''); // for displaying status of OTP verification
     const [otp, setOtp] = useState(['', '', '', '', '', '']); // 6 digit OTP
@@ -47,11 +46,9 @@ const OTP = () => {
 
     const verifyOTP = async () => {
         const finalotp = otp.join('');
-        console.log(finalotp)
         const response = await getAsync('users/verifyOTP?email=' + data.email + '&otp=' + finalotp);
         if (response.ok) {
             const data = await response.text();
-            console.log(data);
             if (data === '{"message": "OTP verified successfully"}') {
                 await setRequiredCookie();
                 navigate('/')
@@ -67,7 +64,6 @@ const OTP = () => {
     const generateOTP = async () => {
         const response = await getAsync('users/sendOTP?email=' + data.email);
         if (response.ok) {
-            console.log('OTP sent');
             setStatus('OTP sent');
         }
         else {

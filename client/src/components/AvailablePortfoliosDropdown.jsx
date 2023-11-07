@@ -11,11 +11,10 @@ const useUserID = () => {
     const [cookie] = useCookies();
     const [userId, setUserId] = useState(null);
     const [error, setError] = useState(null);
-    
+
     useEffect(() => {
-        const fetchData = async() => {
+        const fetchData = async () => {
             try {
-                console.log(cookie.email)
                 const response = await getAsync(`users/user?email=${cookie.email}`, cookie.accessToken);
 
                 if (!response.ok) {
@@ -42,8 +41,6 @@ const useUserID = () => {
 };
 
 const PortfolioSelector = (props) => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
     const { chosenPortfolio, handlePortfolioChange } = props;
     const [cookie] = useCookies();
     const [portfolios, setPortfolios] = useState([]);
@@ -54,7 +51,7 @@ const PortfolioSelector = (props) => {
     useEffect(() => {
         if (!userId) return; // If userId is not set yet, do not fetch portfolios
 
-        const fetchData = async() => {
+        const fetchData = async () => {
             setLoading(true); // Begin loading
             try {
                 const response = await getAsync(`portfolios/user/${userId}`, cookie.accessToken);
@@ -83,16 +80,16 @@ const PortfolioSelector = (props) => {
         <Autocomplete
             id="portfolio-dropdown"
             options={portfolios}
-            
+
             getOptionLabel={(option) => option.name}
             fullWidth
             value={chosenPortfolio} // Set the selected value here
             onChange={(event, newValue) => handlePortfolioChange(newValue)}
             renderInput={(params) => (
-                <TextField 
-                    {...params} 
-                    label="Choose a Portfolio" 
-                    variant="outlined" 
+                <TextField
+                    {...params}
+                    label="Choose a Portfolio"
+                    variant="outlined"
                     // Display a loading indicator or placeholder if still loading
                     placeholder={loading ? "Loading..." : "Select a Portfolio"}
                 />

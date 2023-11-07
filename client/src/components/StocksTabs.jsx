@@ -51,13 +51,11 @@ function DeleteStock({ isVisible, checkedItems, onStocksDeleted, portfolioId }) 
         setLoading(true);
         for (let stockSymbol of checkedItems) {
             const response = await deleteAsync(`portfolioStocks/${portfolioId}/stocks/${stockSymbol}/drop`, cookie.accessToken);
-            // Check for a successful response and handle any errors as needed
+            // Check for a successful response
             if (response.ok) {
-                console.log("Stock deleted successfully");
-                alert("Stock deleted successfully");
+                alert("Stock(s) deleted successfully");
             } else {
-                console.log("Error deleting stock(s)");
-
+                alert("Error deleting stock(s)");
             }
         }
         onStocksDeleted(checkedItems); // Notify parent component that stocks have been deleted
@@ -129,7 +127,7 @@ export default function StocksTabs({ stocks, portfolioId }) {
             <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: colors.primary[400] }} >
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" TabIndicatorProps={{
                     style: {
-                        backgroundColor: colors.greenAccent[400], // Change the color to your desired color
+                        backgroundColor: colors.greenAccent[400],
                     },
                 }}>
                     <Tab label="Stocks" {...a11yProps(0)}

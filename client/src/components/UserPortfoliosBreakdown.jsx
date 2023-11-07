@@ -6,6 +6,10 @@ import { tokens } from '../theme';
 import BreakdownTable from './PortfolioBreakdownTable';
 
 const COLORS = ['#0088FE', '#FF5D73', '#FFC658', '#00C49F', '#AF19FF', '#FFBB28'];
+function generateHSLColor(index) {
+  const hue = index * 137.508; // use golden angle approximation
+  return `hsl(${hue % 360}, 50%, 60%)`;
+}
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -60,14 +64,41 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
     return <Typography variant="h4">Portfolio Data Loading..</Typography>;
   }
 
-  const transformedData = Object.values(groupDataBy(portfolioStockData, grouping))
+  // Calculate the total value of the portfolio
+  let transformedData = Object.values(groupDataBy(portfolioStockData, grouping))
     .sort((a, b) => b.value - a.value);
 
   const totalPortfolioValue = transformedData.reduce((total, current) => total + current.value, 0);
 
+  // Group small slices into "Others"
+  const MIN_PERCENTAGE_FOR_OTHERS = 1;
+  let others = { name: 'Others', value: 0 };
+
+  transformedData = transformedData.reduce((accumulator, current) => {
+    if ((current.value / totalPortfolioValue) * 100 < MIN_PERCENTAGE_FOR_OTHERS) {
+      others.value += current.value;
+    } else {
+      accumulator.push(current);
+    }
+    return accumulator;
+  }, []);
+
+  if (others.value > 0) {
+    transformedData.push(others); // Add "Others" to the array
+  }
+
+  transformedData.sort((a, b) => b.value - a.value);
+
+  // Generate additional colors if necessary
+  while (COLORS.length < transformedData.length) {
+    COLORS.push(generateHSLColor(COLORS.length));
+  }
+  
   const groupLabel = grouping
     ? grouping.charAt(0).toUpperCase() + grouping.slice(1).replace(/([A-Z])/g, ' $1').trim()
     : '';
+
+    
 
   return (
     <Paper style={{ padding: '20px' }}>
@@ -82,7 +113,7 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
         <MenuItem value="stockSector">Sector</MenuItem>
         <MenuItem value="stockIndustry">Industry</MenuItem>
       </Select>
-      <ResponsiveContainer height={400}>
+      <ResponsiveContainer height={500}>
         <PieChart>
           <Pie
             data={transformedData}
@@ -90,13 +121,13 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
             nameKey="name"
             cx="50%"
             cy="50%"
-            outerRadius={150}
+            outerRadius={120}
             fill="#8884d8"
             labelLine={false}
           >
             {transformedData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
           <Legend />

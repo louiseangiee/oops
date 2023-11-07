@@ -281,7 +281,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
             <Box flex={1} margin={1}>
             <Box flex={1} margin={1}>
               <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                Volatility:
+                Volatility (Monthly):
               </Typography>
               <Typography variant="h3" fontWeight="bold">
                 {vol2}

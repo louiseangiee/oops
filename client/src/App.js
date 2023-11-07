@@ -1,5 +1,4 @@
-import {useState} from 'react';
-import {CookiesProvider, useCookies} from 'react-cookie';
+import {CookiesProvider} from 'react-cookie';
 import {ColorModeContext, useMode} from './theme';
 import {CssBaseline, ThemeProvider} from '@mui/material';
 import RequireAuth from './components/RequireAuth';
@@ -7,21 +6,11 @@ import {Routes, Route} from 'react-router-dom';
 import Dashboard from './pages/dashboard';
 import Home from './pages/home';
 import Portfolio from './pages/portfolio';
-import Team from './pages/team';
-import Invoices from './pages/invoices';
-import Contacts from './pages/contacts';
-import Bar from './pages/bar';
-import Form from './pages/form';
-import Line from './pages/line';
-import Pie from './pages/pie';
-import FAQ from './pages/faq';
-import Geography from './pages/geography';
 import Login from './pages/login';
 import Layout from './Layout';
 import Analytics from './pages/analytics_dashboard';
 import Profile from './pages/profile';
 import AccessLog from './pages/access_log';
-import AutoRefreshOnRouteChange from './AutoRefreshOnRouteChange';
 import StockMarketPage from './pages/stockMarketpage';
 import OTP from './pages/otp';
 import ComparePortfolio from './pages/comparePortfolio';
@@ -29,7 +18,6 @@ import ComparePortfolio from './pages/comparePortfolio';
 function App() {
 	// access to the theme and the color mode
 	const [theme, colorMode] = useMode();
-	const [isSidebar, setIsSidebar] = useState(true);
 
 	return (
 		<CookiesProvider>
@@ -66,22 +54,11 @@ function App() {
 										path="stock-market"
 										element={<StockMarketPage />}
 									/>
-                  <Route path="compare-portfolio" element ={<ComparePortfolio />} />
+									<Route
+										path="compare-portfolio"
+										element={<ComparePortfolio />}
+									/>
 								</Route>
-
-								<Route path="team" element={<Team />} />
-								<Route path="contacts" element={<Contacts />} />
-								<Route path="invoices" element={<Invoices />} />
-								<Route path="form" element={<Form />} />
-								<Route path="bar" element={<Bar />} />
-								<Route path="pie" element={<Pie />} />
-								<Route path="line" element={<Line />} />
-								<Route path="faq" element={<FAQ />} />
-								{/* <Route path="/calendar" element={<Calendar />} /> */}
-								<Route
-									path="/geography"
-									element={<Geography />}
-								/>
 							</Route>
 						</Routes>
 					</div>

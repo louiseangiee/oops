@@ -1,25 +1,21 @@
-import * as React from 'react';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { Box, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { useNavigate } from 'react-router-dom';
-import { useState } from "react";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import StockSelector from './StockSelectorDropdown';
 import { getAsync, postAsync } from '../utils/utils';
 import { useCookies } from 'react-cookie';
 import { isAHoliday } from '@18f/us-federal-holidays';
+import dayjs from 'dayjs';
 
 function ButtonField(props) {
     const {
@@ -50,12 +46,14 @@ function ButtonField(props) {
 }
 
 function ButtonDatePicker(props) {
-    const [open, setOpen] = React.useState(false);
+    const yesterday = dayjs().subtract(1, 'day');
+    const [open, setOpen] = useState(false);
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
     return (
         <DatePicker
+            defaultValue={yesterday}
             slots={{ field: ButtonField, ...props.slots }}
             slotProps={{ field: { setOpen } }}
             {...props}
@@ -73,8 +71,6 @@ function ButtonDatePicker(props) {
 }
 
 export default function AddStocks({ portfolioId }) {
-
-    const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [cookie] = useCookies()
@@ -85,14 +81,10 @@ export default function AddStocks({ portfolioId }) {
     const [date, setDate] = useState(null);
     const [chosenStock, setChosenStock] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [priceLoading, setPriceLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    const [open, setOpen] = React.useState(false);
-
-    const isWeekend = (date) => {
-        const day = date.day();
-
-        return day === 0 || day === 6;
-    };
+    const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -106,25 +98,33 @@ export default function AddStocks({ portfolioId }) {
     const handleStockChange = async (newValue) => {
         setChosenStock(newValue ? newValue : null);
         if (newValue != null) {
-            handleStockPriceChange(newValue.code, date);
+            handleStockPriceChange(newValue, date);
         }
     };
-    const handleStockPriceChange = async (symbol, date) => {
-        if (date == null || chosenStock == null) return;
+    const handleStockPriceChange = async (stock, date) => {
+        setError("");
+        if (date == null || stock == null) {
+            setStockPrice(0);
+            return;
+        }
         else {
             setLoading(true);
+            setPriceLoading(true);
             var dateChosen = date.format('YYYY-MM-DD');
             if (isAHoliday(new Date(dateChosen))) {
-                alert("Stock market is closed on this date. Please choose another date.");
+                setError("Stock market is closed on this date. Please choose another date.");
                 setDate(null);
                 setStockPrice(0);
             }
-            const response = await getAsync(`stocks/priceAtDate?symbol=${symbol}&date=${dateChosen}`, cookie.accessToken);
+            const response = await getAsync(`stocks/priceAtDate?symbol=${stock.code}&date=${dateChosen}`, cookie.accessToken);
             const data = await response.json();
-            console.log(data);
-            console.log(data[dateChosen]);
-            setStockPrice(data[dateChosen]);
+            if (data.price === undefined) {
+                data.price = 0;
+                setError("Failed to receive stock price. Please try a different stock")
+            }
+            setStockPrice(data.price);
             setLoading(false);
+            setPriceLoading(false);
         }
     }
 
@@ -193,10 +193,20 @@ export default function AddStocks({ portfolioId }) {
                             disableFuture
                             label={date == null ? null : date.format('DD-MM-YYYY')}
                             value={date}
-                            shouldDisableDate={isWeekend}
-                            onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock.code, newValue); console.log(newValue); }}
+                            shouldDisableDate={(day) => {
+                                // Check if the day is a weekend
+                                const isWeekend = [6, 0].includes(day.day()); // 6 = Saturday, 0 = Sunday
+                                // Check if the day is today
+                                const today = day.isSame(dayjs(), 'day');
+                                // Check if the day is public holiday
+                                const holiday = isAHoliday(new Date(day.format('YYYY-MM-DD')));
+                                // Return true if either is true
+                                return isWeekend || today || holiday;
+                            }}
+                            onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock, newValue); console.log(newValue); }}
                         />
                     </LocalizationProvider>
+                    <Typography>{error}</Typography>
                     <TextField
                         margin="dense"
                         id="price"
@@ -206,7 +216,7 @@ export default function AddStocks({ portfolioId }) {
                         placeholder="e.g. 20"
                         startAdornment="$"
                         fullWidth
-                        value={'Stock price: $' + stockPrice}
+                        value={priceLoading ? 'Loading...' : 'Stock price: $' + stockPrice}
                         sx={{
                             color: colors.grey[100],
                             '& .MuiOutlinedInput-root': {
@@ -247,7 +257,7 @@ export default function AddStocks({ portfolioId }) {
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
                     <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} disabled={loading} onClick={handleAddClick}>Add</Button>
+                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} disabled={loading} onClick={handleAddClick}>{loading ? 'Loading...' : 'Add'}</Button>
                 </DialogActions>
             </Dialog>
         </div>

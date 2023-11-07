@@ -1,11 +1,10 @@
-import { } from "@mui/material";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Box, Button, Typography, useTheme, Link, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../../theme";
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import EditPortfolio from "../../components/EditPortfolio";
 import StocksTabs from "../../components/StocksTabs";
 import { useParams } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCookies } from "react-cookie";
 import { deleteAsync, getAsync } from "../../utils/utils";
 import { useAuth } from "../../context/AuthContext";
@@ -20,7 +19,7 @@ import loadingLight from "./loading_light.json";
 function DeletePortfolio() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
   const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
   const navigate = useNavigate();
@@ -38,7 +37,7 @@ function DeletePortfolio() {
       const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
       const data = await response.json();
       setPortfolioData(data);
-      console.log("portfolioData: ",data);
+      console.log("portfolioData: ", data);
     }
     fetchData();
   }, [portfolioId, cookie.accessToken]);
@@ -208,7 +207,7 @@ const Portfolio = () => {
   const [percentageReturns, setPercentageReturns] = useState(0);
   const [refreshIntervalId, setRefreshIntervalId] = useState(null); // Store the interval ID
 
-  // Function to fetch portfolio data
+  // Fetch portfolio data
   const fetchPortfolioData = async () => {
     if (userData && portfolioId) {
       if (userData.role === "ROLE_ADMIN") {
@@ -222,7 +221,6 @@ const Portfolio = () => {
         const data = await response.json();
         setPortfolioData(data);
         setIsLoading(false); // Data is loaded, set isLoading to false
-        console.log(data);
       } else if (userData.role === "ROLE_USER") {
         const response = await getAsync(`portfolios/${userData.id}/${portfolioId}`, cookie.accessToken);
         if (!response.ok) {
@@ -234,34 +232,37 @@ const Portfolio = () => {
         const data = await response.json();
         setPortfolioData(data);
         setIsLoading(false); // Data is loaded, set isLoading to false
-        console.log(data);
       }
     }
   };
 
+
+  // Fetch Portfolio Returns
   const fetchPortfolioSummaryData = async () => {
-    setIsLoading(true);
     const portfolioSummaryResponse = await getAsync(`portfolioStocks/${portfolioId}/summary`, cookie.accessToken);
     const portfolioSummaryData = await portfolioSummaryResponse.json();
-    console.log(portfolioSummaryData);
     setOverallReturns(portfolioSummaryData.overallReturns.overalReturn);
     setPercentageReturns(portfolioSummaryData.overallReturns.percentage);
-    setIsLoading(false);
+    // TODO - set Loading State for portfolio summary
   }
 
   // Fetch data on initial component load
   useEffect(() => {
-    fetchPortfolioData();
-    fetchPortfolioSummaryData();
+    const fetchData = async () => {
+      await fetchPortfolioData();
+      await fetchPortfolioSummaryData();
+    }
+
+    fetchData();
+
     console.log("Cleared interval " + refreshIntervalId);
     // Set up an interval to periodically fetch data (e.g., every 30 seconds)
-    const intervalId = setInterval(fetchPortfolioData, 10000); // Adjust the interval as needed
+    const intervalId = setInterval(fetchData, 30000); // Adjust the interval as needed
     setRefreshIntervalId(intervalId);
 
     return () => {
       if (refreshIntervalId) {
         clearInterval(refreshIntervalId);
-
       }
     };
   }, [portfolioId, userData]);
@@ -275,11 +276,10 @@ const Portfolio = () => {
     </Typography>,
   ];
 
+  //no data or no access
   if (!portfolioData) {
-    // If portfolioData doesn't exist or doesn't have a name, show the Lottie animation
     return (
       <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="80%">
-
         <Lottie
           animationData={noDataAnimation}
           loop={true} // Set to true for looping
@@ -292,13 +292,14 @@ const Portfolio = () => {
       </Box>
     );
   }
+
   if (isLoading) {
     return (
       <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="80%">
         <Lottie
           animationData={Loading}
-          loop={true} // Set to true for looping
-          autoplay={true} // Set to true to play the animation automatically
+          loop={true}
+          autoplay={true}
           style={{ width: 300, height: 300 }}
         />
       </Box>
@@ -377,16 +378,17 @@ const Portfolio = () => {
           >
             Return
           </Typography>
+
           <Typography
             variant="h1"
             fontWeight="bold"
-            sx={{ color: overallReturns > 0 ? 'green' : 'red' }}
+            sx={{ color: overallReturns > 0 ? 'green' : overallReturns < 0 ? 'red' : colors.grey[100] }}
           >
-            {overallReturns > 0 ? '+' : '-'}
-            ${overallReturns !== 0 ? Math.abs(overallReturns) : '-'}
-            /
-            {percentageReturns !== 0 ? Math.abs(percentageReturns) : '-'}%
+            {overallReturns < 0 ? '-' : ''}
+            ${Math.abs(overallReturns)}/
+            {percentageReturns}%
           </Typography>
+
 
         </Box>
         <Box

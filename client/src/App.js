@@ -47,10 +47,6 @@ function App() {
 										element={<AccessLog />}
 									/>
 									<Route
-										path="analytics"
-										element={<Analytics />}
-									/>
-									<Route
 										path="stock-market"
 										element={<StockMarketPage />}
 									/>

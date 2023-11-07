@@ -492,6 +492,32 @@ public class PortfolioStockService {
 
     }
 
+    public Map<String, Object> getPortfolioSummary(Integer portfolioId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Portfolio portfolio = portfolioService.findById(portfolioId).orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
+            List<PortfolioStock> portfolioStocks = portfolio.getPortfolioStocks();
+            if (portfolioStocks.isEmpty()) {
+                response.put("totalPortfolioValue", 0.00);
+                // response.put("stockReturns", new HashMap<>());
+                response.put("overallReturns", new HashMap<>());
+                return response;
+            }
+            double totalPortfolioValue = getTotalPortfolioValue(portfolioId);
+            //Map<String, Map<String, Double>> stockReturns = calculateStockReturnsForPortfolio(portfolioId);
+            Map<String, Double> overallReturns = calculateOverallPortfolioReturns(portfolioId);
+
+            response.put("totalPortfolioValue", totalPortfolioValue);
+            // response.put("stockReturns", stockReturns);
+            response.put("overallReturns", overallReturns);
+            return response;
+        } catch (Exception e) {
+           throw new RuntimeException("Error getting portfolio summary service: " + e.getMessage(), e); 
+        }
+        
+    }
+
+
     private Function<PortfolioStock, String> getGroupingFunction(String groupBy) {
         switch (groupBy.toLowerCase()) {
             case "sector":

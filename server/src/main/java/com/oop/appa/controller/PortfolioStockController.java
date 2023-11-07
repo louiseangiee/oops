@@ -278,21 +278,13 @@ public class PortfolioStockController {
         }
     }
 
+    @Operation(summary = "Get the summary of a portfolio")
+    @Parameter(name = "portfolioId", description = "portfolio id")
     @GetMapping("/{portfolioId}/summary")
     public ResponseEntity<?> getPortfolioSummary(@PathVariable Integer portfolioId) {
         try {
-            double totalPortfolioValue = portfolioStockService.getTotalPortfolioValue(portfolioId);
-            Map<String, Map<String, Double>> stockReturns = portfolioStockService
-                    .calculateStockReturnsForPortfolio(portfolioId);
-            Map<String, Double> overallReturns = portfolioStockService.calculateOverallPortfolioReturns(portfolioId);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("totalPortfolioValue", totalPortfolioValue);
-            response.put("stockReturns", stockReturns);
-            response.put("overallReturns", overallReturns);
-
+            Map<String, Object> response = portfolioStockService.getPortfolioSummary(portfolioId);
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving portfolio summary");
         }

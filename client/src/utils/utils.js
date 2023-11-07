@@ -3,21 +3,26 @@ export const getAsync = (url, token = null) => {
 	return fetch('http://localhost:8080/' + url, {headers});
 };
 
-export const fetchAllEndpoints = async (endpoints, token) => {
-    const fetchPromises = endpoints.map(endpoint => getAsync(endpoint, token));
+export const fetchAllEndpoints = async (urls, accessToken) => {
+    const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined;
   
-    try {
-        const responses = await Promise.all(fetchPromises);
-        const invalidResponse = responses.find(response => !response.ok);
-        if (invalidResponse) {
-            throw new Error(`API call failed: ${invalidResponse.statusText}`);
-        }
-        return await Promise.all(responses.map(response_1 => response_1.json()));
-    } catch (error) {
-        console.error("Error fetching data from endpoints:", error);
-        throw error;
-    }
+    const fetchPromises = urls.map(url =>
+      fetch('http://localhost:8080/' + url, { headers })
+    );
+    console.log("Promises: ", fetchPromises)
+    const responses = await Promise.all(fetchPromises);
+    console.log("Responses: ", responses)
+  
+    const data = await Promise.all(
+      responses.map(async response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+      })
+    );
+  
+    return data;
   };
+  
 
 export const putAsync = (url, data, token = null) => {
     const headers = {

@@ -407,7 +407,7 @@ const Portfolio = () => {
             fontStyle="italic"
             sx={{ color: colors.grey[300] }}
           >
-            Remaning Capital
+            Remaining Capital
           </Typography>
           <Typography
             variant="h1"

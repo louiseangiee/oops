@@ -21,7 +21,16 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final AccessLogRepository accessLogRepository;
 
+
+    private boolean isValidPassword(String password) {
+        String passwordRegex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&#.]).{8,25}$";
+        return password.matches(passwordRegex);
+    }
+
     public AuthenticationResponse register(RegisterRequest request) {
+        if (!isValidPassword(request.getPassword())) {
+                throw new IllegalArgumentException("Password does not meet requirements.");
+        }
         var user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())

@@ -5,6 +5,7 @@ import { useCookies } from "react-cookie";
 import { getAsync } from '../utils/utils';
 import { Typography, Box, Table, Divider } from '@mui/material';
 import { tokens } from "../theme";
+import PortfolioBreakdown from './UserPortfoliosBreakdown';
 
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -159,13 +160,13 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
       // Check if the portfolioSummaries object exists
       if (!portfolioSummaries) {
         console.error("Error: portfolioSummaries is not defined.");
-        return null; // or you can return a default value or throw an error
+        return ''; // or you can return a default value or throw an error
       }
     
       // Check if the overallReturn property exists
       if (!portfolioSummaries.overallReturns) {
         console.error("Error: overallReturn is not defined in the portfolioSummaries object.");
-        return null; // or you can return a default value or throw an error
+        return ''; // or you can return a default value or throw an error
       }
     
       // If everything checks out, return the overallReturn value
@@ -232,52 +233,69 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
               justifyContent="space-between" 
               alignItems="center" 
               width="100%">
+                  <Box flex={1} margin={1}>
+                      <Box flex={1} margin={1}>
+                        <Typography mt={1}variant="h5" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
+                            Total Portfolio Value: 
+                          </Typography>
+                        <Typography  variant="h3" fontWeight="bold">
+                          ${portfolioData2.totalCapital - portfolioData2.remainingCapital}
+                          </Typography>
+                      </Box>
 
-                  <Box flex={1} margin={2}>
-                    <Typography mt={1}variant="h4" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
-                        Total Portfolio Value: 
+                      <Box flex={1} margin={1}>
+                      <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
+                        Overall Returns: 
                       </Typography>
-                    <Typography  variant="h2" fontWeight="bold">
-                      ${portfolioData2.totalCapital - portfolioData2.remainingCapital}
-                      </Typography>
+                      <Typography  variant="h3" fontWeight="bold" style={{ color: overallReturn2 < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>
+                        {overallReturn2} <span style={{ color: overallReturn2 < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>({overallReturn2Percentage}%)</span>
+                        </Typography>
+                        </Box>  
+                    </Box>
+
+                    <Box flex={1} margin={1}>
+
+                        <Box flex={1} margin={1}>
+                          <Typography mt={1}variant="h5" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
+                              Remaining Capital: 
+                            </Typography>
+                          <Typography  variant="h3" fontWeight="bold">
+                            ${portfolioData2.remainingCapital}
+                            </Typography>
+
+                            <Box flex={1} >
+
+                              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
+                                  Capital Allocation:
+                              </Typography>
+                              <Typography  variant="h3" fontWeight="bold">
+                                    ${portfolioData2.totalCapital}
+                                </Typography>
+
+                              </Box>
+
+                          </Box>
+
+                    
+                  
                   </Box>
 
-                  <Box flex={1} margin={2}>
-                  <Typography mt={1}variant="h4" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
-                      Remaining Capital: 
-                    </Typography>
-                  <Typography  variant="h2" fontWeight="bold">
-                    ${portfolioData2.remainingCapital}
-                    </Typography>
-                  </Box>
-
-                  <Box flex={1} margin={2}>
-                <Typography mt={1} variant="h4" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
-                  Capital Allocation:
-                </Typography>
-                <Typography  variant="h2" fontWeight="bold">
-                  ${portfolioData2.totalCapital}
-                  </Typography>
-                </Box>
+                  
 
           </Box>
           
           <Divider />
+          <br />
+                
+            <PortfolioBreakdown portfolioStockData={portfolioData2.portfolioStocks} />
+                 
 
-          <Box display="flex" 
+                  
+            <Box display="flex" 
               flexDirection="row" 
               justifyContent="space-between" 
               alignItems="center" 
               width="100%">
-
-                <Box flex={1} margin={2}>
-                  <Typography mt={1} variant="h4" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
-                    Overall Returns: 
-                  </Typography>
-                  <Typography  variant="h2" fontWeight="bold">
-                     {overallReturn2} <span style={{ color: overallReturn2 < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>({overallReturn2Percentage}%)</span>
-                    </Typography>
-                  </Box>
 
               </Box>
 
@@ -290,9 +308,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           </Typography>
           {/* Include other content for portfolioData2 here */}
 
-          <Table>
-            {/* Table content goes here */}
-          </Table>
+          
         </Box>
       </Box>
 

@@ -3,7 +3,7 @@ import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContai
 import { useTheme } from '@mui/material/styles';
 import { useCookies } from "react-cookie";
 import { getAsync } from '../utils/utils';
-import { Typography, Box, Table } from '@mui/material';
+import { Typography, Box, Table, Divider } from '@mui/material';
 import { tokens } from "../theme";
 
 
@@ -25,8 +25,8 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   const [portfolioData1, setPortfolioData1] = useState([]);
   const [portfolioData2, setPortfolioData2] = useState([]);
 
-  const[portfolioSummaries1, setPortfolioSummaries1] = useState(null);
-  const[portfolioSummaries2, setPortfolioSummaries2] = useState(null);
+  const[portfolioSummaries1, setPortfolioSummaries1] = useState([]);
+  const[portfolioSummaries2, setPortfolioSummaries2] = useState([]);
 
   const[portfolioVolatility1, setPortfolioVolatility1] = useState(null);
   const[portfolioVolatility2, setPortfolioVolatility2] = useState(null);
@@ -129,6 +129,57 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
 
     }
     
+    // Utility function to safely convert a number to a fixed number of decimal places
+    function toFixedSafe(value, digits = 2, defaultValue = 'N/A') {
+      try {
+        // Ensure the value is a number by coercing the value
+        const number = Number(value);
+        // Check if the number is actually a valid finite number
+        if (Number.isFinite(number)) {
+          return number.toFixed(digits);
+        } else {
+          // Handle cases where the number is Infinity or NaN
+          throw new Error('Value is not a finite number');
+        }
+      } catch (error) {
+        console.error(error);
+        // Return a default value or indicator
+        return defaultValue;
+      }
+    }
+    
+    // Now use the utility function for your variables
+    const volAnnual1 = toFixedSafe(portfolioVolatility1Annual);
+    const volAnnual2 = toFixedSafe(portfolioVolatility2Annual);
+    const vol1 = toFixedSafe(portfolioVolatility1);
+    const vol2 = toFixedSafe(portfolioVolatility2);
+    
+  
+    function getOverallReturn(portfolioSummaries) {
+      // Check if the portfolioSummaries object exists
+      if (!portfolioSummaries) {
+        console.error("Error: portfolioSummaries is not defined.");
+        return null; // or you can return a default value or throw an error
+      }
+    
+      // Check if the overallReturn property exists
+      if (!portfolioSummaries.overallReturns) {
+        console.error("Error: overallReturn is not defined in the portfolioSummaries object.");
+        return null; // or you can return a default value or throw an error
+      }
+    
+      // If everything checks out, return the overallReturn value
+      return portfolioSummaries.overallReturns;
+    }
+    
+    // Usage:
+    const overallReturn1 = getOverallReturn(portfolioSummaries1).overalReturn;
+    const overallReturn2 = getOverallReturn(portfolioSummaries2).overalReturn;
+    const overallReturn1Percentage = getOverallReturn(portfolioSummaries1).percentage;
+    const overallReturn2Percentage = getOverallReturn(portfolioSummaries2).percentage;
+
+    
+    
 
 
   // Effect to fetch data for both portfolios
@@ -137,6 +188,8 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
     fetchPortfolioSummaries();
     fetchPortfolioVolalities();
   }, [chosenPortfolio1, chosenPortfolio2]);
+
+  // console.log(portfolioSummaries2.overallReturns)
 
 
    // Render the chart or a loading indicator
@@ -163,20 +216,80 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
 
         {/* This is the second half of the page for portfolioData2 */}
         <Box flex={1} margin={2} padding={3} style={{backgroundColor: colors.primary[400]}} borderLeft={3}>
-          <Typography variant="h3" fontWeight="bold" fontStyle="italic">
+          <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{color: colors.greenAccent[400]}}>
             ID {portfolioData2.portfolioId}: {portfolioData2.name} 
           </Typography>
-          <Typography mt={2} variant="h5" fontStyle="italic">
+          <Typography mt={2} variant="h4" fontWeight="bold">
+            Portfolio Description: 
+          </Typography>
+          <Typography mt={1} variant="h5" fontStyle="italic">
             {portfolioData2.description}
           </Typography>
+          
+          {/* Include description for portfolioData2 here */}
+          <Box display="flex" 
+              flexDirection="row" 
+              justifyContent="space-between" 
+              alignItems="center" 
+              width="100%">
+
+                  <Box flex={1} margin={2}>
+                    <Typography mt={1}variant="h4" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
+                        Total Portfolio Value: 
+                      </Typography>
+                    <Typography  variant="h2" fontWeight="bold">
+                      ${portfolioData2.totalCapital - portfolioData2.remainingCapital}
+                      </Typography>
+                  </Box>
+
+                  <Box flex={1} margin={2}>
+                  <Typography mt={1}variant="h4" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
+                      Remaining Capital: 
+                    </Typography>
+                  <Typography  variant="h2" fontWeight="bold">
+                    ${portfolioData2.remainingCapital}
+                    </Typography>
+                  </Box>
+
+                  <Box flex={1} margin={2}>
+                <Typography mt={1} variant="h4" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
+                  Capital Allocation:
+                </Typography>
+                <Typography  variant="h2" fontWeight="bold">
+                  ${portfolioData2.totalCapital}
+                  </Typography>
+                </Box>
+
+          </Box>
+          
+          <Divider />
+
+          <Box display="flex" 
+              flexDirection="row" 
+              justifyContent="space-between" 
+              alignItems="center" 
+              width="100%">
+
+                <Box flex={1} margin={2}>
+                  <Typography mt={1} variant="h4" fontWeight="bold" fontStyle="italic" style={{color: colors.blueAccent[400]}}>
+                    Overall Returns: 
+                  </Typography>
+                  <Typography  variant="h2" fontWeight="bold">
+                     {overallReturn2} <span style={{ color: overallReturn2 < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>({overallReturn2Percentage}%)</span>
+                    </Typography>
+                  </Box>
+
+              </Box>
+
           <Typography variant="h4" fontWeight="bold" style={{ textDecoration: 'underline' }} mt={1}> Portfolio Volatility </Typography>
           <Typography mt={2} variant="h5" fontStyle="italic">
-            Volatility: {portfolioVolatility2}
+              Volatility: {volAnnual2}
           </Typography>
           <Typography variant="h5" fontStyle="italic">
-            Volatility Annualized: {portfolioVolatility2Annual}
+              Volatility Annualized: {vol2}
           </Typography>
           {/* Include other content for portfolioData2 here */}
+
           <Table>
             {/* Table content goes here */}
           </Table>

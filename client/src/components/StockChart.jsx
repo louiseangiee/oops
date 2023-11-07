@@ -145,6 +145,8 @@ const StockChart = ({ chosenStock }) => {
           1 Week
         </Button>
       </ButtonGroup>
+
+      
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart data={chartData}>
           <CartesianGrid stroke="#f5f5f5" />

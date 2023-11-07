@@ -6,10 +6,9 @@ import { useTheme } from "@mui/material";
 import { useCookies } from 'react-cookie';
 import { getAsync } from '../utils/utils';
 
-const StockSelector = (props) => {
+const StockSelector = ({ chosenStock, handleStockChange }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const { chosenStock, handleStockChange } = props;
     const [cookie] = useCookies();
     const [stocks, setStocks] = useState([]);
     const [error, setError] = useState(null); // To handle any errors during fetch
@@ -25,11 +24,11 @@ const StockSelector = (props) => {
 
                 const data = await response.json();
                 const formattedData = data
-                .filter(stock => stock && stock.stockSymbol && stock.name) 
-                .map(stock => ({
-                    code: stock.stockSymbol,
-                    name: `${stock.name} (${stock.stockSymbol})`
-                }));
+                    .filter(stock => stock && stock.stockSymbol && stock.name)
+                    .map(stock => ({
+                        code: stock.stockSymbol,
+                        name: `${stock.name} (${stock.stockSymbol})`
+                    }));
 
                 setStocks(formattedData);
             } catch (err) {

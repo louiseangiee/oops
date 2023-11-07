@@ -11,7 +11,14 @@ import AddStocks from './AddStocks';
 import noDataDark from './lotties/no_data_dark.json';
 import { deleteAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
-import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
+
+
+CustomTabPanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.number.isRequired,
+    value: PropTypes.number.isRequired,
+};
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -39,26 +46,28 @@ function DeleteStock({ isVisible, checkedItems, onStocksDeleted, portfolioId }) 
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [cookie] = useCookies();
-    const { userData } = useAuth()
-
+    const [loading, setLoading] = useState(false);
     const handleDelete = async () => {
+        setLoading(true);
         for (let stockSymbol of checkedItems) {
             const response = await deleteAsync(`portfolioStocks/${portfolioId}/stocks/${stockSymbol}/drop`, cookie.accessToken);
             // Check for a successful response and handle any errors as needed
             if (response.ok) {
                 console.log("Stock deleted successfully");
+                alert("Stock deleted successfully");
             } else {
                 console.log("Error deleting stock(s)");
 
             }
         }
-
         onStocksDeleted(checkedItems); // Notify parent component that stocks have been deleted
+        setLoading(false);
     }
 
     return (
         isVisible ? (
             <Button
+                disabled={loading}
                 sx={{
                     color: colors.grey[100],
                     backgroundColor: colors.redAccent[600],
@@ -69,18 +78,12 @@ function DeleteStock({ isVisible, checkedItems, onStocksDeleted, portfolioId }) 
                 }}
                 onClick={handleDelete}
             >
-                Delete Stocks
+                {loading ? "Loading..." : "Delete Stocks"}
             </Button>
         ) : null
     );
 
 }
-
-CustomTabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-};
 
 function a11yProps(index) {
     return {
@@ -90,13 +93,12 @@ function a11yProps(index) {
 }
 
 export default function StocksTabs({ stocks, portfolioId }) {
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = useState(0);
     const theme = useTheme();
-    console.log(stocks);
     const colors = tokens(theme.palette.mode);
 
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
-    const [checkedItems, setCheckedItems] = React.useState([]);
+    const [checkedItems, setCheckedItems] = useState([]);
 
     const onStocksDeleted = (deletedStockSymbols) => {
         // Filter out the deleted stocks from the current stocks list
@@ -109,6 +111,7 @@ export default function StocksTabs({ stocks, portfolioId }) {
         setCheckedItems([]);
     };
 
+    //set the checked items
     const handleCheckboxChange = (event, stockSymbol) => {
         if (event.target.checked) {
             setCheckedItems((prev) => [...prev, stockSymbol]);
@@ -116,7 +119,6 @@ export default function StocksTabs({ stocks, portfolioId }) {
             setCheckedItems((prev) => prev.filter((item) => item !== stockSymbol));
         }
     };
-
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -133,7 +135,7 @@ export default function StocksTabs({ stocks, portfolioId }) {
                     <Tab label="Stocks" {...a11yProps(0)}
                         sx={{
                             '&.Mui-selected': {
-                                color: colors.greenAccent[400], // Change the color to your desired color
+                                color: colors.greenAccent[400],
                             },
                             '&.Mui-selected:hover': {
                                 color: colors.greenAccent[400], // Color for the active tab when hovered
@@ -244,9 +246,9 @@ export default function StocksTabs({ stocks, portfolioId }) {
                     (<Box display="flex" alignItems="center" justifyContent="center" flexDirection="column" mb="20px">
                         <Lottie
                             animationData={noDataDark}
-                            loop={true} // Set to true for looping
-                            autoplay={true} // Set to true to play the animation automatically
-                            style={{ width: '200px', height: '200px' }} // Customize the dimensions
+                            loop={true}
+                            autoplay={true}
+                            style={{ width: '200px', height: '200px' }}
                         />
                         <AddStocks portfolioId={portfolioId} />
                     </Box>)

@@ -3,7 +3,7 @@ import { useCookies } from "react-cookie";
 import { useEffect } from "react";
 
 const RequireAuth = () => {
-    const [cookie] = useCookies(["accessToken"]);
+    const [cookie] = useCookies();
     const location = useLocation();
     return (
         cookie.accessToken

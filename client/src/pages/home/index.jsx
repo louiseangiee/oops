@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Typography, useTheme, InputBase } from "@mui/material";
+import { Box, IconButton, Typography, useTheme, InputBase } from "@mui/material";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import PortfolioCard from "../../components/PortfolioCard";
@@ -9,7 +9,6 @@ import Lottie from 'lottie-react';
 import loading from './fetching_data.json';
 import noData from './no_data.json';
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { getAsync } from "../../utils/utils";
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -28,7 +27,7 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!userData.id) return;
-      
+
       let portfolios = [];
 
       if (role === "ROLE_ADMIN") {
@@ -61,7 +60,7 @@ const Home = () => {
 
       setDataFetched(portfoliosWithReturns);
     };
-    
+
     fetchData();
   }, [userData.id, role, cookie.accessToken]);
 

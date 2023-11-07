@@ -61,20 +61,22 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
   }, [portfolioStockData, grouping]);
 
   if (!portfolioStockData || portfolioStockData.length === 0) {
-    return <Typography variant="h4">Portfolio Data Loading..</Typography>;
+    return <Typography variant="h4">Portfolio Data Loading...</Typography>;
   }
 
+  // Generate initial grouped data
+  const groupedData = groupDataBy(portfolioStockData, grouping);
+
+  // Data for the table should include all items without aggregating into "Others"
+  const tableData = Object.values(groupedData).sort((a, b) => b.value - a.value);
+
   // Calculate the total value of the portfolio
-  let transformedData = Object.values(groupDataBy(portfolioStockData, grouping))
-    .sort((a, b) => b.value - a.value);
+  const totalPortfolioValue = tableData.reduce((total, current) => total + current.value, 0);
 
-  const totalPortfolioValue = transformedData.reduce((total, current) => total + current.value, 0);
-
-  // Group small slices into "Others"
+  // Aggregate small slices into "Others" for the pie chart data
   const MIN_PERCENTAGE_FOR_OTHERS = 1;
-  let others = { name: 'Others', value: 0 };
-
-  transformedData = transformedData.reduce((accumulator, current) => {
+  const others = { name: 'Others', value: 0 };
+  const pieChartData = tableData.reduce((accumulator, current) => {
     if ((current.value / totalPortfolioValue) * 100 < MIN_PERCENTAGE_FOR_OTHERS) {
       others.value += current.value;
     } else {
@@ -84,16 +86,14 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
   }, []);
 
   if (others.value > 0) {
-    transformedData.push(others); // Add "Others" to the array
+    pieChartData.push(others); // Add "Others" to the pie chart data
   }
 
-  transformedData.sort((a, b) => b.value - a.value);
-
-  // Generate additional colors if necessary
-  while (COLORS.length < transformedData.length) {
+  // Generate additional colors if necessary for the pie chart
+  while (COLORS.length < pieChartData.length) {
     COLORS.push(generateHSLColor(COLORS.length));
   }
-  
+
   const groupLabel = grouping
     ? grouping.charAt(0).toUpperCase() + grouping.slice(1).replace(/([A-Z])/g, ' $1').trim()
     : '';
@@ -115,25 +115,23 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
       </Select>
       <ResponsiveContainer height={500}>
         <PieChart>
+          {/* Use pieChartData for the Pie chart which includes "Others" */}
           <Pie
-            data={transformedData}
+            data={pieChartData}
             dataKey="value"
             nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={120}
-            fill="#8884d8"
-            labelLine={false}
+            // ...  
           >
-            {transformedData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
+            {pieChartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
           <Legend />
         </PieChart>
       </ResponsiveContainer>
-      <BreakdownTable data={transformedData} totalValue={totalPortfolioValue} />
+      {/* Use tableData for the BreakdownTable which excludes "Others" */}
+      <BreakdownTable data={tableData} totalValue={totalPortfolioValue} />
     </Paper>
   );
 };

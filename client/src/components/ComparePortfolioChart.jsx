@@ -7,6 +7,7 @@ import { Typography, Box, Table, Divider } from '@mui/material';
 import { tokens } from "../theme";
 import PortfolioBreakdown from './UserPortfoliosBreakdown';
 import ReturnsTable from './StocksPerformanceTable';
+import { fetchAllEndpoints } from '../utils/utils';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -42,19 +43,29 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   // Fetch data for both portfolios
   const fetchOverallPortfolio = async () => {
     try {
-      if (!chosenPortfolio1 || !chosenPortfolio2) return;
-      const response1 = await getAsync(`portfolios/${chosenPortfolio1.portfolioId}`, cookies.accessToken);
-      const response2 = await getAsync(`portfolios/${chosenPortfolio2.portfolioId}`, cookies.accessToken);
-      if (!response1.ok || !response2.ok) {
-        throw new Error('Network response was not ok');
+      if (!chosenPortfolio1 || !chosenPortfolio2) {
+        return;
+      }  
+      else{
+        const response1 = await getAsync(`portfolios/${chosenPortfolio1.portfolioId}`, cookies.accessToken);
+        const response2 = await getAsync(`portfolios/${chosenPortfolio2.portfolioId}`, cookies.accessToken);
+        if (!response1.ok || !response2.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data1 = await response1.json();
+        const data2 = await response2.json();
+  
+        console.log(data1);
+        console.log(data2);
+  
+        setPortfolioData1(data1);
+        setPortfolioData2(data2);
+     
       }
-      const data1 = await response1.json();
-      const data2 = await response2.json();
-      setPortfolioData1(data1);
-      setPortfolioData2(data2);
     } catch (err) {
       console.error('There was an error fetching the portfolio details:', err);
     }
+     
   };
 
   const fetchPortfolioSummaries = async () => {
@@ -114,6 +125,9 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
       console.error('There was an error fetching the portfolio details:', error);
     }
   };
+
+  
+  
 
   const mergeChartData = () => {
     // Implement your chart data merging logic here
@@ -193,7 +207,53 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
     fetchOverallPortfolio();
     fetchPortfolioSummaries();
     fetchPortfolioVolalities();
+
+    
   }, [chosenPortfolio1, chosenPortfolio2]);
+
+  // useEffect(() => {
+  //   const fetchPortfolioData = async () => {
+  //     if (!chosenPortfolio1 || !chosenPortfolio2) return;
+  
+  //     // Prepare endpoints for all required data
+  //     const endpoints = [
+  //       `portfolios/${chosenPortfolio1.portfolioId}`,
+  //       `portfolios/${chosenPortfolio2.portfolioId}`,
+  //       `portfolioStocks/${chosenPortfolio1.portfolioId}/summary`,
+  //       `portfolioStocks/${chosenPortfolio2.portfolioId}/summary`,
+  //       `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility`,
+  //       `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility/annualized`,
+  //       `portfolioStocks/${chosenPortfolio2.portfolioId}/volatility`,
+  //       `portfolioStocks/${chosenPortfolio2.portfolioId}/volatility/annualized`,
+  //     ];
+  
+  //     try {
+  //       const results = await fetchAllEndpoints(endpoints, cookies.accessToken);
+  //       console.log(results);
+  
+  //       // Extract the responses and set state or handle data accordingly
+  //       const [portfolioData1, portfolioData2, portfolioSummaries1, portfolioSummaries2, 
+  //              portfolioVolatility1, portfolioVolatility1Annual, 
+  //              portfolioVolatility2, portfolioVolatility2Annual] = results;
+        
+  //       // Update the state or perform further actions with the fetched data
+  //       setPortfolioData1(portfolioData1);
+  //       setPortfolioData2(portfolioData2);
+  //       setPortfolioSummaries1(portfolioSummaries1);
+  //       setPortfolioSummaries2(portfolioSummaries2);
+  //       setPortfolioVolatility1(portfolioVolatility1);
+  //       setPortfolioVolatility1Annual(portfolioVolatility1Annual);
+  //       setPortfolioVolatility2(portfolioVolatility2);
+  //       setPortfolioVolatility2Annual(portfolioVolatility2Annual);
+  //     } catch (error) {
+  //       console.error('There was an error fetching the portfolio data:', error);
+  //       // Handle the error by setting fallback states or showing messages
+  //     }
+  //   };
+  
+  //   fetchPortfolioData();
+  // }, [chosenPortfolio1, chosenPortfolio2, cookies.accessToken]); // Add dependencies for useEffect here
+  
 
   // Render the chart or a loading indicator
   return (
@@ -204,17 +264,92 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
         flexDirection="row"
         justifyContent="space-between"
         alignItems="center"
-        width="100%"
       >
         {/* This is the first half of the page for portfolioData1 */}
-        <Box flex={1} margin={2}>
-          <Typography variant="h3" fontWeight="bold">
-            {portfolioData1.name}
+        {/* This is the second half of the page for portfolioData2 */}
+        <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
+          <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
+            ID {portfolioData1.portfolioId}: {portfolioData1.name}
           </Typography>
-          <Typography mt={2}>
+          <Typography mt={2} variant="h4" fontWeight="bold">
+            Portfolio Description:
+          </Typography>
+          <Typography mt={1} variant="h5" fontStyle="italic">
             {portfolioData1.description}
           </Typography>
-          {/* Include other content for portfolioData1 here */}
+
+          
+
+          {/* Include description for portfolioData2 here */}
+          <Box display="flex"
+            flexDirection="row"
+            justifyContent="space-between"
+            alignItems="center"
+            width="100%">
+            <Box flex={1} margin={1}>
+              <Box flex={1} margin={1}>
+                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                  Total Portfolio Value:
+                </Typography>
+                <Typography variant="h3" fontWeight="bold">
+                  ${portfolioData1.totalCapital - portfolioData1.remainingCapital}
+                </Typography>
+              </Box>
+              <Box flex={1} margin={1}>
+                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                  Overall Returns:
+                </Typography>
+                <Typography variant="h3" fontWeight="bold" style={{ color: overallReturn1 < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>
+                  {overallReturn1} <span style={{ color: overallReturn1 < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>({overallReturn1Percentage}%)</span>
+                </Typography>
+              </Box>
+            </Box>
+            <Box flex={1} margin={1}>
+              <Box flex={1} margin={1}>
+                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                  Remaining Capital:
+                </Typography>
+                <Typography variant="h3" fontWeight="bold">
+                  ${portfolioData1.remainingCapital}
+                </Typography>
+                <Box flex={1}>
+                  <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                    Capital Allocation:
+                  </Typography>
+                  <Typography variant="h3" fontWeight="bold">
+                    ${portfolioData1.totalCapital}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Box flex={1} margin={1}>
+            <Box flex={1} margin={1}>
+              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                Volatility (Monthly):
+              </Typography>
+              <Typography variant="h3" fontWeight="bold">
+                {vol1}
+              </Typography>
+            </Box>
+            <Box flex={1} margin={1}>
+              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                Volatility Annualized:
+              </Typography>
+              <Typography variant="h3" fontWeight="bold">
+                {volAnnual1}
+              </Typography>
+            </Box>
+          </Box>
+          </Box>
+          <Divider />
+          <br />
+          <PortfolioBreakdown portfolioStockData={portfolioData1.portfolioStocks} />
+          <br />
+          <Divider />
+          <br />
+          <ReturnsTable stockData= {portfolioData1} stockReturns={summary1} />
+          
+          
         </Box>
 
         {/* This is the second half of the page for portfolioData2 */}
@@ -298,9 +433,9 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <br />
           <Divider />
           <br />
-          <ReturnsTable stockReturns={summary2} />
-
-
+          <ReturnsTable stockData= {portfolioData1} stockReturns={summary2} />
+          
+          
         </Box>
       </Box>
     </div>

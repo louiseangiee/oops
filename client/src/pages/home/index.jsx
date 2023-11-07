@@ -47,10 +47,7 @@ const Home = () => {
             throw new Error(`HTTP error! status: ${summaryResponse.status}`);
           }
           const summaryData = await summaryResponse.json();
-          console.log(summaryData);
-
           const overallReturn = summaryData.overallReturns.overalReturn;
-
           return { ...portfolio, overallReturn: overallReturn };
         } catch (error) {
           console.error('Failed to fetch overall returns for portfolio:', portfolio.portfolioId, error);

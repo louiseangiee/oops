@@ -138,7 +138,6 @@ export default function AddStocks({ portfolioId }) {
             "quantity": stockQuantity,
             "buyDate": date.format('YYYY-MM-DD')
         }
-        console.log(data);
         const response = await postAsync(`portfolioStocks/${portfolioId}`, data, cookie.accessToken);
         if (response.ok) {
             setLoading(false);
@@ -203,7 +202,7 @@ export default function AddStocks({ portfolioId }) {
                                 // Return true if either is true
                                 return isWeekend || today || holiday;
                             }}
-                            onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock, newValue); console.log(newValue); }}
+                            onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock, newValue) }}
                         />
                     </LocalizationProvider>
                     <Typography>{error}</Typography>

@@ -38,24 +38,26 @@ const Home = () => {
         portfolios = await response.json();
       }
 
-      // Fetch and add the overall returns for each portfolio
-      const portfoliosWithReturns = await Promise.all(portfolios.map(async (portfolio) => {
-        try {
-          const summaryResponse = await getAsync(`portfolioStocks/${portfolio.portfolioId}/summary`, cookie.accessToken);
-          if (!summaryResponse.ok) {
-            // If the response is not OK, throw an error
-            throw new Error(`HTTP error! status: ${summaryResponse.status}`);
-          }
-          const summaryData = await summaryResponse.json();
-          const overallReturn = summaryData.overallReturns.overalReturn;
-          return { ...portfolio, overallReturn: overallReturn };
-        } catch (error) {
-          console.error('Failed to fetch overall returns for portfolio:', portfolio.portfolioId, error);
-          return { ...portfolio, overallReturn: null }; // Handle the error case
-        }
-      }));
+      setDataFetched(portfolios);
 
-      setDataFetched(portfoliosWithReturns);
+      // // Fetch and add the overall returns for each portfolio
+      // const portfoliosWithReturns = await Promise.all(portfolios.map(async (portfolio) => {
+      //   try {
+      //     const summaryResponse = await getAsync(`portfolioStocks/${portfolio.portfolioId}/summary`, cookie.accessToken);
+      //     if (!summaryResponse.ok) {
+      //       // If the response is not OK, throw an error
+      //       throw new Error(`HTTP error! status: ${summaryResponse.status}`);
+      //     }
+      //     const summaryData = await summaryResponse.json();
+      //     const overallReturn = summaryData.overallReturns.overalReturn;
+      //     return { ...portfolio, overallReturn: overallReturn };
+      //   } catch (error) {
+      //     console.error('Failed to fetch overall returns for portfolio:', portfolio.portfolioId, error);
+      //     return { ...portfolio, overallReturn: null }; // Handle the error case
+      //   }
+      // }));
+
+      // setDataFetched(portfoliosWithReturns);
     };
 
     fetchData();
@@ -141,7 +143,7 @@ const Home = () => {
                 gridColumn="span 3"
                 backgroundColor={colors.primary[400]}
                 display="flex"
-                alignItems="center"
+                alignItems="flex-start"
                 justifyContent="center"
                 key={index}
                 padding="20px"

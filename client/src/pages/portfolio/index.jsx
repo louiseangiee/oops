@@ -31,13 +31,10 @@ function DeletePortfolio() {
 
   // Fetch the portfolio data based on portfolioId
   useEffect(() => {
-    // Replace this with your actual data fetching logic
-    // Example: fetch portfolio data using portfolioId
     async function fetchData() {
       const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
       const data = await response.json();
       setPortfolioData(data);
-      console.log("portfolioData: ", data);
     }
     fetchData();
   }, [portfolioId, cookie.accessToken]);
@@ -78,9 +75,8 @@ function DeletePortfolio() {
     setLoading(true);
     const response = await deleteAsync('portfolios/' + portfolioData['portfolioId'], cookie.accessToken);
     if (response.ok) {
-      // Handle the case when the response is not OK, for example, show an error message.
+      // when deleted, navigate to home page
       setLoading(false);
-      console.log("Deleted portfolio with ID " + portfolioData['portfolioId']);
       setOpen(false);
       navigate("/");
       handleOpenSuccessAlert();
@@ -98,7 +94,7 @@ function DeletePortfolio() {
       {/* Snackbar for error message */}
       <Snackbar
         open={isErrorAlertOpen}
-        autoHideDuration={5000} // Adjust the duration as needed
+        autoHideDuration={5000}
         onClose={handleCloseErrorAlert}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
@@ -116,7 +112,7 @@ function DeletePortfolio() {
       {/* Snackbar for success message */}
       <Snackbar
         open={isSuccessAlertOpen}
-        autoHideDuration={5000} // Adjust the duration as needed
+        autoHideDuration={5000}
         onClose={handleCloseSuccessAlert}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
@@ -138,7 +134,9 @@ function DeletePortfolio() {
           backgroundColor: colors.primary[400],
           fontSize: "22px",
           fontWeight: "bold"
-        }}>Confirm Deletion of Portfolio</DialogTitle>
+        }}>
+          Confirm Deletion of Portfolio
+        </DialogTitle>
         <DialogContent sx={{ backgroundColor: colors.primary[400] }}>
           <DialogContentText>
             Please confirm that you would like to delete this portfolio by entering the name of the portfolio down below. Do note that this action cannot be undone.
@@ -178,9 +176,9 @@ function DeletePortfolio() {
             {loading ?
               <Lottie
                 animationData={loadingLight}
-                loop={true} // Set to true for looping
-                autoplay={true} // Set to true to play the animation automatically
-                style={{ width: '80px', height: '80px' }} // Customize the dimensions
+                loop={true}
+                autoplay={true}
+                style={{ width: '80px', height: '80px' }}
               />
               :
               "Delete"
@@ -199,13 +197,13 @@ const Portfolio = () => {
 
   const { userData } = useAuth();
   const { portfolioId } = useParams();
-  const [isLoading, setIsLoading] = useState(true); // Add a loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   // State to store portfolio data
   const [portfolioData, setPortfolioData] = useState({});
   const [overallReturns, setOverallReturns] = useState(0);
   const [percentageReturns, setPercentageReturns] = useState(0);
-  const [refreshIntervalId, setRefreshIntervalId] = useState(null); // Store the interval ID
+  const [refreshIntervalId, setRefreshIntervalId] = useState(null);
 
   // Fetch portfolio data
   const fetchPortfolioData = async () => {
@@ -253,9 +251,7 @@ const Portfolio = () => {
       await fetchPortfolioSummaryData();
     }
 
-    fetchData();
-
-    console.log("Cleared interval " + refreshIntervalId);
+    fetchData()
     // Set up an interval to periodically fetch data (e.g., every 30 seconds)
     const intervalId = setInterval(fetchData, 30000); // Adjust the interval as needed
     setRefreshIntervalId(intervalId);
@@ -407,7 +403,7 @@ const Portfolio = () => {
             fontStyle="italic"
             sx={{ color: colors.grey[300] }}
           >
-            Remaning Capital
+            Remaining Capital
           </Typography>
           <Typography
             variant="h1"

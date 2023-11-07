@@ -42,7 +42,6 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
 
   // Fetch data for both portfolios
   const fetchOverallPortfolio = async () => {
-    console.log(chosenPortfolio1.portfolioId);
     try {
       if (!chosenPortfolio1 || !chosenPortfolio2) {
         return;
@@ -197,7 +196,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   // Usage:
   const summary1 = getStockReturns(portfolioSummaries1);
   const summary2 = getStockReturns(portfolioSummaries2);
-  
+
   const overallReturn1 = getOverallReturn(portfolioSummaries1).overalReturn;
   const overallReturn2 = getOverallReturn(portfolioSummaries2).overalReturn;
   const overallReturn1Percentage = getOverallReturn(portfolioSummaries1).percentage;
@@ -365,7 +364,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
             {portfolioData2.description}
           </Typography>
 
-          
+
 
           {/* Include description for portfolioData2 here */}
           <Box display="flex"
@@ -410,23 +409,23 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
               </Box>
             </Box>
             <Box flex={1} margin={1}>
-            <Box flex={1} margin={1}>
-              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                Volatility (Monthly):
-              </Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {vol2}
-              </Typography>
+              <Box flex={1} margin={1}>
+                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                  Volatility (Monthly):
+                </Typography>
+                <Typography variant="h3" fontWeight="bold">
+                  {vol2}
+                </Typography>
+              </Box>
+              <Box flex={1} margin={1}>
+                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                  Volatility Annualized:
+                </Typography>
+                <Typography variant="h3" fontWeight="bold">
+                  {volAnnual2}
+                </Typography>
+              </Box>
             </Box>
-            <Box flex={1} margin={1}>
-              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                Volatility Annualized:
-              </Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {volAnnual2}
-              </Typography>
-            </Box>
-          </Box>
           </Box>
           <Divider />
           <br />

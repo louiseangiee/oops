@@ -93,6 +93,11 @@ export default function AddStocks({ portfolioId }) {
     const handleClose = () => {
         setOpen(false);
         setDate(null);
+        setStockQuantity(0);
+        setChosenStock(null);
+        setStockPrice(0);
+        setError("");
+        setLoading(false);
     };
 
     const handleStockChange = async (newValue) => {
@@ -138,7 +143,6 @@ export default function AddStocks({ portfolioId }) {
             "quantity": stockQuantity,
             "buyDate": date.format('YYYY-MM-DD')
         }
-        console.log(data);
         const response = await postAsync(`portfolioStocks/${portfolioId}`, data, cookie.accessToken);
         if (response.ok) {
             setLoading(false);
@@ -203,7 +207,7 @@ export default function AddStocks({ portfolioId }) {
                                 // Return true if either is true
                                 return isWeekend || today || holiday;
                             }}
-                            onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock, newValue); console.log(newValue); }}
+                            onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock, newValue) }}
                         />
                     </LocalizationProvider>
                     <Typography>{error}</Typography>
@@ -257,7 +261,7 @@ export default function AddStocks({ portfolioId }) {
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
                     <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} disabled={loading} onClick={handleAddClick}>{loading ? 'Loading...' : 'Add'}</Button>
+                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} disabled={stockPrice == 0 || chosenStock == null || date == null || stockQuantity == 0} onClick={handleAddClick}>{loading ? 'Loading...' : 'Add'}</Button>
                 </DialogActions>
             </Dialog>
         </div>

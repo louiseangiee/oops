@@ -94,12 +94,14 @@ public class PortfolioStockService {
     public PortfolioStock createPortfolioStock(PortfolioStockCreationDTO dto) {
         try {
             // Validate DTO
-            if (dto.getQuantity() == 0) {
-                throw new IllegalArgumentException("Quantity cannot be 0");
-            } else if (dto.getBuyPrice() == 0) {
-                throw new IllegalArgumentException("Buy price cannot be 0");
+            if (dto.getQuantity() <= 0) {
+                throw new IllegalArgumentException("Quantity cannot be 0 or negative");
+            } else if (dto.getBuyPrice() <= 0) {
+                throw new IllegalArgumentException("Buy price cannot be 0 or negative");
             } else if (dto.getBuyDate() == null) {
                 throw new IllegalArgumentException("Buy date cannot be null");
+            } else if (dto.getBuyDate().isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException("Buy date cannot be in the future");
             }
             String action;
             Portfolio portfolio = portfolioService.findById(dto.getPortfolioId())
@@ -491,6 +493,32 @@ public class PortfolioStockService {
         }
 
     }
+
+    public Map<String, Object> getPortfolioSummary(Integer portfolioId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Portfolio portfolio = portfolioService.findById(portfolioId).orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
+            List<PortfolioStock> portfolioStocks = portfolio.getPortfolioStocks();
+            if (portfolioStocks.isEmpty()) {
+                response.put("totalPortfolioValue", 0.00);
+                // response.put("stockReturns", new HashMap<>());
+                response.put("overallReturns", new HashMap<>());
+                return response;
+            }
+            double totalPortfolioValue = getTotalPortfolioValue(portfolioId);
+            //Map<String, Map<String, Double>> stockReturns = calculateStockReturnsForPortfolio(portfolioId);
+            Map<String, Double> overallReturns = calculateOverallPortfolioReturns(portfolioId);
+
+            response.put("totalPortfolioValue", totalPortfolioValue);
+            // response.put("stockReturns", stockReturns);
+            response.put("overallReturns", overallReturns);
+            return response;
+        } catch (Exception e) {
+           throw new RuntimeException("Error getting portfolio summary service: " + e.getMessage(), e); 
+        }
+        
+    }
+
 
     private Function<PortfolioStock, String> getGroupingFunction(String groupBy) {
         switch (groupBy.toLowerCase()) {

@@ -1,7 +1,6 @@
 import { Box } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockAccessLogs, mockDataContacts } from "../../data/mockData";
 import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
 import { getAsync } from "../../utils/utils";
@@ -15,14 +14,11 @@ import loading from './fetching_data.json';
 const AccessLog = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [cookie] = useCookies(["accessToken"]);
+  const [cookie] = useCookies();
   const [accessLogData, setAccessLogData] = useState(null);
 
   const { userData } = useAuth();
-  console.log(userData);
-  // const accessLogs = userData.accessLogs;
   const userId = userData.id;
-  // console.log(accessLogs);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,22 +27,16 @@ const AccessLog = () => {
         const response = await getAsync("accessLogs", cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          console.log(data.content);
           setAccessLogData(data.content);
         } else {
-          console.log("Error fetching access logs");
-          console.log(response);
           setAccessLogData(null);
         }
       } else if (userData.role === "ROLE_USER") {
         const response = await getAsync("accessLogs/user/" + userId, cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          console.log(data.content);
           setAccessLogData(data.content);
         } else {
-          console.log("Error fetching access logs");
-          console.log(response);
           setAccessLogData(null);
         }
       }
@@ -111,8 +101,8 @@ const AccessLog = () => {
           <Box display="flex" justifyContent="center" alignItems="center" height="100%">
             <Lottie
               animationData={loading}
-              loop={true} // Set to true for looping
-              autoplay={true} // Set to true to play the animation automatically
+              loop={true}
+              autoplay={true}
               style={{ width: 300, height: 300 }}
             />
           </Box>
@@ -120,8 +110,8 @@ const AccessLog = () => {
           <Box display="flex" justifyContent="center" alignItems="center" height="100%">
             <Lottie
               animationData={noData}
-              loop={true} // Set to true for looping
-              autoplay={true} // Set to true to play the animation automatically
+              loop={true}
+              autoplay={true}
               style={{ width: 300, height: 300 }}
             />
           </Box>

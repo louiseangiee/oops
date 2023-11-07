@@ -1,15 +1,12 @@
-import * as React from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { Box, useTheme, InputAdornment, Snackbar, Alert } from "@mui/material";
+import { useTheme, InputAdornment, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../theme";
-import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { getAsync, putAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
@@ -18,7 +15,6 @@ import Lottie from 'lottie-react';
 
 
 export default function EditPortfolio({ portfolioId, small }) {
-    const navigate = useNavigate();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [cookie] = useCookies();
@@ -27,32 +23,24 @@ export default function EditPortfolio({ portfolioId, small }) {
     const [updatedDescription, setUpdatedDescription] = useState('');
     const [updatedCapital, setUpdatedCapital] = useState('');
     const [capitalError, setCapitalError] = useState(false);
-    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    // Add state variables to track whether the fields have been edited
     const [isNameEdited, setIsNameEdited] = useState(false);
     const [isDescriptionEdited, setIsDescriptionEdited] = useState(false);
     const [isCapitalEdited, setIsCapitalEdited] = useState(false);
-    const [loading, setLoading] = useState(false); // Add a loading state
-
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        // Replace this with your actual data fetching logic
-        // Example: fetch portfolio data using portfolioId
         // Fetch the portfolio data based on portfolioId
         async function fetchData() {
             const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
             const data = await response.json();
             setPortfolioData(data);
-            console.log(data);
         }
         fetchData();
 
         if (!/^\d*\.?\d*$/.test(updatedCapital) || updatedCapital === '' || parseFloat(updatedCapital) <= 0) {
             setCapitalError(true);
-            setIsButtonDisabled(true);
             return; // Prevent form submission
         } else {
-            setIsButtonDisabled(false);
             setCapitalError(false);
         }
 
@@ -61,12 +49,11 @@ export default function EditPortfolio({ portfolioId, small }) {
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
 
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
     };
-
     const handleClose = () => {
         setOpen(false);
         setUpdatedCapital('');
@@ -121,8 +108,6 @@ export default function EditPortfolio({ portfolioId, small }) {
         if (updatedCapital !== portfolioData.totalCapital && updatedCapital !== '') {
             formData.totalCapital = parseFloat(updatedCapital);
         }
-
-        console.log(formData);
         setLoading(true);
 
         async function editPortfolio() {
@@ -138,11 +123,6 @@ export default function EditPortfolio({ portfolioId, small }) {
                 setIsDescriptionEdited(false);
                 setIsCapitalEdited(false);
                 return;
-                // setTimeout(() => {
-                //     navigate("/portfolio/" + portfolioId);
-                // }, 1000);
-                // window.location.reload();
-                // fetchData();
             } else {
                 setLoading(false);
                 handleOpenErrorAlert();
@@ -156,7 +136,7 @@ export default function EditPortfolio({ portfolioId, small }) {
             {/* Snackbar for error message */}
             <Snackbar
                 open={isErrorAlertOpen}
-                autoHideDuration={5000} // Adjust the duration as needed
+                autoHideDuration={5000}
                 onClose={handleCloseErrorAlert}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
@@ -174,7 +154,7 @@ export default function EditPortfolio({ portfolioId, small }) {
             {/* Snackbar for success message */}
             <Snackbar
                 open={isSuccessAlertOpen}
-                autoHideDuration={5000} // Adjust the duration as needed
+                autoHideDuration={5000}
                 onClose={handleCloseSuccessAlert}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
@@ -202,9 +182,6 @@ export default function EditPortfolio({ portfolioId, small }) {
                 </DialogTitle>
                 <DialogContent
                     sx={{ backgroundColor: colors.primary[400] }}>
-                    {/* <DialogContentText>
-                        To create a new portfolio, please enter the portfolio name, description/strategy, and the capital.
-                    </DialogContentText> */}
                     <TextField
                         margin="dense"
                         id="name"
@@ -275,9 +252,9 @@ export default function EditPortfolio({ portfolioId, small }) {
                         {loading ?
                             <Lottie
                                 animationData={loadingLight}
-                                loop={true} // Set to true for looping
-                                autoplay={true} // Set to true to play the animation automatically
-                                style={{ width: '80px', height: '80px' }} // Customize the dimensions
+                                loop={true}
+                                autoplay={true}
+                                style={{ width: '80px', height: '80px' }}
                             />
                             :
                             "Confirm Changes"

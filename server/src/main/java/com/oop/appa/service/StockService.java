@@ -12,6 +12,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -366,12 +367,16 @@ public class StockService {
     public Map<String, Double> fetchStockPriceAtDate(String stockSymbol, String stringDate) {
         try {
             LocalDate date = LocalDate.parse(stringDate);
+            LocalDate todayDate = LocalDate.now();
 
             InputStream responseStream = marketDataService.fetchDailyDataStream(stockSymbol, "full");
             JsonStreamProcessor processor = new JsonStreamProcessor();
             Map<String, Double> stockPrices = processor.processJsonStream(responseStream);
             Map<String, Double> result = new HashMap<>();
-
+            if (date.getYear() == todayDate.getYear() && date.getMonthValue() == todayDate.getMonthValue() && date.getDayOfMonth() == todayDate.getDayOfMonth()){
+                System.out.println("today");
+                date = date.minusDays(1);
+            }
             for (int i = 0; i < 10; i++) {
                 Double price = stockPrices.get(date.toString());
                 System.out.println(date.toString());

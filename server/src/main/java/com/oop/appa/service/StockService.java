@@ -1,6 +1,7 @@
 package com.oop.appa.service;
 
 import java.io.InputStream;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -363,32 +365,53 @@ public class StockService {
         }
     }
 
-    public Map<String, Double> fetchStockPriceAtDate(String stockSymbol, String stringDate) {
+    public Map<String, Object> fetchStockPriceAtDate(String stockSymbol, String stringDate) {
         try {
             LocalDate date = LocalDate.parse(stringDate);
-
+            if (date.isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException("Date cannot be in the future: " + stringDate);
+            }
             InputStream responseStream = marketDataService.fetchDailyDataStream(stockSymbol, "full");
             JsonStreamProcessor processor = new JsonStreamProcessor();
             Map<String, Double> stockPrices = processor.processJsonStream(responseStream);
-            Map<String, Double> result = new HashMap<>();
-
+            Map<String, Object> result = new HashMap<>();
+            String message;
+    
             for (int i = 0; i < 10; i++) {
+                System.out.println("Checking for price on " + date.toString());
                 Double price = stockPrices.get(date.toString());
-                System.out.println(date.toString());
-                if (price != null) {
-                    result.put(date.toString(), price);
+    
+                if (price != null ) {
+                    result.put("date", date.toString());
+                    result.put("price", price);
+                    if (date.equals(LocalDate.parse(stringDate))){
+                        message = "Exact date match found.";
+                    } else if (date.equals(LocalDate.now())){
+                        message = "Date selected was today and data was available.";
+                    } else if (date.equals(LocalDate.now().minusDays(1))) {
+                        message = "Date selected was today and data was not available. Closest date match found.";
+                    } else {
+                        message = "Date selected was a weekend or a bank holiday. Closest date match found.";
+                    }
+                    result.put("message", message);
                     return result;
+                } else {
+                    if (date.getDayOfWeek() == DayOfWeek.MONDAY) {
+                        date = date.minusDays(3);  
+                    } else {
+                        date = date.minusDays(1);  
+                    }
                 }
-                date = date.plusDays(1);
             }
-            throw new IllegalArgumentException("Price not found for " + stockSymbol + " around the date " + stringDate + ". Please try another date that is earlier.");
+            return result;
+    
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format: " + stringDate, e);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching PortfolioStock price at date service: " + e.getMessage(), e);
+            throw new RuntimeException("Error fetching stock price at date service: " + e.getMessage(), e);
         }
     }
-
+    
     public double calculateDailyVolatility(String stockSymbol) {
         try {
             List<Map<String, Object>> dataPoints = fetchOneMonthData(stockSymbol);

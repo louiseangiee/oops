@@ -330,7 +330,7 @@ public class StockController {
     @GetMapping("/priceAtDate")
     public ResponseEntity<?> fetchPriceAtDate(@RequestParam String symbol, @RequestParam String date) {
         try {
-            Map<String,Double> price = stockService.fetchStockPriceAtDate(symbol, date);
+            Map<String,Object> price = stockService.fetchStockPriceAtDate(symbol, date);
             return ResponseEntity.ok(price);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();

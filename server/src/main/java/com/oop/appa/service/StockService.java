@@ -84,13 +84,14 @@ public class StockService {
         try {
             JsonNode searchResults = marketDataService.fetchSearchTicker(searchTerm).path("bestMatches");
             List<Map<String, String>> results = new ArrayList<>();
+            String regex = "^[A-Za-z]+$";
 
             for (JsonNode node : searchResults) {
                 String symbol = node.path("1. symbol").asText();
                 String name = node.path("2. name").asText();
                 String type = node.path("3. type").asText();
 
-                if (!symbol.isEmpty() && !name.isEmpty() && type.equals("Equity")) {
+                if (symbol.matches(regex) && !symbol.isEmpty() && !name.isEmpty() && type.equals("Equity")) {
                     Map<String, String> result = new HashMap<>();
                     result.put("symbol", symbol);
                     result.put("name", name);

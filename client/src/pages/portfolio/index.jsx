@@ -38,7 +38,7 @@ function DeletePortfolio() {
       const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
       const data = await response.json();
       setPortfolioData(data);
-      console.log(data);
+      console.log("portfolioData: ",data);
     }
     fetchData();
   }, [portfolioId, cookie.accessToken]);

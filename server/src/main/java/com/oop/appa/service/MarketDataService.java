@@ -146,7 +146,7 @@ public class MarketDataService {
     }
 
     public JsonNode fetchSearchTicker(String searchTerm) {
-        String apiKey = System.getenv("ALPHAVANTAGE_API_KEY");
+        String apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
         String apiUrl = ALPHA_VANTAGE_BASE_URL + "/query?function=SYMBOL_SEARCH&keywords=" + searchTerm + "&apikey="
                 + apiKey;
         JsonNode response = webClient.get()

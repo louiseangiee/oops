@@ -128,7 +128,7 @@ public class PortfolioStockService {
                         - (dto.getBuyPrice() * dto.getQuantity());
                 if (totalCapitalRemainingAfterPurchase < 0) {
                     action = String.format(
-                            "User attempted to drop and repurchase stock %s from Portfolio #%d - %s with new price: %f and quantity: %d on %s, but insufficient capital",
+                            "User attempted to drop and repurchase stock %s from Portfolio #%d - %s with new price: %.2f and quantity: %d on %s, but insufficient capital",
                             stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                             dto.getQuantity(), dto.getBuyDate());
                     accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
@@ -140,7 +140,7 @@ public class PortfolioStockService {
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(
-                        "User succesfully dropped and repurchased stock %s in Portfolio #%d - %s with new price: %f and quantity: %d on %s",
+                        "User succesfully dropped and repurchased stock %s in Portfolio #%d - %s with new price: %.2f and quantity: %d on %s",
                         stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                         dto.getQuantity(), dto.getBuyDate());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
@@ -151,7 +151,7 @@ public class PortfolioStockService {
                         - (dto.getBuyPrice() * dto.getQuantity());
                 if (totalCapitalRemainingAfterPurchase < 0) {
                     action = String.format(
-                            "User attempted to purchase stock %s in Portfolio #%d - %s with new price: %f and quantity: %d on %s, but insufficient capital",
+                            "User attempted to purchase stock %s in Portfolio #%d - %s with new price: %.2f and quantity: %d on %s, but insufficient capital",
                             stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                             dto.getQuantity(), dto.getBuyDate());
                     accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
@@ -167,7 +167,7 @@ public class PortfolioStockService {
                 portfolio.setRemainingCapital(totalCapitalRemainingAfterPurchase);
                 portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
                 action = String.format(
-                        "User added new stock %s to Portfolio #%d - %s, with price: %f and quantity: %d on %s",
+                        "User added new stock %s to Portfolio #%d - %s, with price: %.2f and quantity: %d on %s",
                         stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                         dto.getQuantity(), dto.getBuyDate());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
@@ -764,7 +764,7 @@ public class PortfolioStockService {
         }
 
         String action = String.format(
-                "User successfully %s stock %s in Portfolio #%d - %s with new price: %f and quantity: %d on %s",
+                "User successfully %s stock %s in Portfolio #%d - %s with new price: %.2f and quantity: %d on %s",
                 (quantity < 0) ? "sold" : "bought",
                 stockSymbol, portfolio.getPortfolioId(), portfolio.getName(), stockPrice, quantity, LocalDate.now());
 

@@ -128,22 +128,6 @@ public class UserController {
 
     }
 
-    // POST endpoint
-    @PostMapping
-    @Operation(summary = "Create a new user")
-    @Parameter(name = "user", description = "user object")
-    public ResponseEntity<?> save(User user) {
-        try {
-            userService.save(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(user);
-        } catch (Exception e) {
-            ErrorResponse error = new ErrorResponse();
-            error.setMessage("Error saving user");
-            error.setDetails(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-
     @PutMapping
     @Operation(summary = "Update a user")
     @Parameter(name = "user", description = "user object")
@@ -154,36 +138,6 @@ public class UserController {
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error updating user");
-            error.setDetails(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-
-    @DeleteMapping("/{user_id}")
-    @Operation(summary = "Delete a user by id")
-    @Parameter(name = "user_id", description = "user id")
-    public ResponseEntity<?> deleteById(@PathVariable int user_id) {
-        try {
-            userService.deleteById(user_id);
-            return ResponseEntity.ok("User with ID " + user_id + " was successfully deleted.");
-        } catch (Exception e) {
-            ErrorResponse error = new ErrorResponse();
-            error.setMessage("Error deleting user with ID " + user_id);
-            error.setDetails(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-
-    @DeleteMapping
-    @Operation(summary = "Delete a user by user object")
-    @Parameter(name = "user", description = "user object")
-    public ResponseEntity<?> delete(@RequestBody User user) {
-        try {
-            userService.delete(user);
-            return ResponseEntity.ok("User was successfully deleted.");
-        } catch (Exception e) {
-            ErrorResponse error = new ErrorResponse();
-            error.setMessage("Error deleting user");
             error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }

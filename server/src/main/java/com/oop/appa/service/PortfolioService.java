@@ -123,24 +123,54 @@ public class PortfolioService {
         try {
             Portfolio existingPortfolio = portfolioRepository.findById(portfolioId)
                     .orElseThrow(() -> new EntityNotFoundException("No portfolio found with ID: " + portfolioId + "."));
-
+            double originalTotalCapital = existingPortfolio.getTotalCapital();
+            double newTotalCapital = portfolio.getTotalCapital();
+            double capitalInvested = originalTotalCapital - existingPortfolio.getRemainingCapital();
+            double newRemainingCapital;
+    
+            if (newTotalCapital > originalTotalCapital) {
+                newRemainingCapital = existingPortfolio.getRemainingCapital() + (newTotalCapital - originalTotalCapital);
+            } else if (newTotalCapital >= capitalInvested) {
+                newRemainingCapital = newTotalCapital - capitalInvested;
+            } else {
+                throw new IllegalArgumentException("Total capital cannot be reduced below the amount already invested.");
+            }
+ 
+            String action = String.format("User updates portfolio #%d - %s", portfolio.getPortfolioId(), existingPortfolio.getName());
+            String changes = "";
+                if (!existingPortfolio.getName().equals(portfolio.getName())) {
+                changes += String.format(" Name changed to '%s'.", portfolio.getName());
+            }
+            if (!existingPortfolio.getDescription().equals(portfolio.getDescription())) {
+                changes += String.format(" Description changed to '%s'.",  portfolio.getDescription());
+            }
+            if (Double.compare(existingPortfolio.getTotalCapital(), newTotalCapital) != 0) {
+                changes += String.format(" Total capital changed to %.2f.", newTotalCapital);
+            }
+            if (Double.compare(existingPortfolio.getRemainingCapital(), newRemainingCapital) != 0) {
+                changes += String.format(" Remaining capital changed to %.2f.", newRemainingCapital);
+            }
+    
+            if (!changes.isEmpty()) {
+                action += ". Changes:" + changes;
+            } else {
+                action += " No changes detected.";
+            }
+    
             existingPortfolio.setName(portfolio.getName());
             existingPortfolio.setDescription(portfolio.getDescription());
-            existingPortfolio.setTotalCapital(portfolio.getTotalCapital());
-            existingPortfolio.setRemainingCapital(portfolio.getRemainingCapital());
-
+            existingPortfolio.setTotalCapital(newTotalCapital);
+            existingPortfolio.setRemainingCapital(newRemainingCapital);
+    
             Portfolio updatedPortfolio = portfolioRepository.save(existingPortfolio);
-
-            String action = String.format("User updates portfolio #%d - %s", portfolio.getPortfolioId(),
-                    portfolio.getName());
-            accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
+            accessLogRepository.save(new AccessLog(existingPortfolio.getUser(), action));
+    
             return updatedPortfolio;
         } catch (Exception e) {
             throw new RuntimeException("Error updating an existing portfolio service: " + e.getMessage(), e);
         }
-
     }
-
+    
     // DELETE
     public void deleteById(Integer id) {
         try {
@@ -166,7 +196,7 @@ public class PortfolioService {
             String action = String.format("User deletes all portfolios under user ID: " + user_id);
             accessLogRepository.save(new AccessLog(user, action));
         } catch (Exception e) {
-            throw new RuntimeException("Error deleting portfolio service: "+ e.getMessage(), e);
+            throw new RuntimeException("Error deleting portfolio service: " + e.getMessage(), e);
         }
     }
 }

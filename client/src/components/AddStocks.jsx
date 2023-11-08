@@ -5,7 +5,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../theme";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -16,6 +16,8 @@ import { getAsync, postAsync } from '../utils/utils';
 import { useCookies } from 'react-cookie';
 import { isAHoliday } from '@18f/us-federal-holidays';
 import dayjs from 'dayjs';
+
+
 
 function ButtonField(props) {
     const {
@@ -83,6 +85,27 @@ export default function AddStocks({ portfolioId }) {
     const [loading, setLoading] = useState(false);
     const [priceLoading, setPriceLoading] = useState(false);
     const [error, setError] = useState("");
+    const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
+    const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
+
+    // error alert handler
+    const handleOpenErrorAlert = () => {
+        setIsErrorAlertOpen(true);
+        setIsSuccessAlertOpen(false);
+    };
+    const handleCloseErrorAlert = () => {
+        setIsErrorAlertOpen(false);
+    };
+
+    // success alert handler
+    const handleOpenSuccessAlert = () => {
+        setIsSuccessAlertOpen(true);
+        setIsErrorAlertOpen(false);
+
+    };
+    const handleCloseSuccessAlert = () => {
+        setIsSuccessAlertOpen(false);
+    };
 
     const [open, setOpen] = useState(false);
 
@@ -146,17 +169,52 @@ export default function AddStocks({ portfolioId }) {
         const response = await postAsync(`portfolioStocks/${portfolioId}`, data, cookie.accessToken);
         if (response.ok) {
             setLoading(false);
-            alert("Stock added successfully!");
+            handleOpenSuccessAlert();
             handleClose();
         }
         else {
-            alert("Failed to add stock. Please try again.")
+            handleOpenErrorAlert();
             handleClose();
         }
     };
 
     return (
         <div>
+            {/* Snackbar for error message */}
+            <Snackbar
+                open={isErrorAlertOpen}
+                autoHideDuration={5000}
+                onClose={handleCloseErrorAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="error"
+                    onClose={handleCloseErrorAlert}
+                    sx={{ backgroundColor: colors.redAccent[600] }}
+                >
+                    Failed to add stock. Please try again.
+                </Alert>
+            </Snackbar>
+
+            {/* Snackbar for success message */}
+            <Snackbar
+                open={isSuccessAlertOpen}
+                autoHideDuration={5000}
+                onClose={handleCloseSuccessAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="success"
+                    onClose={handleCloseSuccessAlert}
+                    sx={{ backgroundColor: colors.greenAccent[600] }}
+                >
+                    Stock added successfully!
+                </Alert>
+            </Snackbar>
             <Button
                 sx={{
                     backgroundColor: colors.blueAccent[700],

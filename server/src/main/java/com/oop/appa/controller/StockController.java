@@ -249,21 +249,6 @@ public class StockController {
         }
     }
 
-    // @Operation(summary = "Get daily volatility of a stock")
-    // @Parameter(name = "symbol", description = "stock symbol")
-    // @GetMapping("/calculateDailyVolatility")
-    // public ResponseEntity<?> calculateDailyVolatility(@RequestParam String symbol) {
-    //     try {
-    //         double volatility = stockService.calculateDailyVolatility(symbol);
-    //         return ResponseEntity.ok(volatility);
-    //     } catch (Exception e) {
-    //         ErrorResponse error = new ErrorResponse();
-    //         error.setMessage("Error in calculating daily volatility");
-    //         error.setDetails(e.getMessage());
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    //     }
-    // }
-
     @Operation(summary = "Get weekly volatility of a stock")
     @Parameter(name = "symbol", description = "stock symbol")
     @GetMapping("/calculateMonthlyVolatility")

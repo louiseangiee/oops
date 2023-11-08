@@ -124,7 +124,7 @@ export default function Profile() {
                     </Alert>
                 </Snackbar>
 
-                <Topbar invisible={false} />
+                {/* <Topbar invisible={false} /> */}
                 <div style={{
                     display: 'flex',
                     justifyContent: 'center',

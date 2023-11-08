@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useTheme } from "@mui/material";
+import { useTheme, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../theme";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +25,16 @@ export default function CreatePortfolio() {
     const { userData } = useAuth();
     const [capitalError, setCapitalError] = useState(false);
     const [loading, setLoading] = useState(false); // Add a loading state
+
+    const [alert, setAlert] = useState({ open: false, type: '', message: '' });
+
+    const showAlert = (type, message) => {
+        setAlert({ open: true, type, message });
+    };
+
+    const closeAlert = () => {
+        setAlert({ open: false, type: '', message: '' });
+    };
 
 
     // Initialize state variables for form fields
@@ -45,12 +55,12 @@ export default function CreatePortfolio() {
     useEffect(() => {
         const decimalRegex = /^\d+(\.\d{2})?$/;
         const validCapital = decimalRegex.test(portfolioCapital) && parseFloat(portfolioCapital) > 0;
-    
+
         setCapitalError(!validCapital);
         setIsButtonDisabled(!validCapital || !portfolioName || !portfolioDescription);
-    
+
     }, [portfolioCapital, portfolioName, portfolioDescription]);
-    
+
     const handleCreate = () => {
         setLoading(true);
         const formData = {
@@ -64,13 +74,23 @@ export default function CreatePortfolio() {
         async function createPortfolio() {
             const response = await postAsync('portfolios', formData, cookie.accessToken);
             const data = await response.json();
-            if (response.ok) {
-                setLoading(false);
-                navigate("/portfolio/" + data["portfolioId"]);
-            } else {
-                setLoading(false);
-                setOpen(false);
-                return;
+            try {
+                if (response.ok) {
+                    setLoading(false);
+                    navigate("/portfolio/" + data["portfolioId"]);
+                } else {
+                    throw response;
+                }
+            }
+            catch (err) {
+                handleClose();
+                err.json().then(errorDetails => {
+                    const error_message = errorDetails.details?.split(":")[1];
+                    showAlert('error', "Error:" + error_message);
+                }).catch(jsonError => {
+                    console.log(jsonError);
+                    showAlert('error', "An error occurred");
+                });
             }
 
         }
@@ -90,11 +110,46 @@ export default function CreatePortfolio() {
         }
         setPortfolioCapital(value);
     };
-    
 
-    
+
+
     return (
         <div>
+            {/* Snackbar for error message */}
+            <Snackbar
+                open={alert.open && alert.type === 'error'}
+                autoHideDuration={5000}
+                onClose={closeAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="error"
+                    onClose={closeAlert}
+                    sx={{ backgroundColor: colors.redAccent[600] }}
+                >
+                    {alert.message}
+                </Alert>
+            </Snackbar>
+
+            {/* Snackbar for success message */}
+            <Snackbar
+                open={alert.open && alert.type === 'success'}
+                autoHideDuration={5000}
+                onClose={closeAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="success"
+                    onClose={closeAlert}
+                    sx={{ backgroundColor: colors.greenAccent[600] }}
+                >
+                    {alert.message}
+                </Alert>
+            </Snackbar>
             <Button
                 sx={{
                     backgroundColor: colors.blueAccent[700],

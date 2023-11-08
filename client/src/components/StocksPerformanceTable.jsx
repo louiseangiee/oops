@@ -29,7 +29,6 @@ const TableHeaderCell = ({ id, label, onRequestSort, orderDirection, orderBy }) 
   </TableCell>
 );
 
-
 const ReturnsTable = ({ stockData, stockReturns }) => {
   const [orderDirection, setOrderDirection] = useState('asc');
   const [orderBy, setOrderBy] = useState('percentage');
@@ -51,17 +50,14 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
             getAsync(`portfolioStocks/${stockData.portfolioId}/stocks/${stock.stockSymbol}/calculateAnnualisedReturn`, cookies.accessToken),
           ]);
           const [weightData, weightedReturnData, annualisedReturnData] = await Promise.all(responses.map(res => res.json()));
-            
+
           details[stock.stockSymbol] = {
             weight: weightData[stock.stockSymbol], // Assuming that API response follows the same pattern
-            weightedReturn: weightedReturnData[stock.stockSymbol],
-            annualisedReturn: annualisedReturnData[stock.stockSymbol],
-
-            
+            weightedReturn: weightedReturnData.weightedReturn,
+            annualisedReturn: annualisedReturnData.annualisedReturn,
           };
-          
         }
-        
+
         setStockDetails(details);
       } catch (error) {
         console.error('Failed to fetch stock details:', error);
@@ -70,12 +66,12 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
         setLoading(false);
       }
     };
-  
+
     if (stockData && stockData.portfolioStocks && stockData.portfolioStocks.length > 0) {
       fetchStockDetails();
     }
   }, [stockData, cookies.accessToken]);
-  
+
   const sortedStockReturns = useMemo(() => {
     return Object.entries(stockReturns || {})
       .map(([symbol, data]) => ({
@@ -89,13 +85,13 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
         return (orderDirection === 'asc' ? valueA - valueB : valueB - valueA);
       });
   }, [stockReturns, stockDetails, orderBy, orderDirection]);
-  
 
   const handleRequestSort = (property) => {
     const isAsc = orderBy === property && orderDirection === 'asc';
     setOrderBy(property);
     setOrderDirection(isAsc ? 'desc' : 'asc');
   };
+
   // Helper function to apply styling for negative returns
   const returnCellStyle = (value) => ({
     color: value < 0 ? 'red' : 'green',
@@ -105,45 +101,50 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
   if (error) return <Box sx={{ display: 'flex', justifyContent: 'center' }}><Typography color="error">{error}</Typography></Box>;
 
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="simple table" stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell>Stock</TableCell>
-            <TableHeaderCell
-              id="weight"
-              label="Weight (%)"
-              onRequestSort={handleRequestSort}
-              orderDirection={orderDirection}
-              orderBy={orderBy}
-            />
-            <TableHeaderCell
-              id="percentage"
-              label="Return (%)"
-              onRequestSort={handleRequestSort}
-              orderDirection={orderDirection}
-              orderBy={orderBy}
-            />
-            <TableCell align="right">Returns ($)</TableCell>
-            <TableCell align="right">Weighted Return (%)</TableCell>
-            <TableCell align="right">Annualised Return (%)</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {sortedStockReturns.map((row) => (
-            
-            <TableRow key={row.symbol}>
-              <TableCell component="th" scope="row">{row.symbol}</TableCell>
-              <TableCell align="right">{(row.weight * 100).toFixed(2)}%</TableCell>
-              <TableCell style={returnCellStyle(row.percentage)} align="right">{row.percentage.toFixed(2)}%</TableCell>
-              <TableCell style={returnCellStyle(row.absolute)} align="right">{row.absolute?.toFixed(2)}</TableCell>
-              <TableCell align="right">{row.weightedReturn?.toFixed(2)}%</TableCell>
-              <TableCell align="right">{row.annualisedReturn?.toFixed(2)}</TableCell>
+    <div >
+      <TableContainer component={Paper}>
+        <Table aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Stock</TableCell>
+              <TableHeaderCell
+                id="weight"
+                label="Weight (%)"
+                onRequestSort={handleRequestSort}
+                orderDirection={orderDirection}
+                orderBy={orderBy}
+              />
+              <TableHeaderCell
+                id="percentage"
+                label="Return (%)"
+                onRequestSort={handleRequestSort}
+                orderDirection={orderDirection}
+                orderBy={orderBy}
+              />
+              <TableCell align="right">Returns ($)</TableCell>
+              <TableCell align="right">Weighted Return (%)</TableCell>
+              <TableCell align="right">Annualised Return (%)</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+        </Table>
+      </TableContainer>
+      <TableContainer component={Paper} style={{ maxHeight: '250px', overflowY: 'auto' }}>
+        <Table aria-label="simple table">
+          <TableBody>
+            {sortedStockReturns.map((row) => (
+              <TableRow key={row.symbol}>
+                <TableCell component="th" scope="row">{row.symbol}</TableCell>
+                <TableCell align="right">{(row.weight * 100).toFixed(2)}%</TableCell>
+                <TableCell style={returnCellStyle(row.percentage)} align="right">{row.percentage.toFixed(2)}%</TableCell>
+                <TableCell style={returnCellStyle(row.actualValue)} align="right">{row.actualValue.toFixed(2)}</TableCell>
+                <TableCell align="right">{row.weightedReturn?.toFixed(2)}%</TableCell>
+                <TableCell align="right">{row.annualisedReturn?.toFixed(2)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
   );
 };
 

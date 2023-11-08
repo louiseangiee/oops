@@ -14,7 +14,6 @@ import java.util.Spliterators;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,8 +27,6 @@ import com.oop.appa.dao.StockLookupRepository;
 import com.oop.appa.dao.StockRepository;
 import com.oop.appa.entity.Stock;
 import com.oop.appa.entity.StockLookup;
-
-// import lombok.experimental.var;
 
 @Service
 @Transactional // Adding @Transactional annotation to handle transactions at the service layer.

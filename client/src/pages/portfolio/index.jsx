@@ -442,17 +442,36 @@ const Portfolio = () => {
           gap="5px"
           pl="20px"
           borderRadius="10px"
+          position={"relative"}
+          sx={{
+            overflowX: "scroll",
+            '&::-webkit-scrollbar': { display: 'none' },
+            msOverflowStyle: 'none',  // IE and Edge
+            scrollbarWidth: 'none',  // Firefox
+          }}
         >
           <Typography
             variant="h6"
             fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
+            position='absolute'
+            top='15px'
+            left='10px'
+            sx={{
+              color: colors.grey[300],
+              overflow: "hidden",
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',  // IE and Edge
+              scrollbarWidth: 'none',  // Firefox
+            }}
           >
             Initial Capital
           </Typography>
           <Typography
             variant="h1"
             fontWeight="bold"
+            position='absolute'
+            bottom='10px'
+            left='15px'
             sx={{ color: colors.grey[100] }}
           >
             $
@@ -471,17 +490,36 @@ const Portfolio = () => {
           gap="5px"
           pl="20px"
           borderRadius="10px"
+          position={"relative"}
+          sx={{
+            overflowX: "scroll",
+            '&::-webkit-scrollbar': { display: 'none' },
+            msOverflowStyle: 'none',  // IE and Edge
+            scrollbarWidth: 'none',  // Firefox
+          }}
         >
           <Typography
             variant="h6"
             fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
+            position='absolute'
+            top='15px'
+            left='10px'
+            sx={{
+              color: colors.grey[300],
+              overflow: "hidden",
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',  // IE and Edge
+              scrollbarWidth: 'none',  // Firefox
+            }}
           >
             Remaining Capital
           </Typography>
           <Typography
             variant="h1"
             fontWeight="bold"
+            position='absolute'
+            bottom='10px'
+            left='15px'
             sx={{ color: colors.grey[100] }}
           >
             $
@@ -500,11 +538,27 @@ const Portfolio = () => {
           gap="5px"
           pl="20px"
           borderRadius="10px"
+          position={"relative"}
+          sx={{
+            overflowX: "scroll",
+            '&::-webkit-scrollbar': { display: 'none' },
+            msOverflowStyle: 'none',  // IE and Edge
+            scrollbarWidth: 'none',  // Firefox
+          }}
         >
           <Typography
             variant="h6"
             fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
+            position='absolute'
+            top='15px'
+            left='10px'
+            sx={{
+              color: colors.grey[300],
+              overflow: "hidden",
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',  // IE and Edge
+              scrollbarWidth: 'none',  // Firefox
+            }}
           >
             Return
           </Typography>
@@ -512,21 +566,23 @@ const Portfolio = () => {
           <Typography
             variant="h1"
             fontWeight="bold"
+            position='absolute'
+            bottom='10px'
+            left='15px'
             sx={{
               color:
                 overallReturns > 0
                   ? "green"
                   : overallReturns < 0
-                  ? "red"
-                  : colors.grey[100],
+                    ? "red"
+                    : colors.grey[100],
             }}
           >
             {!summaryLoading
-              ? `${
-                  overallReturns < 0 ? "-" : overallReturns > 0 ? "+" : ""
-                }$${Math.abs(overallReturns).toFixed(
-                  2
-                )}/${percentageReturns.toFixed(2)}%`
+              ? `${overallReturns < 0 ? "-" : overallReturns > 0 ? "+" : ""
+              }$${Math.abs(overallReturns).toFixed(
+                2
+              )}/${percentageReturns.toFixed(2)}%`
               : "Loading..."}
           </Typography>
         </Box>
@@ -540,25 +596,45 @@ const Portfolio = () => {
           flexDirection="column"
           gap="5px"
           pl="20px"
+          position={"relative"}
           borderRadius="10px"
+          sx={{
+            overflowX: "scroll",
+            '&::-webkit-scrollbar': { display: 'none' },
+            msOverflowStyle: 'none',  // IE and Edge
+            scrollbarWidth: 'none',  // Firefox
+          }}
+
         >
           <Typography
             variant="h6"
             fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
+            position='absolute'
+            top='15px'
+            left='10px'
+            sx={{
+              color: colors.grey[300],
+              overflow: "hidden",
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',  // IE and Edge
+              scrollbarWidth: 'none',  // Firefox
+            }}
           >
             Overall Portfolio Value
           </Typography>
           <Typography
             variant="h1"
+            position='absolute'
+            bottom='10px'
+            left='15px'
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
             $
             {!summaryLoading
               ? `${Math.abs(totalPortfolioValue).toFixed(
-                  2
-                )}`
+                2
+              )}`
               : "Loading..."}
           </Typography>
         </Box>
@@ -575,7 +651,7 @@ const Portfolio = () => {
                 ? portfolioData["portfolioStocks"]
                 : null
             }
-            stockReturns={stockReturns? stockReturns:null}
+            stockReturns={stockReturns ? stockReturns : null}
             portfolioId={portfolioId}
             portfolioData={portfolioData}
             portfolioSummaries={portfolioSummaries}

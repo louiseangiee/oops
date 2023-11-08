@@ -7,7 +7,7 @@ import BreakdownTable from './PortfolioBreakdownTable';
 
 const COLORS = ['#0088FE', '#FF5D73', '#FFC658', '#00C49F', '#AF19FF', '#FFBB28'];
 function generateHSLColor(index) {
-  const hue = index * 137.508; // use golden angle approximation
+  const hue = index * 137.508; // use golden angle approximation2
   return `hsl(${hue % 360}, 50%, 60%)`;
 }
 
@@ -51,7 +51,6 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
 
   useEffect(() => {
     if (!portfolioStockData || portfolioStockData.length === 0) {
-      console.error('Portfolio data is empty.');
       return;
     }
 
@@ -98,7 +97,7 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
     ? grouping.charAt(0).toUpperCase() + grouping.slice(1).replace(/([A-Z])/g, ' $1').trim()
     : '';
 
-    
+
 
   return (
     <Paper style={{ padding: '20px' }}>
@@ -123,9 +122,7 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
             data={pieChartData}
             dataKey="value"
             nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={200}
+          // ...  
           >
             {pieChartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

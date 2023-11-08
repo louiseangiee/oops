@@ -42,11 +42,11 @@ const StockMarketPage = () => {
                     handleStockChange={handleStockChange} />
 
                 {/* StockDetailstable */}
-                <Box paddingX={5} marginBottom={3}>
+                <Box paddingX={3} >
                     
                     <StockDetailsTable chosenStock={chosenStock}/>
                 </Box>
-                <Box paddingX={5}>
+                <Box paddingX={3}>
                         <StockChart chosenStock={chosenStock} />
                 </Box>
         </Box></>

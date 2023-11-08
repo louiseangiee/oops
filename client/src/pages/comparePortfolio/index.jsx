@@ -6,10 +6,11 @@ import ComparePortfolioComponent from "../../components/ComparePortfolioComponen
 const ComparePortfolio = () => {
     return (
         <>
-            <Box m="20px">
+            <Box m="20px" alignItems="top">
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Header title="Compare Portfolio" subtitle="Compare Portfolio Performance" />
                 </Box>
+                
                 <ComparePortfolioComponent />
             </Box>
 

@@ -251,6 +251,14 @@ const Portfolio = () => {
   const [stockReturns, setStockReturns] = useState({});
   const [showInvestedReturns, setShowInvestedReturns] = useState(false);
 
+  // Define fetchData at the component level
+  const fetchData = async () => {
+    await fetchPortfolioData();
+    await fetchPortfolioSummaryData();
+  };
+
+  
+
   // Fetch portfolio data
   const fetchPortfolioData = async () => {
     if (userData && portfolioId) {
@@ -287,47 +295,39 @@ const Portfolio = () => {
     }
   };
 
-  // Fetch Portfolio Returns
   const fetchPortfolioSummaryData = async () => {
-    const portfolioSummaryResponse = await getAsync(
-      `portfolioStocks/${portfolioId}/summary`,
-      cookie.accessToken
-    );
-    const portfolioSummaryData = await portfolioSummaryResponse.json();
-    setPortfolioSummaries(portfolioSummaryData);
-    if (Object.keys(portfolioSummaryData.overallReturns).length === 0) {
-      setOverallReturns(0);
-      setPercentageReturns(0);
-      setTotalPortfolioValue(0);
-      setStockReturns({});
-      setSummaryLoading(false);
-    } else {
-      setOverallReturns(portfolioSummaryData.overallReturns.overalReturn);
-      setPercentageReturns(portfolioSummaryData.overallReturns.percentage);
-      setTotalPortfolioValue(portfolioSummaryData.totalPortfolioValue);
-      setStockReturns(portfolioSummaryData.stockReturns);
-      setSummaryLoading(false);
+    try {
+      const portfolioSummaryResponse = await getAsync(
+        `portfolioStocks/${portfolioId}/summary`,
+        cookie.accessToken
+      );
+      const portfolioSummaryData = await portfolioSummaryResponse.json();
+      setPortfolioSummaries(portfolioSummaryData);
+      if (Object.keys(portfolioSummaryData.overallReturns).length === 0) {
+        setOverallReturns(0);
+        setPercentageReturns(0);
+        setTotalPortfolioValue(0);
+        setStockReturns({});
+        setSummaryLoading(false);
+      } else {
+        setOverallReturns(portfolioSummaryData.overallReturns.overalReturn);
+        setPercentageReturns(portfolioSummaryData.overallReturns.percentage);
+        setTotalPortfolioValue(portfolioSummaryData.totalPortfolioValue);
+        setStockReturns(portfolioSummaryData.stockReturns);
+        setSummaryLoading(false);
+      }
+      // Call fetchData() after the fetch operation
+      fetchData();
+    } catch (error) {
+      console.error("Failed to fetch portfolio summary data:", error);
     }
   };
 
   // Fetch data on initial component load
   useEffect(() => {
-    const fetchData = () => {
-      fetchPortfolioData();
-      fetchPortfolioSummaryData();
-    };
-
     fetchData();
-    // Set up an interval to periodically fetch data (e.g., every 30 seconds)
-    const intervalId = setInterval(fetchData, 30000); // Adjust the interval as needed
-    setRefreshIntervalId(intervalId);
-
-    return () => {
-      if (refreshIntervalId) {
-        clearInterval(refreshIntervalId);
-      }
-    };
   }, [portfolioId, userData]);
+
 
   const breadcrumbs = [
     <Link

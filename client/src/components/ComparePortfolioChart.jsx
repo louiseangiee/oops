@@ -258,7 +258,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
 
   // Render the chart or a loading indicator
   return (
-    console.log(summary2),
+    
     <div>
       {/* Your chart rendering logic will go here */}
       <Box
@@ -266,10 +266,11 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
         flexDirection="row"
         justifyContent="space-between"
         alignItems="flex-start"
+        width="100%"
       >
         {/* This is the first half of the page for portfolioData1 */}
         
-        <Box flex={1} margin={2} padding={3} alignItems="flex-start" style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
+        <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400]}} borderLeft={3}  alignItems="flex-start">
           <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
             ID {portfolioData1.portfolioId}: {portfolioData1.name}
           </Typography>
@@ -355,7 +356,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
         </Box>
 
         {/* This is the second half of the page for portfolioData2 */}
-        <Box flex={1} margin={2} padding={3} alignItems="flex-start" style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
+        <Box flex={1} margin={2} padding={3}  style={{ backgroundColor: colors.primary[400]}} alignItems="flex-start" borderLeft={3}>
           <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
             ID {portfolioData2.portfolioId}: {portfolioData2.name}
           </Typography>
@@ -435,8 +436,8 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <br />
           <Divider />
           <br />
-          {/* <ReturnsTable stockData={portfolioData2} stockReturns={summary2} /> */}
-          <ReturnsTable stockData={portfolioData1} stockReturns={summary2} />
+         
+          <ReturnsTable stockData={portfolioData2} stockReturns={summary2} />
         </Box>
       </Box>
     </div>

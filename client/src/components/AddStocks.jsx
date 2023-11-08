@@ -181,7 +181,6 @@ export default function AddStocks({ portfolioId }) {
         }
         catch (err) {
             handleClose();
-            console.log(err);
             err.json().then(errorDetails => {
                 const error_message = errorDetails.details?.split(":")[1];
                 showAlert('error', "Error:" + error_message);

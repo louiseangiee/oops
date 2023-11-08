@@ -6,9 +6,9 @@ import EditPortfolio from "./EditPortfolio";
 const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const capitalColor = (capital >= 0 || capital == null) ? colors.greenAccent[500] : colors.redAccent[500];
+    //const capitalColor = (capital >= 0 || capital == null) ? colors.greenAccent[500] : colors.redAccent[500];
     const returnsColor = (returns >= 0 || returns == null) ? colors.greenAccent[500] : colors.redAccent[500];
-    capital = capital > 0 ? ("+$" + capital) : (capital === 0 || capital == null) ? "$-" : ("-$" + capital * -1);
+    // capital = capital > 0 ? ("+$" + capital) : (capital === 0 || capital == null) ? "$-" : ("-$" + capital * -1);
     returns = returns > 0 ? ("+$" + returns) : (returns === 0 || returns == null) ? "$-" : ("-$" + returns * -1);
 
     return (
@@ -53,7 +53,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                     fontStyle="italic"
                     sx={{ color: colors.grey[300], fontSize: "10px" }}
                 >
-                    Capital
+                    Initial Capital
                 </Typography>
                 {/* <Typography
                     variant="h6"
@@ -67,7 +67,6 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                 <Typography
                     variant="h4"
                     fontWeight="bold"
-                    sx={{ color: capitalColor }}
                 >
                     {capital}
                 </Typography>

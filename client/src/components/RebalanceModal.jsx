@@ -30,8 +30,6 @@ const RebalanceModal = ({ portfolioId }) => {
   const [page, setPage] = useState(1);
   const [targetPercentages, setTargetPercentages] = useState({});
   const [loading, setLoading] = useState(false);
-  const [allocationsChanged, setAllocationsChanged] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const [responseState, setResponseState] = useState({
     finalStocks: null,
     stockAdjustments: null,
@@ -90,7 +88,6 @@ const RebalanceModal = ({ portfolioId }) => {
   };
 
   const handleAllocationChange = (name, value) => {
-    setAllocationsChanged(true);
     let newValue = value === "" ? "" : Number(value);
 
     setTargetPercentages((prevState) => {
@@ -164,8 +161,6 @@ const RebalanceModal = ({ portfolioId }) => {
         handleOpenSuccessAlert();
         handleClose();
       }
-      // setSuccessMessage(data.message);
-      // setPage(4);
     } catch (error) {
       handleOpenErrorAlert();
       handleClose();

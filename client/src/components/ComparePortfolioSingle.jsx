@@ -11,87 +11,28 @@ import { tokens } from "../theme";
 // CustomTooltip, toFixedSafe, getOverallReturn, getStockReturns, fetchAllEndpoints
 
 const ComparePortfolioSingle = ({ chosenPortfolio }) => {
-  const [cookies] = useCookies(['accessToken']);
+  const [cookies] = useCookies();
   const [portfolioData, setPortfolioData] = useState([]);
-  const [portfolioSummaries, setPortfolioSummaries] = useState([]);
-  const [portfolioVolatility, setPortfolioVolatility] = useState(null);
-  const [portfolioVolatilityAnnual, setPortfolioVolatilityAnnual] = useState(null);
+  const [overallReturn, setOverallReturn] = useState(0);
+  const [overallReturnPercentage, setOverallReturnPercentage] = useState(0);
+  const [volatility, setVolatility] = useState(0);
+  const [volatilityAnnual, setVolatilityAnnual] = useState(0);
+  const [stockReturns, setStockReturns] = useState({});
+
+  // loading states for different endpoints
+  const [loadingPortfolio, setLoadingPortfolio] = useState(true);
+  const [loadingSummary, setLoadingSummary] = useState(true);
+  const [loadingVolatility, setLoadingVolatility] = useState(true);
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const fetchPortfolio = async () => {
-    try {
-      if (!chosenPortfolio) {
-        return;
-      }  
-      else{
-        const response = await getAsync(`portfolios/${chosenPortfolio.portfolioId}`, cookies.accessToken);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-  
-        console.log(data);
-
-        setPortfolioData(data);
-     
-      }
-    } catch (err) {
-      console.error('There was an error fetching the portfolio details:', err);
-    }
-     
-  };
-
-  const fetchPortfolioSummaries = async () => {
-    try {
-      if (!chosenPortfolio) return;
-      const response = await getAsync(`portfolioStocks/${chosenPortfolio.portfolioId}/summary`, cookies.accessToken);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-
-      console.log(data);
-
-      setPortfolioSummaries(data);
-    } catch (err) {
-      console.error('There was an error fetching the portfolio details:', err);
-    }
-  };
-
-  const fetchPortfolioVolalities = async () => {
-    if (!chosenPortfolio) return;
-    let endpoint = `portfolioStocks/${chosenPortfolio.portfolioId}/volatility`;  // Default to monthly data
-    let endpointAnnual = `portfolioStocks/${chosenPortfolio.portfolioId}/volatility/annualized`;
-
-    try {
-      const response = await getAsync(`${endpoint}`, cookies.accessToken); // Use the accessToken from cookies
-      const responseAnnual = await getAsync(`${endpointAnnual}`, cookies.accessToken); // Use the accessToken from cookies
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const responseData = await response.json();
-      const responseDataAnnual = await responseAnnual.json();
-
-      console.log(responseData);
-      console.log(responseDataAnnual);
-
-      setPortfolioVolatility(responseData.portfolioVolatility);
-      setPortfolioVolatilityAnnual(responseDataAnnual.portfolioVolatility);
-    } catch (error) {
-      console.error('There was an error fetching the portfolio details:', error);
-    }
-  };
-
   function toFixedSafe(value, digits = 2, defaultValue = 'N/A') {
+    if (value == null) return;
     try {
       const number = Number(value);
-      if (Number.isFinite(number)) {
+      if (!isNaN(number) && Number.isFinite(number)) {
         return number.toFixed(digits);
-      } else {
-        throw new Error('Value is not a finite number');
       }
     } catch (error) {
       console.error(error);
@@ -99,41 +40,74 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
     }
   }
 
-  const volAnnual = toFixedSafe(portfolioVolatilityAnnual);
-  const vol = toFixedSafe(portfolioVolatility);
-  console.log(vol);
+  const fetchPortfolio = async () => {
+    try {
+      if (!chosenPortfolio || chosenPortfolio.portfolioId === undefined) {
+        return;
+      }
+      else {
+        const response = await getAsync(`portfolios/${chosenPortfolio.portfolioId}`, cookies.accessToken);
+        if (!response.ok) {
+          setLoadingPortfolio(false);
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setPortfolioData(data);
+        setLoadingPortfolio(false);
 
-  function getOverallReturn(portfolioSummaries) {
-    if (!portfolioSummaries) {
-      console.error("Error: portfolioSummaries is not defined.");
-      return '';
+      }
+    } catch (err) {
+      console.error('There was an error fetching the portfolio details:', err);
+      setLoadingPortfolio(false);
     }
-    if (!portfolioSummaries.overallReturns) {
-      console.error("Error: overallReturn is not defined in the portfolioSummaries object.");
-      return ''; 
+    setLoadingPortfolio(false);
+  };
+
+  const fetchPortfolioSummaries = async () => {
+    try {
+      if (!chosenPortfolio || chosenPortfolio.portfolioId === undefined) return;
+      const response = await getAsync(`portfolioStocks/${chosenPortfolio.portfolioId}/summary`, cookies.accessToken);
+      if (!response.ok) {
+        setLoadingSummary(false);
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setOverallReturn(data?.overallReturns?.overalReturn ? data.overallReturns.overalReturn : 0);
+      setOverallReturnPercentage(data?.overallReturns?.percentage ? data.overallReturns.percentage : 0);
+      setStockReturns(data?.stockReturns ? data.stockReturns : {});
+      setLoadingSummary(false);
+    } catch (err) {
+      console.error('There was an error fetching the portfolio details:', err);
+      setLoadingSummary(false);
     }
-    return portfolioSummaries.overallReturns;
-  }
+    setLoadingSummary(false);
+  };
 
-  function getStockReturns(portfolioSummaries) {
-    if (!portfolioSummaries) {
-      console.error("Error: portfolioSummaries is not defined.");
-      return '';
+  const fetchPortfolioVolalities = async () => {
+    if (!chosenPortfolio || chosenPortfolio.portfolioId === undefined) return;
+    let endpoint = `portfolioStocks/${chosenPortfolio.portfolioId}/volatility`;
+    let endpointAnnual = `portfolioStocks/${chosenPortfolio.portfolioId}/volatility/annualized`;
+
+    try {
+      const response = await getAsync(`${endpoint}`, cookies.accessToken);
+      const responseAnnual = await getAsync(`${endpointAnnual}`, cookies.accessToken); // Use the accessToken from cookies
+
+      if (!response.ok) {
+        setLoadingVolatility(false);
+        throw new Error('Network response was not ok');
+      }
+      const responseData = await response.json();
+      const responseDataAnnual = await responseAnnual.json();
+
+      setVolatility(toFixedSafe(responseData.portfolioVolatility));
+      setVolatilityAnnual(toFixedSafe(responseDataAnnual.portfolioVolatility));
+      setLoadingVolatility(false);
+    } catch (error) {
+      console.error('There was an error fetching the portfolio details:', error);
+      setLoadingVolatility(false);
     }
-
-    if (!portfolioSummaries.stockReturns) {
-      console.error("Error: stockReturns is not defined in the portfolioSummaries object.");
-      return ''; 
-    }
-    return portfolioSummaries.stockReturns;
-  }
-
-  const summary = getStockReturns(portfolioSummaries);
-
-  console.log(summary);
-
-  const overallReturn = getOverallReturn(portfolioSummaries).overalReturn;
-  const overallReturnPercentage = getOverallReturn(portfolioSummaries).percentage;
+    setLoadingVolatility(false);
+  };
 
   useEffect(() => {
     fetchPortfolio();
@@ -141,8 +115,11 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
     fetchPortfolioVolalities();
   }, [chosenPortfolio]);
 
+
   return (
     <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
+      {loadingPortfolio ? 'Loading...' : (
+        <>
           <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
             ID {portfolioData.portfolioId}: {portfolioData.name}
           </Typography>
@@ -153,9 +130,6 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
             {portfolioData.description}
           </Typography>
 
-          
-
-          {/* Include description for portfolioData2 here */}
           <Box display="flex"
             flexDirection="row"
             justifyContent="space-between"
@@ -167,15 +141,17 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
                   Total Portfolio Value:
                 </Typography>
                 <Typography variant="h3" fontWeight="bold">
-                  ${portfolioData.totalCapital - portfolioData.remainingCapital}
+                  ${(portfolioData.totalCapital - portfolioData.remainingCapital).toFixed(2)}
                 </Typography>
               </Box>
               <Box flex={1} margin={1}>
                 <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
                   Overall Returns:
                 </Typography>
-                <Typography variant="h3" fontWeight="bold" style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>
-                  {overallReturn} <span style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>({overallReturnPercentage}%)</span>
+                <Typography variant="h3" fontWeight="bold" style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300], wordWrap: 'break-word' }}>
+                  {loadingSummary ? 'Calculating...' :
+                    `$${overallReturn}(${overallReturnPercentage}%)`
+                  }
                 </Typography>
               </Box>
             </Box>
@@ -198,36 +174,40 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
               </Box>
             </Box>
             <Box flex={1} margin={1}>
-            <Box flex={1} margin={1}>
-              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                Volatility (Monthly):
-              </Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {(vol * 100).toFixed(2)}%
-              </Typography>
-            </Box>
-            <Box flex={1} margin={1}>
-              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                Volatility Annualized:
-              </Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {(volAnnual * 100).toFixed(2)}%
-              </Typography>
-            </Box>
-          </Box>
-          </Box>
-          <Divider />
-          <br />
-          <PortfolioBreakdown portfolioStockData={portfolioData.portfolioStocks} />
-          <br />
-          <Divider />
-          <br />
-          <ReturnsTable stockData= {portfolioData} stockReturns={summary} />
-          
-          
-        </Box>
+              <Box flex={1} margin={1}>
+                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                  Volatility (Monthly):
+                </Typography>
+                <Typography variant="h3" fontWeight="bold">
+                  {loadingVolatility ? 'Calculating data...' :
+                    (volatility * 100).toFixed(2) + '%'
+                  }
 
-    
+                </Typography>
+              </Box>
+              <Box flex={1} margin={1}>
+                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                  Volatility Annualized:
+                </Typography>
+                <Typography variant="h3" fontWeight="bold">
+                  {loadingVolatility ? 'Calculating data...' :
+                    (volatilityAnnual * 100).toFixed(2) + '%'
+                  }
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </>)}
+      <Divider />
+      <br />
+      <PortfolioBreakdown portfolioStockData={portfolioData.portfolioStocks} />
+      <br />
+      <Divider />
+      <br />
+      <ReturnsTable stockData={portfolioData} stockReturns={stockReturns} />
+
+
+    </Box>
   );
 };
 

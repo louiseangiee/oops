@@ -29,6 +29,8 @@ import noDataAnimation from "./no_data.json";
 import Loading from "./fetching_data.json";
 import loadingLight from "./loading_light.json";
 import RebalanceModal from "../../components/RebalanceModal";
+import Tooltip from "@mui/material/Tooltip";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 
 function DeletePortfolio() {
   const theme = useTheme();
@@ -210,6 +212,7 @@ function DeletePortfolio() {
                 backgroundColor: colors.redAccent[700],
               },
             }}
+            disabled={document.getElementById("confirm-deletion")?.value !== portfolioData["name"]}
           >
             {loading ? (
               <Lottie
@@ -246,6 +249,7 @@ const Portfolio = () => {
   const [refreshIntervalId, setRefreshIntervalId] = useState(null);
   const [totalPortfolioValue, setTotalPortfolioValue] = useState(0);
   const [stockReturns, setStockReturns] = useState({});
+  const [showInvestedReturns, setShowInvestedReturns] = useState(false);
 
   // Fetch portfolio data
   const fetchPortfolioData = async () => {
@@ -393,6 +397,14 @@ const Portfolio = () => {
     );
   }
 
+  const handleTooltipClose = () => {
+    setShowInvestedReturns(false);
+  };
+
+  const handleTooltipOpen = () => {
+    setShowInvestedReturns(!showInvestedReturns);
+  };
+
   return (
     <Box m="20px">
       {/* HEADER */}
@@ -442,17 +454,36 @@ const Portfolio = () => {
           gap="5px"
           pl="20px"
           borderRadius="10px"
+          position={"relative"}
+          sx={{
+            overflowX: "scroll",
+            '&::-webkit-scrollbar': { display: 'none' },
+            msOverflowStyle: 'none',  // IE and Edge
+            scrollbarWidth: 'none',  // Firefox
+          }}
         >
           <Typography
             variant="h6"
             fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
+            position='absolute'
+            top='15px'
+            left='10px'
+            sx={{
+              color: colors.grey[300],
+              overflow: "hidden",
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',  // IE and Edge
+              scrollbarWidth: 'none',  // Firefox
+            }}
           >
             Initial Capital
           </Typography>
           <Typography
-            variant="h1"
+            variant="h2"
             fontWeight="bold"
+            position='absolute'
+            bottom='10px'
+            left='15px'
             sx={{ color: colors.grey[100] }}
           >
             $
@@ -471,17 +502,36 @@ const Portfolio = () => {
           gap="5px"
           pl="20px"
           borderRadius="10px"
+          position={"relative"}
+          sx={{
+            overflowX: "scroll",
+            '&::-webkit-scrollbar': { display: 'none' },
+            msOverflowStyle: 'none',  // IE and Edge
+            scrollbarWidth: 'none',  // Firefox
+          }}
         >
           <Typography
             variant="h6"
             fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
+            position='absolute'
+            top='15px'
+            left='10px'
+            sx={{
+              color: colors.grey[300],
+              overflow: "hidden",
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',  // IE and Edge
+              scrollbarWidth: 'none',  // Firefox
+            }}
           >
             Remaining Capital
           </Typography>
           <Typography
-            variant="h1"
+            variant="h2"
             fontWeight="bold"
+            position='absolute'
+            bottom='10px'
+            left='15px'
             sx={{ color: colors.grey[100] }}
           >
             $
@@ -490,46 +540,77 @@ const Portfolio = () => {
               : "0.00"}
           </Typography>
         </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="flex-start"
-          justifyContent="center"
-          flexDirection="column"
-          gap="5px"
-          pl="20px"
-          borderRadius="10px"
-        >
-          <Typography
-            variant="h6"
-            fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
-          >
-            Return
-          </Typography>
-
-          <Typography
-            variant="h1"
-            fontWeight="bold"
+        <ClickAwayListener onClickAway={handleTooltipClose}>
+          <Box
+            gridColumn="span 3"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="flex-start"
+            justifyContent="center"
+            flexDirection="column"
+            gap="5px"
+            pl="20px"
+            borderRadius="10px"
+            position={"relative"}
             sx={{
-              color:
-                overallReturns > 0
-                  ? "green"
-                  : overallReturns < 0
-                  ? "red"
-                  : colors.grey[100],
+              overflowX: "scroll",
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',  // IE and Edge
+              scrollbarWidth: 'none',  // Firefox
             }}
           >
-            {!summaryLoading
-              ? `${
-                  overallReturns < 0 ? "-" : overallReturns > 0 ? "+" : ""
-                }$${Math.abs(overallReturns).toFixed(
-                  2
-                )}/${percentageReturns.toFixed(2)}%`
-              : "Loading..."}
-          </Typography>
-        </Box>
+            <Tooltip
+              title={
+                showInvestedReturns
+                  ? `Click to show Actual Returns`
+                  : `Click to show Invested Capital Returns`
+              }
+              arrow
+              enterTouchDelay={0}
+              leaveTouchDelay={5000}
+              onClick={handleTooltipOpen}
+            >
+              <Typography
+                variant="h6"
+                fontStyle="italic"
+                position='absolute'
+                top='15px'
+                left='10px'
+                sx={{
+                  color: colors.grey[300],
+                  overflow: "hidden",
+                  '&::-webkit-scrollbar': { display: 'none' },
+                  msOverflowStyle: 'none',  // IE and Edge
+                  scrollbarWidth: 'none',  // Firefox
+                }}
+              >
+                {showInvestedReturns ? `Invested Capital Returns` : `Actual Returns`}
+              </Typography>
+
+              <Typography
+                variant="h2"
+                fontWeight="bold"
+                position='absolute'
+                bottom='10px'
+                left='15px'
+                sx={{
+                  color:
+                    overallReturns > 0
+                      ? "green"
+                      : overallReturns < 0
+                        ? "red"
+                        : colors.grey[100],
+                }}
+              >
+                {!summaryLoading
+                  ? showInvestedReturns
+                    ? `${overallReturns < 0 ? "" : overallReturns > 0 ? "+" : ""}${percentageReturns.toFixed(2)}%`
+                    : `${overallReturns < 0 ? "-" : overallReturns > 0 ? "+" : ""}$${Math.abs(overallReturns).toFixed(2)}`
+                  : "Loading..."}
+              </Typography>
+            </Tooltip>
+          </Box>
+        </ClickAwayListener>
 
         <Box
           gridColumn="span 3"
@@ -540,25 +621,43 @@ const Portfolio = () => {
           flexDirection="column"
           gap="5px"
           pl="20px"
+          position={"relative"}
           borderRadius="10px"
+          sx={{
+            overflowX: "scroll",
+            '&::-webkit-scrollbar': { display: 'none' },
+            msOverflowStyle: 'none',  // IE and Edge
+            scrollbarWidth: 'none',  // Firefox
+          }}
+
         >
           <Typography
             variant="h6"
             fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
+            position='absolute'
+            top='15px'
+            left='10px'
+            sx={{
+              color: colors.grey[300],
+              overflow: "hidden",
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',  // IE and Edge
+              scrollbarWidth: 'none',  // Firefox
+            }}
           >
             Overall Portfolio Value
           </Typography>
           <Typography
-            variant="h1"
+            variant="h2"
+            position='absolute'
+            bottom='10px'
+            left='15px'
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
             $
             {!summaryLoading
-              ? `${Math.abs(totalPortfolioValue).toFixed(
-                  2
-                )}`
+              ? `${Math.abs(totalPortfolioValue).toFixed(2)}`
               : "Loading..."}
           </Typography>
         </Box>
@@ -575,7 +674,7 @@ const Portfolio = () => {
                 ? portfolioData["portfolioStocks"]
                 : null
             }
-            stockReturns={stockReturns? stockReturns:null}
+            stockReturns={stockReturns ? stockReturns : null}
             portfolioId={portfolioId}
             portfolioData={portfolioData}
             portfolioSummaries={portfolioSummaries}

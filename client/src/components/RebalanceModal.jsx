@@ -140,6 +140,7 @@ const RebalanceModal = ({ portfolioId }) => {
       }
     }
   };
+
   const handleConfirmRebalance = async () => {
     console.log({
       portfolioStocks: responseState.stockAdjustments,
@@ -281,6 +282,9 @@ const RebalanceModal = ({ portfolioId }) => {
                   <DialogActions
                     sx={{ backgroundColor: colors.primary[400], paddingRight: "0px" }}
                   >
+                    <Button variant="filled" onClick={handleClose} sx={{ width: "80px", height: "33px" }}>
+                      Cancel
+                    </Button>
                     <Button variant="contained" onClick={handleRebalanceSubmit} sx={{ width: "80px", height: "33px" }}>
                       {loading ?
                         <Lottie
@@ -325,7 +329,7 @@ const RebalanceModal = ({ portfolioId }) => {
                       label="Change Percentage to:"
                       type="number"
                       inputProps={{ step: "0.01", min: "0", max: "100" }} // Uncomment and use inputProps
-                      onBlur={(e) => {
+                      onChange={(e) => {
                         handleAllocationChange(key, e.target.value);
                         handleAllocationChange(
                           key,

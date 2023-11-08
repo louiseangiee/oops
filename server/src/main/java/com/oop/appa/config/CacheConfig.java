@@ -16,6 +16,6 @@ public class CacheConfig {
             "portfolioVolatility", 
             "annualizedVolatility",
             "AnnualizedportfolioVolatility",
-            "portfolioList");
+            "portfolioUser");
     }
 }

@@ -189,7 +189,7 @@ export default function AddStocks({ portfolioId }) {
             {/* Snackbar for error message */}
             <Snackbar
                 open={isErrorAlertOpen}
-                autoHideDuration={5000}
+                autoHideDuration={1000}
                 onClose={handleCloseErrorAlert}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
@@ -207,7 +207,7 @@ export default function AddStocks({ portfolioId }) {
             {/* Snackbar for success message */}
             <Snackbar
                 open={isSuccessAlertOpen}
-                autoHideDuration={5000}
+                autoHideDuration={1000}
                 onClose={handleCloseSuccessAlert}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >

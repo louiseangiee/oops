@@ -11,53 +11,19 @@ import { tokens } from "../theme";
 // CustomTooltip, toFixedSafe, getOverallReturn, getStockReturns, fetchAllEndpoints
 
 const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
-  const [cookies] = useCookies(['accessToken']);
+  const [cookies] = useCookies();
   // const [portfolioData, setPortfolioData] = useState([]);
   // const [portfolioSummaries, setPortfolioSummaries] = useState([]);
   const [portfolioVolatility, setPortfolioVolatility] = useState(null);
   const [portfolioVolatilityAnnual, setPortfolioVolatilityAnnual] = useState(null);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [loadingTable, setLoadingTable] = useState(true);
 
-//   const fetchPortfolio = async () => {
-//     try {
-//       if (!chosenPortfolio) {
-//         return;
-//       }  
-//       else{
-//         const response = await getAsync(`portfolios/${chosenPortfolio.portfolioId}`, cookies.accessToken);
-//         if (!response.ok) {
-//           throw new Error('Network response was not ok');
-//         }
-//         const data = await response.json();
-  
-//         console.log(data);
 
-//         setPortfolioData(data);
-     
-//       }
-//     } catch (err) {
-//       console.error('There was an error fetching the portfolio details:', err);
-//     }
-     
-//   };
-
-//   const fetchPortfolioSummaries = async () => {
-//     try {
-//       if (!chosenPortfolio) return;
-//       const response = await getAsync(`portfolioStocks/${chosenPortfolio.portfolioId}/summary`, cookies.accessToken);
-//       if (!response.ok) {
-//         throw new Error('Network response was not ok');
-//       }
-//       const data = await response.json();
-
-//       console.log(data);
-
-//       setPortfolioSummaries(data);
-//     } catch (err) {
-//       console.error('There was an error fetching the portfolio details:', err);
-//     }
-//   };
+  const handleLoadingState = (isLoading) => {
+    setLoadingTable(isLoading);
+  };
 
   const fetchPortfolioVolalities = async () => {
     let endpoint = `portfolioStocks/${portfolioData.portfolioId}/volatility`;  // Default to monthly data
@@ -85,7 +51,7 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
 
   function toFixedSafe(value, digits = 2, defaultValue = 'N/A') {
     try {
-        console.log("Checking toFixed passed in value", value);
+      console.log("Checking toFixed passed in value", value);
       const number = Number(value);
       if (Number.isFinite(number)) {
         return number.toFixed(digits);
@@ -109,6 +75,7 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
   }
   console.log(vol);
 
+
   function getOverallReturn(portfolioSummaries) {
     if (!portfolioSummaries) {
       console.error("Error: portfolioSummaries is not defined.");
@@ -116,7 +83,7 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
     }
     if (!portfolioSummaries.overallReturns) {
       console.error("Error: overallReturn is not defined in the portfolioSummaries object.");
-      return ''; 
+      return '';
     }
     return portfolioSummaries.overallReturns;
   }
@@ -129,7 +96,7 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
 
     if (!portfolioSummaries.stockReturns) {
       console.error("Error: stockReturns is not defined in the portfolioSummaries object.");
-      return ''; 
+      return '';
     }
     return portfolioSummaries.stockReturns;
   }
@@ -143,97 +110,96 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
 
   useEffect(() => {
     fetchPortfolioVolalities();
-    console.log("Volatility", portfolioVolatility);
-    console.log("Annaul Volatility", portfolioVolatilityAnnual);
   }, [portfolioData.portfolioId]);
 
   return (
     <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
-          <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
-            ID {portfolioData.portfolioId}: {portfolioData.name}
-          </Typography>
-          <Typography mt={2} variant="h4" fontWeight="bold">
-            Portfolio Description:
-          </Typography>
-          <Typography mt={1} variant="h5" fontStyle="italic">
-            {portfolioData.description}
-          </Typography>
+      <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
+        ID {portfolioData.portfolioId}: {portfolioData.name}
+      </Typography>
+      <Typography mt={2} variant="h4" fontWeight="bold">
+        Portfolio Description:
+      </Typography>
+      <Typography mt={1} variant="h5" fontStyle="italic">
+        {portfolioData.description}
+      </Typography>
 
-          
 
-          {/* Include description for portfolioData2 here */}
-          <Box display="flex"
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems="center"
-            width="100%">
-            <Box flex={1} margin={1}>
-              <Box flex={1} margin={1}>
-                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                  Total Portfolio Value:
-                </Typography>
-                <Typography variant="h3" fontWeight="bold">
-                  ${portfolioData.totalCapital - portfolioData.remainingCapital}
-                </Typography>
-              </Box>
-              <Box flex={1} margin={1}>
-                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                  Overall Returns:
-                </Typography>
-                <Typography variant="h3" fontWeight="bold" style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>
-                  {overallReturn} <span style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>({overallReturnPercentage}%)</span>
-                </Typography>
-              </Box>
-            </Box>
-            <Box flex={1} margin={1}>
-              <Box flex={1} margin={1}>
-                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                  Remaining Capital:
-                </Typography>
-                <Typography variant="h3" fontWeight="bold">
-                  ${portfolioData.remainingCapital}
-                </Typography>
-                <Box flex={1}>
-                  <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                    Capital Allocation:
-                  </Typography>
-                  <Typography variant="h3" fontWeight="bold">
-                    ${portfolioData.totalCapital}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-            <Box flex={1} margin={1}>
-            <Box flex={1} margin={1}>
-              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                Volatility (Monthly):
-              </Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {(vol * 100).toFixed(2)}%
-              </Typography>
-            </Box>
-            <Box flex={1} margin={1}>
-              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                Volatility Annualized:
-              </Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {(volAnnual * 100).toFixed(2)}%
-              </Typography>
-            </Box>
+
+      {/* Include description for portfolioData2 here */}
+      <Box display="flex"
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+        width="100%">
+        <Box flex={1} margin={1}>
+          <Box flex={1} margin={1}>
+            <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+              Total Portfolio Value:
+            </Typography>
+            <Typography variant="h3" fontWeight="bold">
+              ${portfolioData.totalCapital - portfolioData.remainingCapital}
+            </Typography>
           </Box>
+          <Box flex={1} margin={1}>
+            <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+              Overall Returns:
+            </Typography>
+            <Typography variant="h3" fontWeight="bold" style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>
+              {overallReturn} <span style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>({overallReturnPercentage}%)</span>
+            </Typography>
           </Box>
-          <Divider />
-          <br />
-          <PortfolioBreakdown portfolioStockData={portfolioData.portfolioStocks} />
-          <br />
-          <Divider />
-          <br />
-          <ReturnsTable stockData= {portfolioData} stockReturns={summary} />
-          
-          
         </Box>
+        <Box flex={1} margin={1}>
+          <Box flex={1} margin={1}>
+            <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+              Remaining Capital:
+            </Typography>
+            <Typography variant="h3" fontWeight="bold">
+              ${portfolioData.remainingCapital}
+            </Typography>
+            <Box flex={1}>
+              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                Capital Allocation:
+              </Typography>
+              <Typography variant="h3" fontWeight="bold">
+                ${portfolioData.totalCapital}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+        <Box flex={1} margin={1}>
+          <Box flex={1} margin={1}>
+            <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+              Volatility (Monthly):
+            </Typography>
+            <Typography variant="h3" fontWeight="bold">
+              {(vol * 100).toFixed(2)}%
+            </Typography>
+          </Box>
+          <Box flex={1} margin={1}>
+            <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+              Volatility Annualized:
+            </Typography>
+            <Typography variant="h3" fontWeight="bold">
+              {(volAnnual * 100).toFixed(2)}%
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+      <Divider />
+      <br />
+      <PortfolioBreakdown portfolioStockData={portfolioData.portfolioStocks} />
+      <br />
+      <Divider />
+      <br />
+      {!loadingTable &&
+        <ReturnsTable stockData={portfolioData} stockReturns={summary} onLoading={handleLoadingState} />}
 
-    
+
+    </Box>
+
+
   );
 };
 

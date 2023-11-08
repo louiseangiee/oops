@@ -1,13 +1,8 @@
 import { useState } from 'react';
-import Topbar from '../global/Topbar';
-import { Box, Typography, useTheme, TextField, Button, Tooltip, Snackbar, Alert } from "@mui/material";
+import { Box, Typography, useTheme, Button, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../../theme";
-import { putAsync } from "../../utils/utils";
 import { useCookies } from "react-cookie";
 import { useEffect } from 'react';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
-import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -18,9 +13,7 @@ export default function Profile() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("Fetching email...");
     const [fullName, setFullName] = useState("Fetching name...");
-    const [isEditingName, setIsEditingName] = useState(false);
-    const [isEditingEmail, setIsEditingEmail] = useState(false);
-    const [cookie, removeCookie] = useCookies();
+    const [, removeCookie] = useCookies();
     const [dataFetched, setDataFetched] = useState({});
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
@@ -44,48 +37,6 @@ export default function Profile() {
         setIsSuccessAlertOpen(false);
     };
 
-    const handleEditName = () => {
-        setIsEditingName(true);
-    };
-
-    /**
-     * The `handleSaveName` function updates the user's full name in the database and handles any errors
-     * that occur during the process.
-     * @returns The function does not explicitly return anything.
-     */
-    const handleSaveName = async () => {
-        setIsEditingName(false);
-        const trimmedFullName = fullName.trim();
-
-        if (trimmedFullName === '') {
-            setIsErrorAlertOpen(true);
-            handleCancelName();
-            return;
-        }
-
-        const updatedData = {
-            ...dataFetched,
-            fullName: trimmedFullName,
-        };
-        try {
-            const response = await putAsync('api/users', updatedData, cookie.accessToken);
-
-            if (response.ok) {
-                setIsSuccessAlertOpen(true);
-            } else {
-                console.error('Full name update failed');
-                const errorResponse = await response.json();
-                console.error('Error Response:', errorResponse);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
-    const handleCancelName = () => {
-        setFullName(dataFetched.fullName);
-        setIsEditingName(false);
-    };
     return (
         <>
             <main className="content">
@@ -123,8 +74,6 @@ export default function Profile() {
                         Full name is updated <strong>successfully</strong>.
                     </Alert>
                 </Snackbar>
-
-                <Topbar invisible={false} />
                 <div style={{
                     display: 'flex',
                     justifyContent: 'center',

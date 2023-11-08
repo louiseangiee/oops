@@ -18,7 +18,6 @@ import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.User;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 
 @Service
 public class PortfolioServiceImpl implements PortfolioService{

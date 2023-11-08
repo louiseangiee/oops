@@ -100,5 +100,5 @@ Endpoints are secured with JWT-based authentication, ensuring that only authoriz
 To interact with the API, users should replace path parameters like `{user_id}`, `{portfolioId}`, and `{stockSymbol}` with actual values corresponding to their account and portfolio details. Run the application and visit http://localhost:8080/swagger-ui/index.html for testing.
 
 ## Notice
-Pkease contact owners for .env sample to try our services locally.
+Please contact owners for .env sample to try our services locally.
 

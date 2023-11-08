@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import Lottie from 'lottie-react';
 import AddStocks from './AddStocks';
 import noDataDark from './lotties/no_data_dark.json';
+import StockAnalytics from './StockAnalytics';
 import { deleteAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
 import { useState, useEffect } from 'react';
@@ -153,7 +154,7 @@ function a11yProps(index) {
     };
 }
 
-export default function StocksTabs({ stocks, portfolioId }) {
+export default function StocksTabs({ stocks, portfolioId, portfolioData, portfolioSummaries }) {
     const [value, setValue] = useState(0);
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -322,6 +323,12 @@ export default function StocksTabs({ stocks, portfolioId }) {
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
                 Stocks Analytics
+                <Box>
+                    <StockAnalytics
+                    portfolioData={portfolioData}
+                    portfolioSummaries={portfolioSummaries}
+                    ></StockAnalytics>
+                </Box>
             </CustomTabPanel>
         </Box>
     );

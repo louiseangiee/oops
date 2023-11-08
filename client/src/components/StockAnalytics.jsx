@@ -10,60 +10,58 @@ import { tokens } from "../theme";
 // Assume that the following functions and components are shared and can be imported as needed:
 // CustomTooltip, toFixedSafe, getOverallReturn, getStockReturns, fetchAllEndpoints
 
-const ComparePortfolioSingle = ({ chosenPortfolio }) => {
+const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
   const [cookies] = useCookies(['accessToken']);
-  const [portfolioData, setPortfolioData] = useState([]);
-  const [portfolioSummaries, setPortfolioSummaries] = useState([]);
+  // const [portfolioData, setPortfolioData] = useState([]);
+  // const [portfolioSummaries, setPortfolioSummaries] = useState([]);
   const [portfolioVolatility, setPortfolioVolatility] = useState(null);
   const [portfolioVolatilityAnnual, setPortfolioVolatilityAnnual] = useState(null);
-
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const fetchPortfolio = async () => {
-    try {
-      if (!chosenPortfolio) {
-        return;
-      }  
-      else{
-        const response = await getAsync(`portfolios/${chosenPortfolio.portfolioId}`, cookies.accessToken);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
+//   const fetchPortfolio = async () => {
+//     try {
+//       if (!chosenPortfolio) {
+//         return;
+//       }  
+//       else{
+//         const response = await getAsync(`portfolios/${chosenPortfolio.portfolioId}`, cookies.accessToken);
+//         if (!response.ok) {
+//           throw new Error('Network response was not ok');
+//         }
+//         const data = await response.json();
   
-        console.log(data);
+//         console.log(data);
 
-        setPortfolioData(data);
+//         setPortfolioData(data);
      
-      }
-    } catch (err) {
-      console.error('There was an error fetching the portfolio details:', err);
-    }
+//       }
+//     } catch (err) {
+//       console.error('There was an error fetching the portfolio details:', err);
+//     }
      
-  };
+//   };
 
-  const fetchPortfolioSummaries = async () => {
-    try {
-      if (!chosenPortfolio) return;
-      const response = await getAsync(`portfolioStocks/${chosenPortfolio.portfolioId}/summary`, cookies.accessToken);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
+//   const fetchPortfolioSummaries = async () => {
+//     try {
+//       if (!chosenPortfolio) return;
+//       const response = await getAsync(`portfolioStocks/${chosenPortfolio.portfolioId}/summary`, cookies.accessToken);
+//       if (!response.ok) {
+//         throw new Error('Network response was not ok');
+//       }
+//       const data = await response.json();
 
-      console.log(data);
+//       console.log(data);
 
-      setPortfolioSummaries(data);
-    } catch (err) {
-      console.error('There was an error fetching the portfolio details:', err);
-    }
-  };
+//       setPortfolioSummaries(data);
+//     } catch (err) {
+//       console.error('There was an error fetching the portfolio details:', err);
+//     }
+//   };
 
   const fetchPortfolioVolalities = async () => {
-    if (!chosenPortfolio) return;
-    let endpoint = `portfolioStocks/${chosenPortfolio.portfolioId}/volatility`;  // Default to monthly data
-    let endpointAnnual = `portfolioStocks/${chosenPortfolio.portfolioId}/volatility/annualized`;
+    let endpoint = `portfolioStocks/${portfolioData.portfolioId}/volatility`;  // Default to monthly data
+    let endpointAnnual = `portfolioStocks/${portfolioData.portfolioId}/volatility/annualized`;
 
     try {
       const response = await getAsync(`${endpoint}`, cookies.accessToken); // Use the accessToken from cookies
@@ -87,6 +85,7 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
 
   function toFixedSafe(value, digits = 2, defaultValue = 'N/A') {
     try {
+        console.log("Checking toFixed passed in value", value);
       const number = Number(value);
       if (Number.isFinite(number)) {
         return number.toFixed(digits);
@@ -99,8 +98,15 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
     }
   }
 
-  const volAnnual = toFixedSafe(portfolioVolatilityAnnual);
-  const vol = toFixedSafe(portfolioVolatility);
+  var volAnnual = null;
+  var vol = null;
+  if (portfolioVolatilityAnnual) {
+    volAnnual = toFixedSafe(portfolioVolatilityAnnual);
+  }
+
+  if (portfolioVolatility) {
+    vol = toFixedSafe(portfolioVolatility);
+  }
   console.log(vol);
 
   function getOverallReturn(portfolioSummaries) {
@@ -136,10 +142,10 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
   const overallReturnPercentage = getOverallReturn(portfolioSummaries).percentage;
 
   useEffect(() => {
-    fetchPortfolio();
-    fetchPortfolioSummaries();
     fetchPortfolioVolalities();
-  }, [chosenPortfolio]);
+    console.log("Volatility", portfolioVolatility);
+    console.log("Annaul Volatility", portfolioVolatilityAnnual);
+  }, [portfolioData.portfolioId]);
 
   return (
     <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
@@ -231,4 +237,4 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
   );
 };
 
-export default ComparePortfolioSingle;
+export default StockAnalytics;

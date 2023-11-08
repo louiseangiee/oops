@@ -226,6 +226,7 @@ public class PortfolioStockService {
     }
 
     // UPDATE
+    @Transactional
     public void save(PortfolioStock stock) {
         try {
             portfolioStockRepository.save(stock);
@@ -235,6 +236,7 @@ public class PortfolioStockService {
     }
 
     // DELETE
+    @Transactional
     public void delete(PortfolioStock portfolioStock) {
         try {
             PortfolioStock portfolioStockRef = portfolioStockRepository.findById(portfolioStock.getId())
@@ -778,6 +780,7 @@ public class PortfolioStockService {
         return result;
     }
 
+    @Transactional
     private void processStockTransaction(Portfolio portfolio, String stockSymbol, int quantity) {
         PortfolioStock portfolioStock = portfolioStockRepository
                 .findByPortfolioPortfolioIdAndStockStockSymbol(portfolio.getPortfolioId(), stockSymbol)

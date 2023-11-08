@@ -21,6 +21,7 @@ import com.oop.appa.dao.UserRepository;
 import com.oop.appa.entity.User;
 
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -70,6 +71,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void updateOTP(String email, String otp) {
         try {
             User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
@@ -87,6 +89,7 @@ public class UserService {
     }
 
     // POST and UPDATE
+    @Transactional
     public void save(User user) {
         try {
             userRepository.save(user);
@@ -97,6 +100,7 @@ public class UserService {
     }
 
     // DELETE
+    @Transactional
     public void delete(User user) {
         try {
             userRepository.delete(user);
@@ -171,7 +175,8 @@ public class UserService {
             throw new RuntimeException("Error verifying OTP service: " + e.getMessage(), e);
         }
     }
-
+    
+    @Transactional
     public void deleteOtp(String email) {
         try {
             User user = findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
@@ -182,6 +187,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void changePassword(String email, String password) {
         try {
             User user = findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));

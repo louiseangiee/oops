@@ -20,6 +20,7 @@ import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.User;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class PortfolioService {
@@ -95,6 +96,7 @@ public class PortfolioService {
     }
 
     // POST
+    @Transactional
     @CacheEvict(value = "portfolioList", key = "#portfolioDto.user.id")
     public Portfolio createPortfolio(PortfolioCreationDTO portfolioDto) {
         try {
@@ -123,6 +125,7 @@ public class PortfolioService {
     }
 
     // UPDATE
+    @Transactional
     public Portfolio updatePortfolio(Integer portfolioId, Portfolio portfolio) {
         try {
             Portfolio existingPortfolio = portfolioRepository.findById(portfolioId)
@@ -176,6 +179,7 @@ public class PortfolioService {
     }
     
     // DELETE
+    @Transactional
     public void deleteById(Integer id) {
         try {
             Portfolio existingPortfolio = portfolioRepository.findById(id).orElseThrow(
@@ -192,6 +196,7 @@ public class PortfolioService {
 
     }
 
+    @Transactional
     public void deleteByUserId(Integer user_id) {
         try {
             portfolioRepository.deleteByUserId(user_id);

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import com.oop.appa.dao.AccessLogRepository;
 import com.oop.appa.entity.AccessLog;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class AccessLogService {
 
@@ -84,6 +86,7 @@ public class AccessLogService {
     }
 
     // POST and UPDATE
+    @Transactional
     public AccessLog save(AccessLog accessLog) {
         try {
             return accessLogRepository.save(accessLog);
@@ -93,6 +96,7 @@ public class AccessLogService {
     }
 
     // DELETE
+    @Transactional
     public void delete(AccessLog entity) {
         try {
             accessLogRepository.delete(entity);
@@ -102,6 +106,7 @@ public class AccessLogService {
         }
     }
 
+    @Transactional
     public void deleteById(Integer id) {
         try {
             accessLogRepository.deleteById(id);

@@ -5,6 +5,7 @@ import { useCookies } from "react-cookie";
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import Topbar from '../global/Topbar';
 
 
 export default function Profile() {
@@ -13,14 +14,16 @@ export default function Profile() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("Fetching email...");
     const [fullName, setFullName] = useState("Fetching name...");
-    const [, removeCookie] = useCookies();
+    const [cookie, removeCookie] = useCookies();
     const [dataFetched, setDataFetched] = useState({});
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
 
-
-
     const { userData } = useAuth();
+
+    if (cookie.accessToken === undefined || cookie.accessToken === '') {
+        navigate('/login');
+    }
 
     useEffect(() => {
         setEmail(userData.email);
@@ -74,7 +77,7 @@ export default function Profile() {
                         Full name is updated <strong>successfully</strong>.
                     </Alert>
                 </Snackbar>
-                
+                <Topbar invisible={false} />
                 <div style={{
                     display: 'flex',
                     justifyContent: 'center',

@@ -27,13 +27,10 @@ function App() {
 							{/* <Route element={<AutoRefreshOnRouteChange />} /> */}
 							<Route path="/login" element={<Login />} />
 							<Route path="/otp" element={<OTP />} />
+							<Route path="/profile" element={<Profile />} />
 							<Route path="/" element={<Layout />}>
 								{/* Routes that require authentication */}
 								<Route element={<RequireAuth />}>
-									<Route
-										path="/profile"
-										element={<Profile />}
-									/>
 									<Route
 										path="/portfolio/:portfolioId"
 										element={<Portfolio />}

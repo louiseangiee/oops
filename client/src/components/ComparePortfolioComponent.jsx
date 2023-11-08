@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import { useCookies } from "react-cookie";
 import PortfolioSelector from "./AvailablePortfoliosDropdown";
-import ComparePortfolio from "../pages/comparePortfolio";
-import ComparePortfolioChart from "./ComparePortfolioChart";
 import ComparePortfolioSingle from "./ComparePortfolioSingle";
 import { getAsync } from "../utils/utils";
 import { useAuth } from "../context/AuthContext";
+import Grid from '@mui/material/Unstable_Grid2';
 
 const ComparePortfolioComponent = () => {
     const { userData } = useAuth();
@@ -52,8 +51,7 @@ const ComparePortfolioComponent = () => {
         if (userId) { // Only attempt to fetch portfolios if the userId is available
             fetchPortfolios(userId);
         }
-    }, []); // TODO: add back userId dependency if this breaks
-
+    }, []);
     return (
         <>
             <Box display="flex" flexDirection="row" justifyContent="space-between" width="100%">
@@ -73,15 +71,16 @@ const ComparePortfolioComponent = () => {
             </Box>
 
             {/* <ComparePortfolioChart chosenPortfolio1={chosenPortfolio1} chosenPortfolio2={chosenPortfolio2} /> */}
-            <Box
+            <Grid
+                container
                 display="flex"
-                flexDirection="row"
-                justifyContent="space-between"
-                alignItems="center"
+                // flexDirection="row"
+                justifyContent="flex-start"
+                alignItems="flex-start"
             >
                 <ComparePortfolioSingle chosenPortfolio={chosenPortfolio1} />
                 <ComparePortfolioSingle chosenPortfolio={chosenPortfolio2} />
-            </Box>
+            </Grid>
 
 
 

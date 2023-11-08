@@ -6,6 +6,10 @@ import { useCookies } from "react-cookie";
 import { getAsync } from '../utils/utils';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from "../theme";
+import Grid from '@mui/material/Unstable_Grid2';
+import Lottie from 'lottie-react';
+import loadingLight from "../components/lotties/loading_light.json"
+
 
 // Assume that the following functions and components are shared and can be imported as needed:
 // CustomTooltip, toFixedSafe, getOverallReturn, getStockReturns, fetchAllEndpoints
@@ -23,6 +27,7 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
   const [loadingPortfolio, setLoadingPortfolio] = useState(true);
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [loadingVolatility, setLoadingVolatility] = useState(true);
+  const [loadingTable, setLoadingTable] = useState(true);
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -39,6 +44,10 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
       return defaultValue;
     }
   }
+
+  const handleLoadingState = (isLoading) => {
+    setLoadingTable(isLoading);
+  };
 
   const fetchPortfolio = async () => {
     try {
@@ -117,9 +126,17 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
 
 
   return (
-    <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
-      {loadingPortfolio ? 'Loading...' : (
-        <>
+    (loadingPortfolio || loadingSummary || loadingVolatility) ?
+
+      <Grid item md={6} padding={3}>
+        <Lottie
+          animationData={loadingLight}
+          loop={true}
+          autoplay={true}
+          style={{ width: '100%', height: '60px', padding: 0 }}
+        />
+      </Grid> : (
+        <Grid item md={6} padding={3} style={{ backgroundColor: colors.primary[400] }} borderLeft={3} borderRight={3}>
           <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
             ID {portfolioData.portfolioId}: {portfolioData.name}
           </Typography>
@@ -130,10 +147,11 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
             {portfolioData.description}
           </Typography>
 
-          <Box display="flex"
+          <Box
+            display="flex"
             flexDirection="row"
-            justifyContent="space-between"
-            alignItems="center"
+            justifyContent="center"
+            alignItems="start"
             width="100%">
             <Box flex={1} margin={1}>
               <Box flex={1} margin={1}>
@@ -149,9 +167,7 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
                   Overall Returns:
                 </Typography>
                 <Typography variant="h3" fontWeight="bold" style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300], wordWrap: 'break-word' }}>
-                  {loadingSummary ? 'Calculating...' :
-                    `$${overallReturn}(${overallReturnPercentage}%)`
-                  }
+                  $${overallReturn}({overallReturnPercentage}%)
                 </Typography>
               </Box>
             </Box>
@@ -179,10 +195,7 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
                   Volatility (Monthly):
                 </Typography>
                 <Typography variant="h3" fontWeight="bold">
-                  {loadingVolatility ? 'Calculating data...' :
-                    (volatility * 100).toFixed(2) + '%'
-                  }
-
+                  {(volatility * 100).toFixed(2) + '%'}
                 </Typography>
               </Box>
               <Box flex={1} margin={1}>
@@ -190,25 +203,21 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
                   Volatility Annualized:
                 </Typography>
                 <Typography variant="h3" fontWeight="bold">
-                  {loadingVolatility ? 'Calculating data...' :
-                    (volatilityAnnual * 100).toFixed(2) + '%'
-                  }
+                  {(volatilityAnnual * 100).toFixed(2) + '%'}
                 </Typography>
               </Box>
             </Box>
           </Box>
-        </>)}
-      <Divider />
-      <br />
-      <PortfolioBreakdown portfolioStockData={portfolioData.portfolioStocks} />
-      <br />
-      <Divider />
-      <br />
-      <ReturnsTable stockData={portfolioData} stockReturns={stockReturns} />
-
-
-    </Box>
-  );
+          < Divider />
+          <br />
+          <PortfolioBreakdown portfolioStockData={portfolioData.portfolioStocks} />
+          <br />
+          <Divider />
+          <br />
+          <ReturnsTable stockData={portfolioData} stockReturns={stockReturns} onLoading={handleLoadingState} />
+        </Grid>
+      )
+  )
 };
 
 export default ComparePortfolioSingle;

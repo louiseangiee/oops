@@ -29,7 +29,7 @@ const TableHeaderCell = ({ id, label, onRequestSort, orderDirection, orderBy }) 
   </TableCell>
 );
 
-const ReturnsTable = ({ stockData, stockReturns }) => {
+const ReturnsTable = ({ stockData, stockReturns, onLoading }) => {
   const [orderDirection, setOrderDirection] = useState('asc');
   const [orderBy, setOrderBy] = useState('percentage');
   const [cookies] = useCookies(['accessToken']);
@@ -40,6 +40,7 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
   useEffect(() => {
     const fetchStockDetails = async () => {
       setLoading(true);
+      onLoading(true);
       setError(null);
       const details = {};
       try {
@@ -57,13 +58,13 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
             annualisedReturn: annualisedReturnData.annualisedReturn,
           };
         }
-
         setStockDetails(details);
       } catch (error) {
         console.error('Failed to fetch stock details:', error);
         setError('Failed to fetch stock details');
       } finally {
         setLoading(false);
+        onLoading(false);
       }
     };
 

@@ -7,11 +7,13 @@ import ComparePortfolio from "../pages/comparePortfolio";
 import ComparePortfolioChart from "./ComparePortfolioChart";
 import { useEffect } from "react";
 import { getAsync } from "../utils/utils";
+import ComparePortfolioSingle from "./ComparePortfolioSingle";
 
 const useUserID = () => {
     const [cookie] = useCookies();
     const [userId, setUserId] = useState(null);
     const [error, setError] = useState(null);
+    
     
     useEffect(() => {
         const fetchData = async() => {
@@ -57,6 +59,7 @@ const ComparePortfolioComponent = () => {
     const handlePortfolioChange1 = (newValue) => {
         setChosenPortfolio1(newValue || null);
     };
+    console.log("Chosen Portfolio1")
     console.log(chosenPortfolio1)
 
     //FOR THE SECOND PORTFOLIO
@@ -76,13 +79,13 @@ const ComparePortfolioComponent = () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
+            // const data = await response.json();
 
             // Assuming the API returns an array of portfolios and you want to set the first one
-            if (data.length > 0) {
-                setChosenPortfolio1(data[0]);
-                setChosenPortfolio2(data[0]); // or set to data[1] if you want the second one
-            }
+            // if (data.length > 0) {
+            //     setChosenPortfolio1(data[0]);
+            //     setChosenPortfolio2(data[0]); // or set to data[1] if you want the second one
+            // }
         } catch (error) {
             console.error("Fetching portfolios failed: ", error);
         }
@@ -113,9 +116,16 @@ const ComparePortfolioComponent = () => {
             </Box>
 
 
-        <ComparePortfolioChart chosenPortfolio1={chosenPortfolio1} chosenPortfolio2={chosenPortfolio2} />
-
-        
+        {/* <ComparePortfolioChart chosenPortfolio1={chosenPortfolio1} chosenPortfolio2={chosenPortfolio2} /> */}
+        <Box
+        display="flex"
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+        >
+        <ComparePortfolioSingle chosenPortfolio={chosenPortfolio1} />
+        <ComparePortfolioSingle chosenPortfolio={chosenPortfolio2} />
+        </Box>
        
         
         </>

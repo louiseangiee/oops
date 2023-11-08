@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Checkbox from '@mui/material/Checkbox';
 import Tab from '@mui/material/Tab';
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../theme";
 import Button from '@mui/material/Button';
 import Lottie from 'lottie-react';
@@ -11,7 +11,7 @@ import AddStocks from './AddStocks';
 import noDataDark from './lotties/no_data_dark.json';
 import { deleteAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 
 CustomTabPanel.propTypes = {
@@ -42,45 +42,108 @@ function CustomTabPanel(props) {
     );
 }
 
-function DeleteStock({ isVisible, checkedItems, onStocksDeleted, portfolioId }) {
+function DeleteStock({ checkedItems, onStocksDeleted, portfolioId }) {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [cookie] = useCookies();
     const [loading, setLoading] = useState(false);
+    const [alert, setAlert] = useState({ open: false, type: '', message: '' });
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        setIsVisible(checkedItems.length > 0 || loading);
+    }, [checkedItems, loading]);
+
+    const showAlert = (type, message) => {
+        setAlert({ open: true, type, message });
+    };
+
+    const closeAlert = () => {
+        setAlert({ open: false, type: '', message: '' });
+    };
+
     const handleDelete = async () => {
         setLoading(true);
-        for (let stockSymbol of checkedItems) {
-            const response = await deleteAsync(`portfolioStocks/${portfolioId}/stocks/${stockSymbol}/drop`, cookie.accessToken);
-            // Check for a successful response
-            if (response.ok) {
-                alert("Stock(s) deleted successfully");
+
+        const deletePromises = checkedItems.map(stockSymbol =>
+            deleteAsync(`portfolioStocks/${portfolioId}/stocks/${stockSymbol}/drop`, cookie.accessToken)
+        );
+
+        try {
+            const results = await Promise.all(deletePromises);
+            const allSuccessful = results.every(response => response.ok);
+
+            if (!allSuccessful) {
+                // If there was an error, handle it here
+                showAlert('error', 'Error deleting stock(s)');
+                // Potentially add the stock back to the UI
             } else {
-                alert("Error deleting stock(s)");
+                showAlert('success', 'Stock(s) deleted successfully!');
+                // Optimistically update the UI
+                onStocksDeleted(checkedItems);
             }
+        } catch (error) {
+            showAlert('error', 'An error occurred during deletion.');
+            // Potentially add the stock back to the UI
         }
-        onStocksDeleted(checkedItems); // Notify parent component that stocks have been deleted
         setLoading(false);
-    }
+    };
 
     return (
-        isVisible ? (
-            <Button
-                disabled={loading}
-                sx={{
-                    color: colors.grey[100],
-                    backgroundColor: colors.redAccent[600],
-                    borderColor: colors.redAccent[600],
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    padding: "10px 20px",
-                }}
-                onClick={handleDelete}
+        <>
+            <Snackbar
+                open={alert.open && alert.type === 'error'}
+                autoHideDuration={5000}
+                onClose={closeAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-                {loading ? "Loading..." : "Delete Stocks"}
-            </Button>
-        ) : null
-    );
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="error"
+                    onClose={closeAlert}
+                    sx={{ backgroundColor: colors.redAccent[600] }}
+                >
+                    {alert.message}
+                </Alert>
+            </Snackbar>
 
+            {/* Snackbar for success message */}
+            <Snackbar
+                open={alert.open && alert.type === 'success'}
+                autoHideDuration={5000}
+                onClose={closeAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="success"
+                    onClose={closeAlert}
+                    sx={{ backgroundColor: colors.greenAccent[600] }}
+                >
+                    {alert.message}
+                </Alert>
+            </Snackbar>
+
+            {isVisible && (
+                <Button
+                    disabled={loading}
+                    sx={{
+                        color: colors.grey[100],
+                        backgroundColor: colors.redAccent[600],
+                        borderColor: colors.redAccent[600],
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        padding: "10px 20px",
+                    }}
+                    onClick={handleDelete}
+                >
+                    {loading ? "Loading..." : "Delete Stocks"}
+                </Button>
+            )}
+        </>
+    );
 }
 
 function a11yProps(index) {
@@ -171,10 +234,7 @@ export default function StocksTabs({ stocks, portfolioId }) {
                             </Typography>
                             <Box display="flex" gap="20px">
                                 <AddStocks portfolioId={portfolioId} />
-                                <DeleteStock isVisible={checkedItems.length > 0} checkedItems={checkedItems}
-                                    portfolioId={portfolioId}
-                                    onStocksDeleted={onStocksDeleted}
-                                />
+                                <DeleteStock checkedItems={checkedItems} portfolioId={portfolioId} onStocksDeleted={onStocksDeleted} />
                             </Box>
 
                         </Box>

@@ -212,6 +212,7 @@ function DeletePortfolio() {
                 backgroundColor: colors.redAccent[700],
               },
             }}
+            disabled={document.getElementById("confirm-deletion")?.value !== portfolioData["name"]}
           >
             {loading ? (
               <Lottie

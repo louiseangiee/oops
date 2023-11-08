@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,8 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.stream.StreamSupport;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.oop.appa.dao.StockLookupRepository;
@@ -100,7 +103,7 @@ public class StockService {
                     results.add(result);
                 }
             }
-            if (results.size()==0){
+            if (results.size() == 0) {
                 return new ArrayList<>();
             }
             return results;
@@ -365,17 +368,17 @@ public class StockService {
             Map<String, Double> stockPrices = processor.processJsonStream(responseStream);
             Map<String, Object> result = new HashMap<>();
             String message;
-    
+
             for (int i = 0; i < 10; i++) {
                 System.out.println("Checking for price on " + date.toString());
                 Double price = stockPrices.get(date.toString());
-    
-                if (price != null ) {
+
+                if (price != null) {
                     result.put("date", date.toString());
                     result.put("price", price);
-                    if (date.equals(LocalDate.parse(stringDate))){
+                    if (date.equals(LocalDate.parse(stringDate))) {
                         message = "Exact date match found.";
-                    } else if (date.equals(LocalDate.now())){
+                    } else if (date.equals(LocalDate.now())) {
                         message = "Date selected was today and data was available.";
                     } else if (date.equals(LocalDate.now().minusDays(1))) {
                         message = "Date selected was today and data was not available. Closest date match found.";
@@ -386,14 +389,14 @@ public class StockService {
                     return result;
                 } else {
                     if (date.getDayOfWeek() == DayOfWeek.MONDAY) {
-                        date = date.minusDays(3);  
+                        date = date.minusDays(3);
                     } else {
-                        date = date.minusDays(1);  
+                        date = date.minusDays(1);
                     }
                 }
             }
             return result;
-    
+
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format: " + stringDate, e);
         } catch (Exception e) {
@@ -430,7 +433,7 @@ public class StockService {
     }
 
     @Cacheable(value = "annualizedVolatility", key = "#stockSymbol")
-    public Map<String,Double> calculateAnnualizedVolatility(String stockSymbol) {
+    public Map<String, Double> calculateAnnualizedVolatility(String stockSymbol) {
         Map<String, Double> annualizedVolatilities = new HashMap<>();
 
         try {
@@ -439,7 +442,7 @@ public class StockService {
             List<Double> monthlyReturns = new ArrayList<>(dataSize);
             double sum = 0.0;
             double currentClose, previousClose = Double.parseDouble((String) monthlyData.get(0).get("4. close"));
-            
+
             for (int i = 1; i < dataSize; i++) {
                 currentClose = Double.parseDouble((String) monthlyData.get(i).get("4. close"));
                 double monthlyReturn = (currentClose - previousClose) / previousClose;
@@ -463,6 +466,50 @@ public class StockService {
             return annualizedVolatilities;
         } catch (Exception e) {
             throw new RuntimeException("Error calculating annualized volatility service: " + e.getMessage(), e);
+        }
+    }
+
+    public Map<String, Double> fetchStockPricesUpToPeriod(String stockSymbol, String period) {
+        try {
+            LocalDate endDate = LocalDate.now();
+            LocalDate startDate = getStartDateForPeriod(endDate, period);
+            InputStream responseStream;
+            if (period.equals("year")) {
+                responseStream = marketDataService.fetchDailyDataStream(stockSymbol, "full");
+            } else {
+                responseStream = marketDataService.fetchDailyDataStream(stockSymbol, "compact");
+            }
+            JsonStreamProcessor processor = new JsonStreamProcessor();
+            Map<String, Double> stockPrices = processor.processJsonStream(responseStream);
+            Map<String, Double> result = new TreeMap<>(); // Use TreeMap instead of HashMap
+
+            // Stream dates from start date to end date and add prices to result
+            Stream.iterate(startDate, date -> date.plusDays(1))
+                    .limit(ChronoUnit.DAYS.between(startDate, endDate) + 1)
+                    .forEach(date -> {
+                        Double price = stockPrices.get(date.toString());
+                        if (price != null) {
+                            result.put(date.toString(), price);
+                        }
+                    });
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching stock prices up to period: " + e.getMessage(), e);
+        }
+    }
+
+    private LocalDate getStartDateForPeriod(LocalDate referenceDate, String period) {
+        switch (period.toLowerCase()) {
+            case "year":
+                return referenceDate.minusYears(1);
+            case "quarter":
+                return referenceDate.minusMonths(3);
+            case "month":
+                return referenceDate.minusMonths(1);
+            case "week":
+                return referenceDate.minusWeeks(1);
+            default:
+                throw new IllegalArgumentException("Invalid time period: " + period);
         }
     }
 

@@ -11,8 +11,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,19 +38,17 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
     private StockService stockService;
     private PortfolioService portfolioService;
     private AccessLogRepository accessLogRepository;
-    private UserService userService;
 
     @Autowired
     public PortfolioStockServiceImpl(PortfolioStockRepository portfolioStockRepository,
             MarketDataService marketDataService,
             StockService stockService, PortfolioService portfolioService,
-            AccessLogRepository accessLogRepository, UserService userService) {
+            AccessLogRepository accessLogRepository) {
         this.portfolioStockRepository = portfolioStockRepository;
         this.marketDataService = marketDataService;
         this.stockService = stockService;
         this.portfolioService = portfolioService;
         this.accessLogRepository = accessLogRepository;
-        this.userService = userService;
     }
 
     // GET

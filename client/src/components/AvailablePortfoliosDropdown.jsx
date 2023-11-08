@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import { tokens } from "../theme";
-import { useTheme } from "@mui/material";
 import { useCookies } from 'react-cookie';
 import { getAsync } from '../utils/utils';
+import { useAuth } from '../context/AuthContext';
 
-// This is now a custom hook
 const useUserID = () => {
     const [cookie] = useCookies();
     const [userId, setUserId] = useState(null);
@@ -40,13 +38,12 @@ const useUserID = () => {
     return userId; // Only returning userId, but you can also return error if you need to handle it elsewhere
 };
 
-const PortfolioSelector = (props) => {
-    const { chosenPortfolio, handlePortfolioChange } = props;
+const PortfolioSelector = ({ chosenPortfolio, handlePortfolioChange }) => {
+    const { userData } = useAuth();
+    const userId = userData.id
     const [cookie] = useCookies();
     const [portfolios, setPortfolios] = useState([]);
     const [loading, setLoading] = useState(true); // Added loading state to indicate data fetching
-
-    const userId = useUserID(); // Using the custom hook here
 
     useEffect(() => {
         if (!userId) return; // If userId is not set yet, do not fetch portfolios
@@ -74,17 +71,17 @@ const PortfolioSelector = (props) => {
         };
 
         fetchData();
-    }, [userId, cookie]); // useEffect dependency array
+    }, [userId]); // useEffect dependency array
 
-    return (
+    return chosenPortfolio.portfolioId !== undefined && (
         <Autocomplete
             id="portfolio-dropdown"
             options={portfolios}
-
             getOptionLabel={(option) => option.name}
             fullWidth
             value={chosenPortfolio} // Set the selected value here
             onChange={(event, newValue) => handlePortfolioChange(newValue)}
+            isOptionEqualToValue={(option, value) => option.portfolioId === value.portfolioId}
             renderInput={(params) => (
                 <TextField
                     {...params}

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 import com.oop.appa.dao.AccessLogRepository;
@@ -94,6 +95,7 @@ public class PortfolioService {
     }
 
     // POST
+    @CacheEvict(value = "portfolioList", key = "#portfolioDto.user.id")
     public Portfolio createPortfolio(PortfolioCreationDTO portfolioDto) {
         try {
             User user = userRepository.findById(portfolioDto.getUser().getId())

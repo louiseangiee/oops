@@ -255,9 +255,9 @@ const Portfolio = () => {
 
   // Fetch data on initial component load
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchPortfolioData();
-      await fetchPortfolioSummaryData();
+    const fetchData = () => {
+      fetchPortfolioData();
+      fetchPortfolioSummaryData();
     }
 
     fetchData()
@@ -270,7 +270,7 @@ const Portfolio = () => {
         clearInterval(refreshIntervalId);
       }
     };
-  }, [portfolioId, userData, overallReturns, percentageReturns]);
+  }, [portfolioId, userData]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href="/" sx={{ fontSize: "22px" }}>

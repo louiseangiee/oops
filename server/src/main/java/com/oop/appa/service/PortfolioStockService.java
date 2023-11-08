@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -308,28 +309,50 @@ public class PortfolioStockService {
         return weightedReturns;
     }
 
-    public Map<String,Double> calculateStockWeight(Integer portfolioId, String stockSymbol) {
-        Map<String,Double> stockWeightResult = new HashMap<>();
+
+
+    public Map<String, Double> calculateStockWeight(Integer portfolioId, String stockSymbol) {
+        Map<String, Double> stockWeightResult = new HashMap<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         try {
+            // Fetch the specific stock from the portfolio
             PortfolioStock currentStock = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
-            double currentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
+            
+            // Fetch the current price of the specific stock
+            double currentPrice = marketDataService.fetchCurrentData(stockSymbol)
+                    .path("Global Quote")
                     .path("05. price").asDouble();
             double stockMarketValue = currentStock.getQuantity() * currentPrice;
-      
-            double totalPortfolioValue = 0; 
+
+            // Prepare to fetch all current prices in parallel
             List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
-            for (PortfolioStock stock : allStocksInPortfolio) {
-                double stockPrice = marketDataService.fetchCurrentData(stock.getStockSymbol()).path("Global Quote")
-                        .path("05. price").asDouble();
-                totalPortfolioValue += stock.getQuantity() * stockPrice;
-            }
+            List<CompletableFuture<Double>> futurePrices = allStocksInPortfolio.stream()
+                    .map(stock -> CompletableFuture.supplyAsync(() -> {
+                        double price = marketDataService.fetchCurrentData(stock.getStockSymbol())
+                                .path("Global Quote")
+                                .path("05. price").asDouble();
+                        return price * stock.getQuantity();
+                    }, executorService))
+                    .collect(Collectors.toList());
+
+            // Calculate total portfolio value by summing all futures after they complete
+            double totalPortfolioValue = CompletableFuture.allOf(futurePrices.toArray(new CompletableFuture[0]))
+                    .thenApply(v -> futurePrices.stream()
+                            .mapToDouble(CompletableFuture::join)
+                            .sum())
+                    .join();
+
+            // Calculate the weight of the specific stock
             double weight = stockMarketValue / totalPortfolioValue;
             stockWeightResult.put(stockSymbol, weight);
         } catch (Exception e) {
-            throw new RuntimeException("Error calculating stock weight service: " + e.getMessage(), e);
+            throw new RuntimeException("Error calculating stock weight: " + e.getMessage(), e);
+        } finally {
+            executorService.shutdown();
         }
         return stockWeightResult;
     }
+
 
     public Map<String,Double> calculateAnnualisedReturn(Integer portfolioStockId, String stockSymbol) {
         Map<String, Double> annualisedReturnResult = new HashMap<>();
@@ -354,56 +377,72 @@ public class PortfolioStockService {
         return annualisedReturnResult;
     }
 
+
     public Map<String, Map<String, Double>> calculateStockReturnsForPortfolio(Integer portfolioId) {
         try {
             List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
 
             // 1. Calculate the total buy price and total quantity for each unique stock
-            Map<String, Double> totalBuyPrices = new HashMap<>();
-            Map<String, Double> totalQuantities = new HashMap<>();
+            Map<String, Double> totalBuyPrices = new ConcurrentHashMap<>();
+            Map<String, Double> totalQuantities = new ConcurrentHashMap<>();
 
-            for (PortfolioStock stock : allStocksInPortfolio) {
+            allStocksInPortfolio.parallelStream().forEach(stock -> {
                 String stockSymbol = stock.getStock().getStockSymbol();
-                totalBuyPrices.merge(stockSymbol, (double) (stock.getBuyPrice() * stock.getQuantity()), Double::sum);
+                totalBuyPrices.merge(stockSymbol, (double) stock.getBuyPrice() * stock.getQuantity(), Double::sum);
+
                 totalQuantities.merge(stockSymbol, (double) stock.getQuantity(), Double::sum);
-            }
+            });
 
-            // 2. Fetch the current stock prices and calculate the actual value and
-            // percentage return
-            Map<String, Double> currentPrices = new HashMap<>();
-            Map<String, Map<String, Double>> returnsByStock = new HashMap<>();
+            // Prepare an executor service
+            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-            for (String stockSymbol : totalBuyPrices.keySet()) {
-                double currentPrice = marketDataService.fetchCurrentData(stockSymbol)
+            // 2. Fetch the current stock prices in parallel
+            Map<String, CompletableFuture<Double>> priceFutures = new ConcurrentHashMap<>();
+            totalBuyPrices.keySet().forEach(stockSymbol -> priceFutures.put(stockSymbol, CompletableFuture.supplyAsync(() -> {
+                return marketDataService.fetchCurrentData(stockSymbol)
                         .path("Global Quote")
                         .path("05. price").asDouble();
-                currentPrices.put(stockSymbol, currentPrice);
+            }, executorService)));
 
-                double aggregatedBuyPrice = totalBuyPrices.get(stockSymbol);
-                double aggregatedQuantity = totalQuantities.get(stockSymbol);
-                double aggregatedCurrentValue = currentPrice * aggregatedQuantity;
+            // Wait for all futures to complete
+            CompletableFuture.allOf(priceFutures.values().toArray(new CompletableFuture[0])).join();
 
-                double actualValue = aggregatedCurrentValue - aggregatedBuyPrice;
-                double percentageReturn = (actualValue / aggregatedBuyPrice) * 100;
+            // Calculate the returns by stock
+            Map<String, Map<String, Double>> returnsByStock = priceFutures.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            entry -> {
+                                String stockSymbol = entry.getKey();
+                                double currentPrice = entry.getValue().join(); // This is a blocking call
 
-                // Rounding
-                BigDecimal bdActualValue = new BigDecimal(Double.toString(actualValue)).setScale(2,
-                        RoundingMode.HALF_UP);
-                BigDecimal bdPercentageReturn = new BigDecimal(Double.toString(percentageReturn)).setScale(2,
-                        RoundingMode.HALF_UP);
+                                double aggregatedBuyPrice = totalBuyPrices.get(stockSymbol);
+                                double aggregatedQuantity = totalQuantities.get(stockSymbol);
+                                double aggregatedCurrentValue = currentPrice * aggregatedQuantity;
 
-                Map<String, Double> returnDetails = new HashMap<>();
-                returnDetails.put("actualValue", bdActualValue.doubleValue());
-                returnDetails.put("percentage", bdPercentageReturn.doubleValue());
+                                double actualValue = aggregatedCurrentValue - aggregatedBuyPrice;
+                                double percentageReturn = (actualValue / aggregatedBuyPrice) * 100;
 
-                returnsByStock.put(stockSymbol, returnDetails);
-            }
+                                // Rounding
+                                BigDecimal bdActualValue = BigDecimal.valueOf(actualValue).setScale(2, RoundingMode.HALF_UP);
+                                BigDecimal bdPercentageReturn = BigDecimal.valueOf(percentageReturn).setScale(2, RoundingMode.HALF_UP);
+
+                                Map<String, Double> returnDetails = new HashMap<>();
+                                returnDetails.put("actualValue", bdActualValue.doubleValue());
+                                returnDetails.put("percentage", bdPercentageReturn.doubleValue());
+
+                                return returnDetails;
+                            }
+                    ));
+
+            // Shut down the executor service
+            executorService.shutdown();
 
             return returnsByStock;
         } catch (Exception e) {
             throw new RuntimeException("Error calculating stock returns: " + e.getMessage(), e);
         }
     }
+
 
     public Map<String, Double> calculateOverallPortfolioReturns(Integer portfolioId) {
         try {
@@ -584,19 +623,50 @@ public class PortfolioStockService {
         return annualizedVolatilities;
     }
 
-    public double getTotalPortfolioValue(Integer portfolioId) {
+    // public double getTotalPortfolioValue(Integer portfolioId) {
+    //     List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
+
+    //     // Fetch the current prices of unique stocks only once to minimize API calls
+    //     Map<String, Double> currentPrices = new HashMap<>();
+    //     for (PortfolioStock stock : allStocksInPortfolio) {
+    //         String stockSymbol = stock.getStock().getStockSymbol();
+    //         if (!currentPrices.containsKey(stockSymbol)) {
+    //             double currentPrice = marketDataService.fetchCurrentData(stockSymbol)
+    //                     .path("Global Quote").path("05. price").asDouble();
+    //             currentPrices.put(stockSymbol, currentPrice);
+    //         }
+    //     }
+    //     // Calculate total portfolio value
+    //     double totalPortfolioValue = allStocksInPortfolio.stream()
+    //             .mapToDouble(stock -> stock.getQuantity() * currentPrices.get(stock.getStock().getStockSymbol()))
+    //             .sum();
+
+    //     return totalPortfolioValue;
+    // }
+
+    public double getTotalPortfolioValue(Integer portfolioId) throws InterruptedException, ExecutionException {
         List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
 
         // Fetch the current prices of unique stocks only once to minimize API calls
-        Map<String, Double> currentPrices = new HashMap<>();
-        for (PortfolioStock stock : allStocksInPortfolio) {
-            String stockSymbol = stock.getStock().getStockSymbol();
-            if (!currentPrices.containsKey(stockSymbol)) {
+        Map<String, Double> currentPrices = new ConcurrentHashMap<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        
+        List<CompletableFuture<Void>> futures = allStocksInPortfolio.stream()
+            .map(stock -> stock.getStock().getStockSymbol())
+            .distinct() // To ensure we only fetch unique stock symbols
+            .map(stockSymbol -> CompletableFuture.runAsync(() -> {
                 double currentPrice = marketDataService.fetchCurrentData(stockSymbol)
                         .path("Global Quote").path("05. price").asDouble();
                 currentPrices.put(stockSymbol, currentPrice);
-            }
-        }
+            }, executorService))
+            .collect(Collectors.toList());
+
+        // Wait for all futures to complete
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        // Shut down the executor service
+        executorService.shutdown();
+
         // Calculate total portfolio value
         double totalPortfolioValue = allStocksInPortfolio.stream()
                 .mapToDouble(stock -> stock.getQuantity() * currentPrices.get(stock.getStock().getStockSymbol()))

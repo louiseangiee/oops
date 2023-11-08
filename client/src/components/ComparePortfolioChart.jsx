@@ -197,6 +197,9 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   const summary1 = getStockReturns(portfolioSummaries1);
   const summary2 = getStockReturns(portfolioSummaries2);
 
+  console.log(summary1);
+  console.log(summary2);
+
   const overallReturn1 = getOverallReturn(portfolioSummaries1).overalReturn;
   const overallReturn2 = getOverallReturn(portfolioSummaries2).overalReturn;
   const overallReturn1Percentage = getOverallReturn(portfolioSummaries1).percentage;

@@ -37,26 +37,41 @@ export default function EditPortfolio({ portfolioId, small }) {
         setAlert({ open: false, type: '', message: '' });
     };
 
+    // Function to validate capital input
+    const validateCapital = (value) => {
+        const isValid = /^(0|[1-9]\d*)(\.\d+)?$/.test(value) && value !== '' && parseFloat(value) > 0;
+        setCapitalError(!isValid);
+        return isValid; // Returns true if valid, false otherwise
+    };
+
     useEffect(() => {
         // Fetch the portfolio data based on portfolioId
         async function fetchData() {
             const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
             const data = await response.json();
             setPortfolioData(data);
+            setUpdatedCapital(data.totalCapital.toString());
         }
-        fetchData();
 
-        if (!/^\d*\.?\d*$/.test(updatedCapital) || updatedCapital === '' || parseFloat(updatedCapital) <= 0) {
-            setCapitalError(true);
-            return; // Prevent form submission
-        } else {
-            setCapitalError(false);
-        }
+        fetchData();
 
     }, [portfolioId, updatedCapital]);
 
-    const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
-    const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
+    // Update the capital onChange handler
+    const handleCapitalChange = (e) => {
+        const newCapital = e.target.value;
+        setUpdatedCapital(newCapital);
+        validateCapital(newCapital);
+        setIsCapitalEdited(true); // You can still keep the 'edited' state if needed for other logic
+    };
+
+    const hasChanges = () => {
+        return (
+            (updatedName && updatedName !== portfolioData?.name) ||
+            (updatedDescription && updatedDescription !== portfolioData?.description) ||
+            (isCapitalEdited && !capitalError && updatedCapital !== portfolioData?.totalCapital.toString())
+        );
+    };
 
     const [open, setOpen] = useState(false);
 
@@ -212,7 +227,7 @@ export default function EditPortfolio({ portfolioId, small }) {
                         variant="standard"
                         sx={{ color: colors.grey[100] }}
                         defaultValue={portfolioData?.totalCapital}
-                        onChange={(e) => { setUpdatedCapital(e.target.value); setIsCapitalEdited(true) }}
+                        onChange={handleCapitalChange}
                         InputProps={{
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
                         }}
@@ -240,7 +255,7 @@ export default function EditPortfolio({ portfolioId, small }) {
                         type="submit"
                         sx={{ backgroundColor: loading ? colors.greenAccent[600] : colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold", width: "150px", height: "40px", "&:hover": { backgroundColor: colors.greenAccent[600] } }}
                         onClick={handleChanges}
-                        disabled={!isNameEdited && !isDescriptionEdited && (capitalError || !isCapitalEdited)}
+                        disabled={!hasChanges() || loading || capitalError}
                     >
                         {loading ?
                             <Lottie

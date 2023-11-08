@@ -99,6 +99,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
 
   const fetchPortfolioVolalities = async () => {
     if (!chosenPortfolio1 || !chosenPortfolio2) return;
+
     let endpoint1 = `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility`;  // Default to monthly data
     let endpoint1Annual = `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility/annualized`;
 
@@ -120,15 +121,10 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
       const responseData1Annual = await response1Annual.json();
       const responseData2Annual = await response2Annual.json();
 
-      console.log(responseData1);
-      console.log(responseData2);
-      console.log(responseData1Annual);
-      console.log(responseData2Annual);
-
-      setPortfolioVolatility1(responseData1);
-      setPortfolioVolatility2(responseData2);
-      setPortfolioVolatility1Annual(responseData1Annual);
-      setPortfolioVolatility2Annual(responseData2Annual);
+      setPortfolioVolatility1(responseData1.portfolioVolatility);
+      setPortfolioVolatility2(responseData2.portfolioVolatility);
+      setPortfolioVolatility1Annual(responseData1Annual.portfolioVolatility);
+      setPortfolioVolatility2Annual(responseData2Annual.portfolioVolatility);
     } catch (error) {
       console.error('There was an error fetching the portfolio details:', error);
     }

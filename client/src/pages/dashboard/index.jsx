@@ -22,19 +22,7 @@ const Dashboard = () => {
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
   const { userData } = useAuth();
-  // console.log('userEmail:', userEmail);
-  // console.log(useAuth());
-  const [cookies, setCookie, removeCookie] = useCookies(['accessToken']);
-
-  // BOILERPLATE CODE to fetch data from backend
-  // async function getUsers() {
-  //   const response = await getAsync("api/users", cookie.accessToken);
-  //   const data = await response.json();
-  //   console.log(data);
-  //   setUsers(data);
-  // }
-
-
+  const [, removeCookie] = useCookies(['accessToken']);
 
   return (
     <Box m="20px">
@@ -42,18 +30,6 @@ const Dashboard = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
         <Box>
-          {/* <Button
-            sx={{
-              backgroundColor: colors.blueAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Download Reports
-          </Button> */}
           <Button sx={{
             backgroundColor: colors.blueAccent[700],
             color: colors.grey[100],

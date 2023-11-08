@@ -106,7 +106,6 @@ function DeletePortfolio() {
         const error_message = errorDetails.details?.split(":")[1];
         showAlert('error', "Error:" + error_message);
       }).catch(jsonError => {
-        console.log(jsonError);
         showAlert('error', "An error occurred");
       });
     }
@@ -117,39 +116,39 @@ function DeletePortfolio() {
     <div>
       {/* Snackbar for error message */}
       <Snackbar
-                open={alert.open && alert.type === 'error'}
-                autoHideDuration={5000}
-                onClose={closeAlert}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-                <Alert
-                    elevation={6}
-                    variant="filled"
-                    severity="error"
-                    onClose={closeAlert}
-                    sx={{ backgroundColor: colors.redAccent[600] }}
-                >
-                    {alert.message}
-                </Alert>
-            </Snackbar>
+        open={alert.open && alert.type === 'error'}
+        autoHideDuration={5000}
+        onClose={closeAlert}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          severity="error"
+          onClose={closeAlert}
+          sx={{ backgroundColor: colors.redAccent[600] }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
 
-            {/* Snackbar for success message */}
-            <Snackbar
-                open={alert.open && alert.type === 'success'}
-                autoHideDuration={5000}
-                onClose={closeAlert}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-                <Alert
-                    elevation={6}
-                    variant="filled"
-                    severity="success"
-                    onClose={closeAlert}
-                    sx={{ backgroundColor: colors.greenAccent[600] }}
-                >
-                    {alert.message}
-                </Alert>
-            </Snackbar>
+      {/* Snackbar for success message */}
+      <Snackbar
+        open={alert.open && alert.type === 'success'}
+        autoHideDuration={5000}
+        onClose={closeAlert}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          severity="success"
+          onClose={closeAlert}
+          sx={{ backgroundColor: colors.greenAccent[600] }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
 
       <DeleteOutlineOutlinedIcon
         sx={{ color: colors.redAccent[600], fontSize: "35px" }}
@@ -290,7 +289,6 @@ const Portfolio = () => {
         }
         const data = await response.json();
         setPortfolioData(data);
-        console.log(portfolioData);
         setIsLoading(false); // Data is loaded, set isLoading to false
       }
     }
@@ -656,7 +654,7 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            
+
             {!summaryLoading
               ? `$${Math.abs(totalPortfolioValue).toFixed(2)}`
               : "Loading..."}

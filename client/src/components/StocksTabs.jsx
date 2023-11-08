@@ -157,7 +157,6 @@ function a11yProps(index) {
 }
 
 export default function StocksTabs({ stocks, portfolioId, portfolioData, portfolioSummaries, stockReturns }) {
-  console.log(stockReturns);
   const [value, setValue] = useState(0);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -361,9 +360,9 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                         Current Value: $
                         {stock.buyPrice && stock.quantity
                           ? (
-                              stock.buyPrice * stock.quantity +
-                              stockReturns[stock.stockSymbol]?.actualValue
-                            ).toFixed(2)
+                            stock.buyPrice * stock.quantity +
+                            stockReturns[stock.stockSymbol]?.actualValue
+                          ).toFixed(2)
                           : "N/A"}
                       </Typography>
                     )}
@@ -378,7 +377,7 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                         : "N/A"}
                     </Typography>
                     <Typography>{stockReturns[stock]}</Typography>
-                    
+
 
                     <Typography
                       variant="h6"
@@ -411,12 +410,12 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         Stocks Analytics
-                <Box>
-                    <StockAnalytics
-                    portfolioData={portfolioData}
-                    portfolioSummaries={portfolioSummaries}
-                    ></StockAnalytics>
-                </Box>
+        <Box>
+          <StockAnalytics
+            portfolioData={portfolioData}
+            portfolioSummaries={portfolioSummaries}
+          ></StockAnalytics>
+        </Box>
       </CustomTabPanel>
     </Box>
   );

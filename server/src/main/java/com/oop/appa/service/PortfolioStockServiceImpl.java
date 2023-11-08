@@ -42,7 +42,8 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
     private UserService userService;
 
     @Autowired
-    public PortfolioStockServiceImpl(PortfolioStockRepository portfolioStockRepository, MarketDataService marketDataService,
+    public PortfolioStockServiceImpl(PortfolioStockRepository portfolioStockRepository,
+            MarketDataService marketDataService,
             StockService stockService, PortfolioService portfolioService,
             AccessLogRepository accessLogRepository, UserService userService) {
         this.portfolioStockRepository = portfolioStockRepository;
@@ -182,8 +183,6 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
 
                 clearPortfolioVolatilityCache(portfolio.getPortfolioId());
-                System.out.println("Cleared cache for portfolio volatility");
-                System.out.println("Calculating portfolio volatility =" + portfolio.getPortfolioId());
                 calculatePortfolioAnnualizedVolatility(portfolio.getPortfolioId());
                 return portfolioStockRepository.save(portfolioStock);
             }
@@ -194,7 +193,6 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
 
     @Override
     public void clearPortfolioVolatilityCache(Integer portfolioId) {
-        System.out.println("Clearing cache for portfolio volatility");
     }
 
     @Override
@@ -296,8 +294,8 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
 
     // Other services
     @Override
-    public Map<String,Double> calculateWeightedStockReturn(Integer portfolioId, String stockSymbol) {
-            Map<String,Double> weightedReturns = new HashMap<>();
+    public Map<String, Double> calculateWeightedStockReturn(Integer portfolioId, String stockSymbol) {
+        Map<String, Double> weightedReturns = new HashMap<>();
         try {
             PortfolioStock stock = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
             double totalReturn = 0;
@@ -307,7 +305,7 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
             double buyPrice = stock.getBuyPrice();
             double individualReturn = ((currentPrice - buyPrice) / buyPrice) * 100;
             totalReturn += (double) stock.getQuantity() / totalQuantity * individualReturn;
-            
+
             weightedReturns.put("weightedReturn", totalReturn);
         } catch (Exception e) {
             throw new RuntimeException("Error calculating weighted stock return service: " + e.getMessage(), e);
@@ -316,15 +314,15 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
     }
 
     @Override
-    public Map<String,Double> calculateStockWeight(Integer portfolioId, String stockSymbol) {
-        Map<String,Double> stockWeightResult = new HashMap<>();
+    public Map<String, Double> calculateStockWeight(Integer portfolioId, String stockSymbol) {
+        Map<String, Double> stockWeightResult = new HashMap<>();
         try {
             PortfolioStock currentStock = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
             double currentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
                     .path("05. price").asDouble();
             double stockMarketValue = currentStock.getQuantity() * currentPrice;
-      
-            double totalPortfolioValue = 0; 
+
+            double totalPortfolioValue = 0;
             List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
             for (PortfolioStock stock : allStocksInPortfolio) {
                 double stockPrice = marketDataService.fetchCurrentData(stock.getStockSymbol()).path("Global Quote")
@@ -340,7 +338,7 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
     }
 
     @Override
-    public Map<String,Double> calculateAnnualisedReturn(Integer portfolioStockId, String stockSymbol) {
+    public Map<String, Double> calculateAnnualisedReturn(Integer portfolioStockId, String stockSymbol) {
         Map<String, Double> annualisedReturnResult = new HashMap<>();
         try {
             PortfolioStock stock = portfolioStockRepository
@@ -419,20 +417,11 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
     public Map<String, Double> calculateOverallPortfolioReturns(Integer portfolioId) {
         try {
             Map<String, Map<String, Double>> stockReturns = calculateStockReturnsForPortfolio(portfolioId);
-
-            System.out.println("Stock Returns: " + stockReturns);
-
             double totalPurchaseValue = 0.0;
             double totalActualReturn = 0.0;
 
             for (Map.Entry<String, Map<String, Double>> entry : stockReturns.entrySet()) {
                 double actualValueForStock = entry.getValue().get("actualValue");
-
-                System.out.println("Processing stock: " + entry.getKey()); // Check which stock is being processed
-                System.out.println("Actual Value for " + entry.getKey() + ": " + actualValueForStock); // Check the
-                                                                                                       // actual value
-                                                                                                       // for current
-                                                                                                       // stock
 
                 PortfolioStock stock = findByPortfolioIdAndStockSymbol(portfolioId, entry.getKey());
                 double purchaseValue = stock.getBuyPrice() * stock.getQuantity();
@@ -529,7 +518,8 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
     public Map<String, Object> getPortfolioSummary(Integer portfolioId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Portfolio portfolio = portfolioService.findById(portfolioId).orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
+            Portfolio portfolio = portfolioService.findById(portfolioId)
+                    .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
             List<PortfolioStock> portfolioStocks = portfolio.getPortfolioStocks();
             if (portfolioStocks.isEmpty()) {
                 response.put("totalPortfolioValue", 0.00);
@@ -546,11 +536,10 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
             response.put("overallReturns", overallReturns);
             return response;
         } catch (Exception e) {
-           throw new RuntimeException("Error getting portfolio summary service: " + e.getMessage(), e); 
+            throw new RuntimeException("Error getting portfolio summary service: " + e.getMessage(), e);
         }
-        
-    }
 
+    }
 
     private Function<PortfolioStock, String> getGroupingFunction(String groupBy) {
         switch (groupBy.toLowerCase()) {
@@ -575,10 +564,10 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
 
         for (PortfolioStock stock : allStocksInPortfolio) {
             String stockSymbol = stock.getStockSymbol();
-            Map<String,Double> stockMonthlyVolatility = stockService.calculateMonthlyVolatility(stockSymbol);
+            Map<String, Double> stockMonthlyVolatility = stockService.calculateMonthlyVolatility(stockSymbol);
 
             Double stockMonthlyVolatilityData = stockMonthlyVolatility.get(stockSymbol);
-            Map<String,Double> stockWeight = calculateStockWeight(portfolioId, stockSymbol);
+            Map<String, Double> stockWeight = calculateStockWeight(portfolioId, stockSymbol);
             Double stockWeightData = stockWeight.get(stockSymbol);
             portfolioVolatility += stockWeightData * stockMonthlyVolatilityData;
         }
@@ -763,15 +752,16 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
     }
 
     @Override
-    public Map<String, String> executeRebalancePortfolioTransactions(PortfolioStockRebalancingDTO portfolioStocksToBeAdjusted, Integer portfolioId) {
+    public Map<String, String> executeRebalancePortfolioTransactions(
+            PortfolioStockRebalancingDTO portfolioStocksToBeAdjusted, Integer portfolioId) {
         Portfolio portfolio = portfolioService.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
         Map<String, String> result = new HashMap<>();
         for (Map.Entry<String, Integer> entry : portfolioStocksToBeAdjusted.getPortfolioStocks().entrySet()) {
             if ("CASH".equals(entry.getKey())) {
-                continue; 
+                continue;
             }
-            if (entry.getValue() < 0) { 
+            if (entry.getValue() < 0) {
                 processStockTransaction(portfolio, entry.getKey(), entry.getValue());
             }
         }
@@ -781,9 +771,9 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
         // Process Buys
         for (Map.Entry<String, Integer> entry : portfolioStocksToBeAdjusted.getPortfolioStocks().entrySet()) {
             if ("CASH".equals(entry.getKey())) {
-                continue; 
+                continue;
             }
-            if (entry.getValue() > 0) { 
+            if (entry.getValue() > 0) {
                 processStockTransaction(portfolio, entry.getKey(), entry.getValue());
             }
         }
@@ -793,44 +783,45 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
         return result;
     }
 
-    
     private void processStockTransaction(Portfolio portfolio, String stockSymbol, int quantity) {
         PortfolioStock portfolioStock = portfolioStockRepository
                 .findByPortfolioPortfolioIdAndStockStockSymbol(portfolio.getPortfolioId(), stockSymbol)
                 .orElseThrow(() -> new EntityNotFoundException("Portfolio stock not found in the portfolio"));
-    
+
         double stockPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
                 .path("05. price").asDouble();
-    
+
         double transactionAmount = stockPrice * quantity;
-    
+
         if (quantity > 0 && portfolio.getRemainingCapital() < transactionAmount) {
             throw new IllegalArgumentException("Insufficient funds to purchase stock");
         }
-    
+
         int newQuantity = portfolioStock.getQuantity() + quantity;
-        if (newQuantity <= 0) { 
-            portfolio.setRemainingCapital(portfolio.getRemainingCapital() + (stockPrice * portfolioStock.getQuantity()));
+        if (newQuantity <= 0) {
+            portfolio
+                    .setRemainingCapital(portfolio.getRemainingCapital() + (stockPrice * portfolioStock.getQuantity()));
             portfolioStockRepository.delete(portfolioStock);
         } else {
             portfolioStock.setQuantity(newQuantity);
             portfolioStock.setBuyPrice((float) stockPrice);
             portfolioStock.setBuyDate(LocalDate.now());
-    
-            if (quantity < 0) { 
+
+            if (quantity < 0) {
                 portfolio.setRemainingCapital(portfolio.getRemainingCapital() + (-transactionAmount));
-            } else { 
+            } else {
                 portfolio.setRemainingCapital(portfolio.getRemainingCapital() - transactionAmount);
             }
             portfolioStockRepository.save(portfolioStock);
         }
-    
+
         String action = String.format(
                 "User successfully %s stock %s in Portfolio #%d - %s with new price: %.2f and quantity: %d on %s",
                 (quantity < 0) ? "sold" : "bought",
-                stockSymbol, portfolio.getPortfolioId(), portfolio.getName(), stockPrice, Math.abs(quantity), LocalDate.now());
-    
+                stockSymbol, portfolio.getPortfolioId(), portfolio.getName(), stockPrice, Math.abs(quantity),
+                LocalDate.now());
+
         accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
     }
-    
+
 }

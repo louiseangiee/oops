@@ -22,10 +22,9 @@ import com.oop.appa.entity.User;
 
 import jakarta.mail.internet.MimeMessage;
 
-
 @Service
-public class UserServiceImpl implements UserService{
-    
+public class UserServiceImpl implements UserService {
+
     private UserRepository userRepository;
     private JavaMailSender mailSender;
     private TemplateEngine templateEngine;
@@ -75,7 +74,7 @@ public class UserServiceImpl implements UserService{
             throw new RuntimeException("Error fetching user by email service: " + e.getMessage(), e);
         }
     }
-    
+
     @Override
     public void updateOTP(String email, String otp) {
         try {
@@ -153,7 +152,6 @@ public class UserServiceImpl implements UserService{
             helper.setText(htmlContent, true);
 
             mailSender.send(mimeMessage);
-            System.out.println("Mail sent successfully");
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error sending email service: ", e);
@@ -185,7 +183,7 @@ public class UserServiceImpl implements UserService{
             throw new RuntimeException("Error verifying OTP service: " + e.getMessage(), e);
         }
     }
-    
+
     @Override
     public void deleteOtp(String email) {
         try {

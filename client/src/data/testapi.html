@@ -1,49 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Display JSON</title>
-</head>
-<body>
-    <h1>JSON Data:</h1>
-    <pre id="jsonData"></pre>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Display JSON</title>
+	</head>
+	<body>
+		<h1>JSON Data:</h1>
+		<pre id="jsonData"></pre>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetchJSONData();
-        });
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				fetchJSONData();
+			});
 
-        function fetchJSONData() {
-            // replace the "demo" apikey below with your own key
-            var functionName = "TIME_SERIES_DAILY"; //variables can change at will.
-            var key = "AIHSU9GJP3BGASNA";
-            var symbol = "IBM";
-            var interval = "5min" 
-            
-            var urlStatic = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}&apikey=${key}`; //for daily/weekly
-            //const urlDynamic = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}&interval=${interval}&apikey=${key}`;  for livedata
-            
+			function fetchJSONData() {
+				// replace the "demo" apikey below with your own key
+				var functionName = 'TIME_SERIES_DAILY'; //variables can change at will.
+				var key = 'AIHSU9GJP3BGASNA';
+				var symbol = 'IBM';
+				var interval = '5min';
 
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Network response was not ok");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    displayData(data);
-                })
-                .catch(error => {
-                    console.log("There was a problem with the fetch operation:", error.message);
-                });
-        }
+				var urlStatic = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}&apikey=${key}`; //for daily/weekly
+				//const urlDynamic = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}&interval=${interval}&apikey=${key}`;  for livedata
 
-        function displayData(data) {
-            var jsonDataElement = document.getElementById("jsonData");
-            jsonDataElement.textContent = JSON.stringify(data, null, 4);
-        }
-    </script>
-</body>
+				fetch(url)
+					.then((response) => {
+						if (!response.ok) {
+							throw new Error('Network response was not ok');
+						}
+						return response.json();
+					})
+					.then((data) => {
+						displayData(data);
+					})
+					.catch((error) => {});
+			}
+
+			function displayData(data) {
+				var jsonDataElement = document.getElementById('jsonData');
+				jsonDataElement.textContent = JSON.stringify(data, null, 4);
+			}
+		</script>
+	</body>
 </html>

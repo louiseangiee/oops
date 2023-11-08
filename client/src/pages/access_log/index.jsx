@@ -27,7 +27,6 @@ const AccessLog = () => {
         const response = await getAsync("accessLogs", cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           setAccessLogData(data);
         } else {
           setAccessLogData(null);
@@ -36,7 +35,6 @@ const AccessLog = () => {
         const response = await getAsync("accessLogs/user/" + userId, cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           setAccessLogData(data);
         } else {
           setAccessLogData(null);
@@ -69,7 +67,8 @@ const AccessLog = () => {
           }}
         >
           {params.value}
-        </Box> )},
+        </Box>)
+    },
   ];
 
   return (

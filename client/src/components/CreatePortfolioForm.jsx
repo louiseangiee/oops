@@ -88,7 +88,6 @@ export default function CreatePortfolio() {
                     const error_message = errorDetails.details?.split(":")[1];
                     showAlert('error', "Error:" + error_message);
                 }).catch(jsonError => {
-                    console.log(jsonError);
                     showAlert('error', "An error occurred");
                 });
             }

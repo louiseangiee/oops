@@ -46,52 +46,6 @@ const PorfolioBarChart = () => {
     setChartData(dummyData);
   }, []);
 
-  // useEffect(() => {
-  //     fetchData();
-  //   }, [chosenStock, timeSpan]);
-
-
-
-  //   const fetchData = async () => {
-  //     let endpoint = 'stocks/OneYearData';  // Default to 1 year data
-
-  //     switch (timeSpan) {
-  //       case "1Y":
-  //         endpoint = 'stocks/OneYearData';
-  //         break;
-  //       case "1Q":
-  //         endpoint = 'stocks/OneQuarterData';
-  //         break;
-  //       case "1M":
-  //         endpoint = 'stocks/OneMonthData';
-  //         break;
-  //       case "1W":
-  //         endpoint = 'stocks/OneWeekData';
-  //         break;
-  //       default:
-  //         endpoint = 'stocks';
-  //     }
-
-  //     try {
-
-  //       const response = await getAsync(`${endpoint}?symbol=${chosenStock.code}`, cookie.accessToken); // Use the accessToken from cookies
-  //       console.log(response)
-  //       if (!response.ok) {
-  //         throw new Error('Network response was not ok');
-  //       }
-  //       const responseData = await response.json();
-  //       console.log(responseData)
-
-  //       const data = responseData.map(item => ({
-  //         time: item.date,
-  //         value: parseFloat(item["4. close"])
-  //       }));
-  //       setChartData(data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch stock data:", error);
-  //     }
-  //   };
-
   const displayedData = chartData.reverse();
 
   return (

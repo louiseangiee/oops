@@ -76,7 +76,6 @@ const RebalanceModal = ({ portfolioId }) => {
         const error_message = errorDetails.details?.split(":")[1];
         showAlert('error', "Error:" + error_message);
       }).catch(jsonError => {
-        console.log(jsonError);
         showAlert('error', "An error occurred");
       });
     }
@@ -129,7 +128,6 @@ const RebalanceModal = ({ portfolioId }) => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           setResponseState({
             finalStocks: data.finalStocks,
             stockAdjustments: data.stockAdjustments,
@@ -148,7 +146,6 @@ const RebalanceModal = ({ portfolioId }) => {
           const error_message = errorDetails.details?.split(":")[1];
           showAlert('error', "Error:" + error_message);
         }).catch(jsonError => {
-          console.log(jsonError);
           showAlert('error', "An error occurred");
         });
       }
@@ -156,9 +153,6 @@ const RebalanceModal = ({ portfolioId }) => {
   };
 
   const handleConfirmRebalance = async () => {
-    console.log({
-      portfolioStocks: responseState.stockAdjustments,
-    })
     setLoading(true);
     try {
       const response = await postAsync(
@@ -183,7 +177,6 @@ const RebalanceModal = ({ portfolioId }) => {
         const error_message = errorDetails.details?.split(":")[1];
         showAlert('error', "Error:" + error_message);
       }).catch(jsonError => {
-        console.log(jsonError);
         showAlert('error', "An error occurred");
       });
     }

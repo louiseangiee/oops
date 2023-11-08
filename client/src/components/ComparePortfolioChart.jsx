@@ -160,7 +160,6 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   const volAnnual2 = toFixedSafe(portfolioVolatility2Annual);
   const vol1 = toFixedSafe(portfolioVolatility1);
   const vol2 = toFixedSafe(portfolioVolatility2);
-  console.log(vol2)
 
   function getOverallReturn(portfolioSummaries) {
     // Check if the portfolioSummaries object exists
@@ -204,61 +203,14 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   const summary1 = getStockReturns(portfolioSummaries1);
   const summary2 = getStockReturns(portfolioSummaries2);
 
-  console.log(summary1);
-  console.log(summary2);
-
   const overallReturn1 = getOverallReturn(portfolioSummaries1).overalReturn;
   const overallReturn2 = getOverallReturn(portfolioSummaries2).overalReturn;
   const overallReturn1Percentage = getOverallReturn(portfolioSummaries1).percentage;
   const overallReturn2Percentage = getOverallReturn(portfolioSummaries2).percentage;
 
-  // useEffect(() => {
-  //   const fetchPortfolioData = async () => {
-  //     if (!chosenPortfolio1 || !chosenPortfolio2) return;
-
-  //     // Prepare endpoints for all required data
-  //     const endpoints = [
-  //       `portfolios/${chosenPortfolio1.portfolioId}`,
-  //       `portfolios/${chosenPortfolio2.portfolioId}`,
-  //       `portfolioStocks/${chosenPortfolio1.portfolioId}/summary`,
-  //       `portfolioStocks/${chosenPortfolio2.portfolioId}/summary`,
-  //       `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility`,
-  //       `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility/annualized`,
-  //       `portfolioStocks/${chosenPortfolio2.portfolioId}/volatility`,
-  //       `portfolioStocks/${chosenPortfolio2.portfolioId}/volatility/annualized`,
-  //     ];
-
-  //     try {
-  //       const results = await fetchAllEndpoints(endpoints, cookies.accessToken);
-  //       console.log(results);
-
-  //       // Extract the responses and set state or handle data accordingly
-  //       const [portfolioData1, portfolioData2, portfolioSummaries1, portfolioSummaries2, 
-  //              portfolioVolatility1, portfolioVolatility1Annual, 
-  //              portfolioVolatility2, portfolioVolatility2Annual] = results;
-
-  //       // Update the state or perform further actions with the fetched data
-  //       setPortfolioData1(portfolioData1);
-  //       setPortfolioData2(portfolioData2);
-  //       setPortfolioSummaries1(portfolioSummaries1);
-  //       setPortfolioSummaries2(portfolioSummaries2);
-  //       setPortfolioVolatility1(portfolioVolatility1);
-  //       setPortfolioVolatility1Annual(portfolioVolatility1Annual);
-  //       setPortfolioVolatility2(portfolioVolatility2);
-  //       setPortfolioVolatility2Annual(portfolioVolatility2Annual);
-  //     } catch (error) {
-  //       console.error('There was an error fetching the portfolio data:', error);
-  //       // Handle the error by setting fallback states or showing messages
-  //     }
-  //   };
-
-  //   fetchPortfolioData();
-  // }, [chosenPortfolio1, chosenPortfolio2, cookies.accessToken]); // Add dependencies for useEffect here
-
-
   // Render the chart or a loading indicator
   return (
-    
+
     <div>
       {/* Your chart rendering logic will go here */}
       <Box
@@ -269,8 +221,8 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
         width="100%"
       >
         {/* This is the first half of the page for portfolioData1 */}
-        
-        <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400]}} borderLeft={3}  alignItems="flex-start">
+
+        <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400] }} borderLeft={3} alignItems="flex-start">
           <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
             ID {portfolioData1.portfolioId}: {portfolioData1.name}
           </Typography>
@@ -356,7 +308,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
         </Box>
 
         {/* This is the second half of the page for portfolioData2 */}
-        <Box flex={1} margin={2} padding={3}  style={{ backgroundColor: colors.primary[400]}} alignItems="flex-start" borderLeft={3}>
+        <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400] }} alignItems="flex-start" borderLeft={3}>
           <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
             ID {portfolioData2.portfolioId}: {portfolioData2.name}
           </Typography>
@@ -436,7 +388,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <br />
           <Divider />
           <br />
-         
+
           <ReturnsTable stockData={portfolioData2} stockReturns={summary2} />
         </Box>
       </Box>

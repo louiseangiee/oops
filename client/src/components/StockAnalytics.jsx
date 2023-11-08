@@ -39,9 +39,6 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
       const responseData = await response.json();
       const responseDataAnnual = await responseAnnual.json();
 
-      console.log(responseData);
-      console.log(responseDataAnnual);
-
       setPortfolioVolatility(responseData.portfolioVolatility);
       setPortfolioVolatilityAnnual(responseDataAnnual.portfolioVolatility);
     } catch (error) {
@@ -51,7 +48,6 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
 
   function toFixedSafe(value, digits = 2, defaultValue = 'N/A') {
     try {
-      console.log("Checking toFixed passed in value", value);
       const number = Number(value);
       if (Number.isFinite(number)) {
         return number.toFixed(digits);
@@ -73,8 +69,6 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
   if (portfolioVolatility) {
     vol = toFixedSafe(portfolioVolatility);
   }
-  console.log(vol);
-
 
   function getOverallReturn(portfolioSummaries) {
     if (!portfolioSummaries) {
@@ -102,8 +96,6 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
   }
 
   const summary = getStockReturns(portfolioSummaries);
-
-  console.log(summary);
 
   const overallReturn = getOverallReturn(portfolioSummaries).overalReturn;
   const overallReturnPercentage = getOverallReturn(portfolioSummaries).percentage;

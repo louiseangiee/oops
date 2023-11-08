@@ -32,7 +32,7 @@ import com.oop.appa.entity.Stock;
 import com.oop.appa.entity.StockLookup;
 
 @Service
-public class StockServiceImpl implements StockService{
+public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
     private final MarketDataService marketDataService;
     private final StockLookupRepository stockLookupRepository;
@@ -47,7 +47,7 @@ public class StockServiceImpl implements StockService{
 
     // GET
     @Override
-    public List<Stock> findAll(){
+    public List<Stock> findAll() {
         try {
             return stockRepository.findAll();
         } catch (Exception e) {
@@ -280,7 +280,6 @@ public class StockServiceImpl implements StockService{
         try {
             JsonNode quarterlyJson = marketDataService.fetchDailyData(stockSymbol, "compact");
             String threeMonthsAgoDate = getDateThreeMonthsAgo(false); // e.g., "2023-07-15"
-            System.out.println(threeMonthsAgoDate);
             JsonNode quarterlyTimeSeries = quarterlyJson.path("Time Series (Daily)");
 
             List<String> keys = StreamSupport.stream(
@@ -385,7 +384,6 @@ public class StockServiceImpl implements StockService{
             String message;
 
             for (int i = 0; i < 10; i++) {
-                System.out.println("Checking for price on " + date.toString());
                 Double price = stockPrices.get(date.toString());
 
                 if (price != null) {

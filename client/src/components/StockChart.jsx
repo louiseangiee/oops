@@ -134,7 +134,7 @@ const StockChart = ({ chosenStock }) => {
           1 Week
         </Button>
       </ButtonGroup>
-      <Typography variant="h2" fontWeight="bold" marginBottom={2}> {isLoading ? 'Fetching data...' : chosenStock.name} </Typography>
+      <Typography variant="h2" fontWeight="bold" marginBottom={2}> {isLoading ? 'Fetching data...' : chosenStock?.name} </Typography>
 
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart data={chartData}>

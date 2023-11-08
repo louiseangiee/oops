@@ -112,7 +112,9 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
       >
         <MenuItem value="stockSector">Sector</MenuItem>
         <MenuItem value="stockIndustry">Industry</MenuItem>
+        <MenuItem value="stockCountry">Country</MenuItem> {/* Add this line */}
       </Select>
+
       <ResponsiveContainer height={500}>
         <PieChart>
           {/* Use pieChartData for the Pie chart which includes "Others" */}
@@ -120,7 +122,9 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
             data={pieChartData}
             dataKey="value"
             nameKey="name"
-            // ...  
+            cx="50%"
+            cy="50%"
+            outerRadius={200}
           >
             {pieChartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

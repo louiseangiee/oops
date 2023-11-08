@@ -17,6 +17,7 @@ const StockSelector = ({ chosenStock, handleStockChange }) => {
     const fetchStockData = async (search) => {
         if (!search.trim()) {
             setStocks([]);
+            if (chosenStock) handleStockChange(null);
             return;
         }
 
@@ -49,7 +50,7 @@ const StockSelector = ({ chosenStock, handleStockChange }) => {
     };
 
     const handleChange = (event, newValue) => {
-        const stockExists = stocks.some(stock => stock.code === newValue?.code);
+        const stockExists = stocks.some(stock => stock?.code === newValue?.code);
         handleStockChange(stockExists ? newValue : null);
     };
 
@@ -61,8 +62,8 @@ const StockSelector = ({ chosenStock, handleStockChange }) => {
             onInputChange={handleInputChange}
             onChange={handleChange}
             options={stocks}
-            getOptionLabel={(option) => option.name}
-            isOptionEqualToValue={(option, value) => option.code === value.code}
+            getOptionLabel={(option) => option.name || ''}
+            isOptionEqualToValue={(option, value) => option !== null && value !== null && option.code === value.code}
             style={{ minWidth: 200, marginBottom: 20 }}
             renderInput={(params) => (
                 <TextField

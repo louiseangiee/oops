@@ -229,7 +229,7 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
             }}
           />
           <Tab
-            label="Stocks Analytics"
+            label="Portfolio Analytics"
             {...a11yProps(1)}
             sx={{
               "&.Mui-selected": {

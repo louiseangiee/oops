@@ -5,6 +5,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getAsync } from "../../utils/utils";
 import Grid from '@mui/material/Unstable_Grid2';
 import { useCookies } from "react-cookie";
+import Lottie from 'lottie-react';
+import loadingLight from "../../components/lotties/loading_light.json"
 
 
 const OTP = () => {
@@ -15,6 +17,7 @@ const OTP = () => {
     const locationData = location.state.data;
     const colors = tokens(theme.palette.mode);
     const [status, setStatus] = useState(''); // for displaying status of OTP verification
+    const [isLoading, setIsLoading] = useState(false);
     const [otp, setOtp] = useState(['', '', '', '', '', '']); // 6 digit OTP
     const inputRefs = useRef(
         Array(6).fill(null)
@@ -49,14 +52,17 @@ const OTP = () => {
         if (response.ok) {
             const data = await response.json();
             alert(data.message)
+            setIsLoading(false);
             navigate('/');
         }
         else {
             alert('Error changing password')
+            setIsLoading(false);
         }
     }
 
     const verifyOTP = async () => {
+        setIsLoading(true);
         const finalotp = otp.join('');
         const response = await getAsync('users/verifyOTP?email=' + locationData.email + '&otp=' + finalotp);
         if (response.ok) {
@@ -67,14 +73,17 @@ const OTP = () => {
                 const data = await response.text();
                 if (data === '{"message": "OTP verified successfully"}') {
                     await setRequiredCookie();
+                    setIsLoading(false);
                     navigate('/')
                 } else {
                     alert('wrong code');
+                    setIsLoading(false);
                 }
             }
         }
         else {
             alert('error verifying')
+            setIsLoading(false);
         }
     }
 
@@ -134,7 +143,13 @@ const OTP = () => {
                         marginTop: "10px",
                     }}
                         onClick={verifyOTP}
-                    > Verify OTP</Button>
+                    >{isLoading ?
+                        <Lottie
+                            animationData={loadingLight}
+                            loop={true} // Set to true for looping
+                            autoplay={true} // Set to true to play the animation automatically
+                            style={{ width: '50px', height: '50px', padding: 0 }} // Customize the dimensions
+                        /> : <> Verify OTP </>}</Button>
                 </Box>
             </Grid>
         </main >

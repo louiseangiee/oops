@@ -656,9 +656,9 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            $
+            
             {!summaryLoading
-              ? `${Math.abs(totalPortfolioValue).toFixed(2)}`
+              ? `$${Math.abs(totalPortfolioValue).toFixed(2)}`
               : "Loading..."}
           </Typography>
         </Box>

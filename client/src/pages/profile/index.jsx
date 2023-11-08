@@ -144,73 +144,16 @@ export default function Profile() {
                                 }}>
                                 Full Name
                             </Typography>
-                            {isEditingName ? (
-                                <>
-                                    <TextField
-                                        id="fullName"
-                                        style={{
-                                            flex: 1,
-                                            marginRight: '10px',
-                                            // borderColor: isEditingName ? colors.primary[400] : colors.grey[100],
-                                        }}
-                                        value={fullName}
-                                        InputProps={{
-                                            readOnly: !isEditingName,
-                                            classes: {
-                                                notchedOutline: 'editing-name-outline',
-                                            },
-                                        }}
-                                        onChange={(e) => {
-                                            setFullName(e.target.value);
-                                        }}
-                                        size="small"
-                                        fullWidth
-                                        focused
-                                    />
-                                    <Tooltip title="Cancel Changes">
-                                        <HighlightOffOutlinedIcon onClick={handleCancelName} sx={{ marginRight: "10px", color: colors.redAccent[600] }} />
-                                    </Tooltip>
-                                    <Tooltip title="Save Changes">
-                                        <SaveOutlinedIcon onClick={handleSaveName} sx={{ color: colors.greenAccent[600] }} />
-                                    </Tooltip>
-                                    <style jsx>{`
-                                        .editing-name-outline {
-                                            border-color: ${colors.greenAccent[800]} !important;
-                                            
-                                        }
-                                    `}</style>
-                                </>
-                            ) : (
-                                <>
-                                    <TextField
-                                        id="fullName"
-                                        style={{
-                                            flex: 1,
-                                            marginRight: '10px',
+                            <Typography
+                                id="fullName"
+                                style={{
+                                    flex: 1,
+                                    marginLeft: '20px',
 
-                                        }}
-                                        value={fullName}
-                                        InputProps={{
-                                            readOnly: true,
-                                            classes: {
-                                                notchedOutline: 'read-name-outline',
-                                            },
-                                        }}
-                                        size="small"
-                                        fullWidth
-                                    />
-                                    <Tooltip title="Edit">
-                                        <EditOutlinedIcon onClick={handleEditName} />
-                                    </Tooltip>
-
-                                    <style jsx>{`
-                                        .read-name-outline {
-                                            border-color: ${colors.grey[600]} !important;
-                                            
-                                        }
-                                    `}</style>
-                                </>
-                            )}
+                                }}
+                                size="small"
+                                fullWidth
+                            >{fullName}</Typography>
                         </Box>
 
                         <Box m="20px" display="flex" alignItems="center">
@@ -224,24 +167,16 @@ export default function Profile() {
                                 }}>
                                 Email
                             </Typography>
-                            <TextField
-                                id="email"
+                            <Typography
+                                id="fullName"
                                 style={{
                                     flex: 1,
-                                    marginRight: '10px',
+                                    marginLeft: '20px',
+
                                 }}
-                                value={email}
-                                InputProps={{
-                                    readOnly: true,
-                                    classes: {
-                                        notchedOutline: 'editing-email-outline',
-                                    },
-                                }}
-                                onChange={(e) => setEmail(e.target.value)}
                                 size="small"
                                 fullWidth
-                                focused
-                            />
+                            >{email}</Typography>
                         </Box>
                         <Box m="20px" display="flex" alignItems="center">
 
@@ -255,23 +190,16 @@ export default function Profile() {
                                 }}>
                                 Portfolio Count
                             </Typography>
-                            <TextField
-                                id="email"
+                            <Typography
+                                id="fullName"
                                 style={{
                                     flex: 1,
-                                    marginRight: '10px',
-                                }}
-                                value={dataFetched?.portfolios?.length}
-                                InputProps={{
-                                    readOnly: true,
-                                    classes: {
-                                        notchedOutline: 'editing-email-outline',
-                                    },
+                                    marginLeft: '20px',
+
                                 }}
                                 size="small"
                                 fullWidth
-                                focused
-                            />
+                            >{dataFetched?.portfolios?.length}</Typography>
                         </Box>
 
                         {/* Logout Button */}

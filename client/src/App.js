@@ -3,12 +3,10 @@ import {ColorModeContext, useMode} from './theme';
 import {CssBaseline, ThemeProvider} from '@mui/material';
 import RequireAuth from './components/RequireAuth';
 import {Routes, Route} from 'react-router-dom';
-import Dashboard from './pages/dashboard';
 import Home from './pages/home';
 import Portfolio from './pages/portfolio';
 import Login from './pages/login';
 import Layout from './Layout';
-import Analytics from './pages/analytics_dashboard';
 import Profile from './pages/profile';
 import AccessLog from './pages/access_log';
 import StockMarketPage from './pages/stockMarketpage';
@@ -28,14 +26,13 @@ function App() {
 						<Routes>
 							{/* <Route element={<AutoRefreshOnRouteChange />} /> */}
 							<Route path="/login" element={<Login />} />
-							<Route path="/profile" element={<Profile />} />
 							<Route path="/otp" element={<OTP />} />
 							<Route path="/" element={<Layout />}>
 								{/* Routes that require authentication */}
 								<Route element={<RequireAuth />}>
 									<Route
-										path="/dashboard"
-										element={<Dashboard />}
+										path="/profile"
+										element={<Profile />}
 									/>
 									<Route
 										path="/portfolio/:portfolioId"

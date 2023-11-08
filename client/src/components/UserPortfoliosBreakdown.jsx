@@ -112,7 +112,8 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
       >
         <MenuItem value="stockSector">Sector</MenuItem>
         <MenuItem value="stockIndustry">Industry</MenuItem>
-        <MenuItem value="stockCountry">Country</MenuItem> {/* Add this line */}
+        <MenuItem value="stockCountry">Country</MenuItem>
+        <MenuItem value="stockExchange">Exchange</MenuItem> {/* Add this line */}
       </Select>
 
       <ResponsiveContainer height={500}>

@@ -14,6 +14,7 @@ import Lottie from 'lottie-react';
 import noDataAnimation from './no_data.json';
 import Loading from './fetching_data.json';
 import loadingLight from "./loading_light.json";
+import RebalanceModal from "../../components/RebalanceModal";
 
 
 function DeletePortfolio() {
@@ -239,6 +240,7 @@ const Portfolio = () => {
   const fetchPortfolioSummaryData = async () => {
     const portfolioSummaryResponse = await getAsync(`portfolioStocks/${portfolioId}/summary`, cookie.accessToken);
     const portfolioSummaryData = await portfolioSummaryResponse.json();
+    console.log(portfolioSummaryData.overallReturns.percentage)
     setOverallReturns(portfolioSummaryData.overallReturns.overalReturn);
     setPercentageReturns(portfolioSummaryData.overallReturns.percentage);
     // TODO - set Loading State for portfolio summary
@@ -261,7 +263,7 @@ const Portfolio = () => {
         clearInterval(refreshIntervalId);
       }
     };
-  }, [portfolioId, userData]);
+  }, [portfolioId, userData, overallReturns, percentageReturns]);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" href="/" sx={{ fontSize: "22px" }}>
@@ -318,6 +320,7 @@ const Portfolio = () => {
         <Box display="flex" gap="5px">
           <EditPortfolio portfolioId={portfolioId} />
           <DeletePortfolio />
+          <RebalanceModal portfolioId={portfolioId} />
         </Box>
       </Box>
 
@@ -380,7 +383,7 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: overallReturns > 0 ? 'green' : overallReturns < 0 ? 'red' : colors.grey[100] }}
           >
-            {overallReturns && percentageReturns ? (
+            {overallReturns != undefined && percentageReturns != undefined ? (
               `${overallReturns < 0 ? '-' : overallReturns > 0 ? '+' : ''}${Math.abs(overallReturns)}/${percentageReturns}%`
             ) : (
               "Loading..."

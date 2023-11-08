@@ -119,8 +119,8 @@ public class PortfolioStockController {
     @PostMapping("/{portfolioId}/executeRebalance")
     public ResponseEntity<?> executeRebalance(@PathVariable Integer portfolioId, @RequestBody PortfolioStockRebalancingDTO portfolioStockRebalancingDTO){
         try {
-            portfolioStockService.executeRebalancePortfolioTransactions(portfolioStockRebalancingDTO);
-            return ResponseEntity.ok("Rebalancing was successfully completed");
+            Map<String, String> result = portfolioStockService.executeRebalancePortfolioTransactions(portfolioStockRebalancingDTO, portfolioId);
+            return ResponseEntity.ok(result);
         } catch (Exception e){
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error executing rebalancing");

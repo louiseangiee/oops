@@ -30,7 +30,6 @@ import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.PortfolioStock;
 import com.oop.appa.entity.Stock;
 
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
@@ -665,16 +664,10 @@ public class PortfolioStockService {
                     .getOrDefault("CASH", new PortfolioGroupingSummary.Allocation(0.0, 0.0)).getActualValue();
             double cashAdjustment = targetCash - actualCash;
 
-            // Debugging logs (or use logger.info(...) if using a logger)
-            System.out.println("Target CASH: " + targetCash);
-            System.out.println("Actual CASH: " + actualCash);
-            System.out.println("CASH Adjustment: " + cashAdjustment);
-
             stockAdjustments.put("CASH", cashAdjustment);
             double finalCashValue = actualCash + cashAdjustment;
             finalAllocationValues.put("CASH", finalCashValue);
-
-            System.out.println("Final CASH Value: " + finalCashValue);
+            projectedTotalPortfolioValue = projectedTotalPortfolioValue + cashAdjustment;
         }
 
         // Calculate the final allocation percentages based on the updated values
@@ -728,10 +721,10 @@ public class PortfolioStockService {
     }
 
     @Transactional
-    public void executeRebalancePortfolioTransactions(PortfolioStockRebalancingDTO portfolioStocksToBeAdjusted) {
-        Portfolio portfolio = portfolioService.findById(portfolioStocksToBeAdjusted.getPortfolioId())
+    public Map<String, String> executeRebalancePortfolioTransactions(PortfolioStockRebalancingDTO portfolioStocksToBeAdjusted, Integer portfolioId) {
+        Portfolio portfolio = portfolioService.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
-
+        Map<String, String> result = new HashMap<>();
         // Process Sells
         for (Map.Entry<String, Integer> entry : portfolioStocksToBeAdjusted.getPortfolioStocks().entrySet()) {
             if ("CASH".equals(entry.getKey())) {
@@ -757,6 +750,8 @@ public class PortfolioStockService {
 
         // Final portfolio update after buys
         portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
+        result.put("message", "Portfolio successfully rebalanced");
+        return result;
     }
 
     private void processStockTransaction(Portfolio portfolio, String stockSymbol, int quantity) {

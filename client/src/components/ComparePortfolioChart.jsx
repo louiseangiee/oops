@@ -336,7 +336,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
                 Volatility (Monthly):
               </Typography>
               <Typography variant="h3" fontWeight="bold">
-                {vol1}
+                {(vol1*100)}%
               </Typography>
             </Box>
             <Box flex={1} margin={1}>
@@ -344,7 +344,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
                 Volatility Annualized:
               </Typography>
               <Typography variant="h3" fontWeight="bold">
-                {volAnnual1}
+                {(volAnnual1*100)}% 
               </Typography>
             </Box>
           </Box>
@@ -422,7 +422,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
                   Volatility (Monthly):
                 </Typography>
                 <Typography variant="h3" fontWeight="bold">
-                  {vol2}
+                  {(vol2*100)}%
                 </Typography>
               </Box>
               <Box flex={1} margin={1}>
@@ -430,7 +430,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
                   Volatility Annualized:
                 </Typography>
                 <Typography variant="h3" fontWeight="bold">
-                  {volAnnual2}
+                  {(volAnnual2*100)}%
                 </Typography>
               </Box>
             </Box>

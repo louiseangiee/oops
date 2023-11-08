@@ -29,6 +29,8 @@ import noDataAnimation from "./no_data.json";
 import Loading from "./fetching_data.json";
 import loadingLight from "./loading_light.json";
 import RebalanceModal from "../../components/RebalanceModal";
+import Tooltip from "@mui/material/Tooltip";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 
 function DeletePortfolio() {
   const theme = useTheme();
@@ -246,6 +248,7 @@ const Portfolio = () => {
   const [refreshIntervalId, setRefreshIntervalId] = useState(null);
   const [totalPortfolioValue, setTotalPortfolioValue] = useState(0);
   const [stockReturns, setStockReturns] = useState({});
+  const [showInvestedReturns, setShowInvestedReturns] = useState(false);
 
   // Fetch portfolio data
   const fetchPortfolioData = async () => {
@@ -393,6 +396,14 @@ const Portfolio = () => {
     );
   }
 
+  const handleTooltipClose = () => {
+    setShowInvestedReturns(false);
+  };
+
+  const handleTooltipOpen = () => {
+    setShowInvestedReturns(!showInvestedReturns);
+  };
+
   return (
     <Box m="20px">
       {/* HEADER */}
@@ -451,7 +462,7 @@ const Portfolio = () => {
             Initial Capital
           </Typography>
           <Typography
-            variant="h1"
+            variant="h2"
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
@@ -480,7 +491,7 @@ const Portfolio = () => {
             Remaining Capital
           </Typography>
           <Typography
-            variant="h1"
+            variant="h2"
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
@@ -490,46 +501,58 @@ const Portfolio = () => {
               : "0.00"}
           </Typography>
         </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="flex-start"
-          justifyContent="center"
-          flexDirection="column"
-          gap="5px"
-          pl="20px"
-          borderRadius="10px"
-        >
-          <Typography
-            variant="h6"
-            fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
+        <ClickAwayListener onClickAway={handleTooltipClose}>
+          <Box
+            gridColumn="span 3"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="flex-start"
+            justifyContent="center"
+            flexDirection="column"
+            gap="5px"
+            pl="20px"
+            borderRadius="10px"
           >
-            Return
-          </Typography>
+            <Tooltip
+              title={
+                showInvestedReturns
+                  ? `Click to show Actual Returns`
+                  : `Click to show Invested Capital Returns`
+              }
+              arrow
+              enterTouchDelay={0}
+              leaveTouchDelay={5000}
+              onClick={handleTooltipOpen}
+            >
+              <Typography
+                variant="h6"
+                fontStyle="italic"
+                sx={{ color: colors.grey[300] }}
+              >
+                {showInvestedReturns ? `Invested Capital Returns` : `Actual Returns`}
+              </Typography>
 
-          <Typography
-            variant="h1"
-            fontWeight="bold"
-            sx={{
-              color:
-                overallReturns > 0
-                  ? "green"
-                  : overallReturns < 0
-                  ? "red"
-                  : colors.grey[100],
-            }}
-          >
-            {!summaryLoading
-              ? `${
-                  overallReturns < 0 ? "-" : overallReturns > 0 ? "+" : ""
-                }$${Math.abs(overallReturns).toFixed(
-                  2
-                )}/${percentageReturns.toFixed(2)}%`
-              : "Loading..."}
-          </Typography>
-        </Box>
+              <Typography
+                variant="h2"
+                fontWeight="bold"
+                sx={{
+                  color:
+                    overallReturns > 0
+                      ? "green"
+                      : overallReturns < 0
+                      ? "red"
+                      : colors.grey[100],
+                }}
+              >
+                 {!summaryLoading
+            ? showInvestedReturns
+              ? `${overallReturns < 0 ? "" : overallReturns > 0 ? "+" : ""}${percentageReturns.toFixed(2)}%`
+              : `${overallReturns < 0 ? "-" : overallReturns > 0 ? "+" : ""}$${Math.abs(overallReturns).toFixed(2)}`
+            : "Loading..."}
+              </Typography>
+            </Tooltip>
+          </Box>
+        </ClickAwayListener>
 
         <Box
           gridColumn="span 3"
@@ -550,15 +573,13 @@ const Portfolio = () => {
             Overall Portfolio Value
           </Typography>
           <Typography
-            variant="h1"
+            variant="h2"
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
             $
             {!summaryLoading
-              ? `${Math.abs(totalPortfolioValue).toFixed(
-                  2
-                )}`
+              ? `${Math.abs(totalPortfolioValue).toFixed(2)}`
               : "Loading..."}
           </Typography>
         </Box>
@@ -575,7 +596,7 @@ const Portfolio = () => {
                 ? portfolioData["portfolioStocks"]
                 : null
             }
-            stockReturns={stockReturns? stockReturns:null}
+            stockReturns={stockReturns ? stockReturns : null}
             portfolioId={portfolioId}
             portfolioData={portfolioData}
             portfolioSummaries={portfolioSummaries}

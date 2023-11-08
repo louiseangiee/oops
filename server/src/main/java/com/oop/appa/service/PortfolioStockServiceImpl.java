@@ -767,30 +767,27 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
         Portfolio portfolio = portfolioService.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
         Map<String, String> result = new HashMap<>();
-        // Process Sells
         for (Map.Entry<String, Integer> entry : portfolioStocksToBeAdjusted.getPortfolioStocks().entrySet()) {
             if ("CASH".equals(entry.getKey())) {
-                continue; // Skip processing for "CASH"
+                continue; 
             }
-            if (entry.getValue() < 0) { // Selling stocks
+            if (entry.getValue() < 0) { 
                 processStockTransaction(portfolio, entry.getKey(), entry.getValue());
             }
         }
 
-        // Update the portfolio after sells
         portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
 
         // Process Buys
         for (Map.Entry<String, Integer> entry : portfolioStocksToBeAdjusted.getPortfolioStocks().entrySet()) {
             if ("CASH".equals(entry.getKey())) {
-                continue; // Skip processing for "CASH"
+                continue; 
             }
-            if (entry.getValue() > 0) { // Buying stocks
+            if (entry.getValue() > 0) { 
                 processStockTransaction(portfolio, entry.getKey(), entry.getValue());
             }
         }
 
-        // Final portfolio update after buys
         portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
         result.put("message", "Portfolio successfully rebalanced");
         return result;
@@ -801,35 +798,39 @@ public class PortfolioStockServiceImpl implements PortfolioStockService {
         PortfolioStock portfolioStock = portfolioStockRepository
                 .findByPortfolioPortfolioIdAndStockStockSymbol(portfolio.getPortfolioId(), stockSymbol)
                 .orElseThrow(() -> new EntityNotFoundException("Portfolio stock not found in the portfolio"));
-
+    
         double stockPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
                 .path("05. price").asDouble();
-
+    
         double transactionAmount = stockPrice * quantity;
-
-        // Check for sufficient capital if it's a buy transaction
+    
         if (quantity > 0 && portfolio.getRemainingCapital() < transactionAmount) {
             throw new IllegalArgumentException("Insufficient funds to purchase stock");
         }
-
-        portfolioStock.setBuyPrice((float) stockPrice);
-        portfolioStock.setQuantity(portfolioStock.getQuantity() + quantity);
-        portfolioStock.setBuyDate(LocalDate.now());
-
-        // Update remaining capital
-        if (quantity < 0) { // Sell transaction
-            portfolio.setRemainingCapital(portfolio.getRemainingCapital() + (-transactionAmount));
-        } else { // Buy transaction
-            portfolio.setRemainingCapital(portfolio.getRemainingCapital() - transactionAmount);
+    
+        int newQuantity = portfolioStock.getQuantity() + quantity;
+        if (newQuantity <= 0) { 
+            portfolio.setRemainingCapital(portfolio.getRemainingCapital() + (stockPrice * portfolioStock.getQuantity()));
+            portfolioStockRepository.delete(portfolioStock);
+        } else {
+            portfolioStock.setQuantity(newQuantity);
+            portfolioStock.setBuyPrice((float) stockPrice);
+            portfolioStock.setBuyDate(LocalDate.now());
+    
+            if (quantity < 0) { 
+                portfolio.setRemainingCapital(portfolio.getRemainingCapital() + (-transactionAmount));
+            } else { 
+                portfolio.setRemainingCapital(portfolio.getRemainingCapital() - transactionAmount);
+            }
+            portfolioStockRepository.save(portfolioStock);
         }
-
+    
         String action = String.format(
                 "User successfully %s stock %s in Portfolio #%d - %s with new price: %.2f and quantity: %d on %s",
                 (quantity < 0) ? "sold" : "bought",
-                stockSymbol, portfolio.getPortfolioId(), portfolio.getName(), stockPrice, quantity, LocalDate.now());
-
+                stockSymbol, portfolio.getPortfolioId(), portfolio.getName(), stockPrice, Math.abs(quantity), LocalDate.now());
+    
         accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
-        portfolioStockRepository.save(portfolioStock);
     }
-
+    
 }

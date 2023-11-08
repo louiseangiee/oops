@@ -501,16 +501,16 @@ public class PortfolioStockService {
             List<PortfolioStock> portfolioStocks = portfolio.getPortfolioStocks();
             if (portfolioStocks.isEmpty()) {
                 response.put("totalPortfolioValue", 0.00);
-                // response.put("stockReturns", new HashMap<>());
+                response.put("stockReturns", new HashMap<>());
                 response.put("overallReturns", new HashMap<>());
                 return response;
             }
             double totalPortfolioValue = getTotalPortfolioValue(portfolioId);
-            //Map<String, Map<String, Double>> stockReturns = calculateStockReturnsForPortfolio(portfolioId);
+            Map<String, Map<String, Double>> stockReturns = calculateStockReturnsForPortfolio(portfolioId);
             Map<String, Double> overallReturns = calculateOverallPortfolioReturns(portfolioId);
 
             response.put("totalPortfolioValue", totalPortfolioValue);
-            // response.put("stockReturns", stockReturns);
+            response.put("stockReturns", stockReturns);
             response.put("overallReturns", overallReturns);
             return response;
         } catch (Exception e) {
@@ -671,16 +671,10 @@ public class PortfolioStockService {
                     .getOrDefault("CASH", new PortfolioGroupingSummary.Allocation(0.0, 0.0)).getActualValue();
             double cashAdjustment = targetCash - actualCash;
 
-            // Debugging logs (or use logger.info(...) if using a logger)
-            System.out.println("Target CASH: " + targetCash);
-            System.out.println("Actual CASH: " + actualCash);
-            System.out.println("CASH Adjustment: " + cashAdjustment);
-
             stockAdjustments.put("CASH", cashAdjustment);
             double finalCashValue = actualCash + cashAdjustment;
             finalAllocationValues.put("CASH", finalCashValue);
-
-            System.out.println("Final CASH Value: " + finalCashValue);
+            projectedTotalPortfolioValue = projectedTotalPortfolioValue + cashAdjustment;
         }
 
         // Calculate the final allocation percentages based on the updated values
@@ -734,10 +728,10 @@ public class PortfolioStockService {
     }
 
     @Transactional
-    public void executeRebalancePortfolioTransactions(PortfolioStockRebalancingDTO portfolioStocksToBeAdjusted) {
-        Portfolio portfolio = portfolioService.findById(portfolioStocksToBeAdjusted.getPortfolioId())
+    public Map<String, String> executeRebalancePortfolioTransactions(PortfolioStockRebalancingDTO portfolioStocksToBeAdjusted, Integer portfolioId) {
+        Portfolio portfolio = portfolioService.findById(portfolioId)
                 .orElseThrow(() -> new EntityNotFoundException("Portfolio not found"));
-
+        Map<String, String> result = new HashMap<>();
         // Process Sells
         for (Map.Entry<String, Integer> entry : portfolioStocksToBeAdjusted.getPortfolioStocks().entrySet()) {
             if ("CASH".equals(entry.getKey())) {
@@ -763,6 +757,8 @@ public class PortfolioStockService {
 
         // Final portfolio update after buys
         portfolioService.updatePortfolio(portfolio.getPortfolioId(), portfolio);
+        result.put("message", "Portfolio successfully rebalanced");
+        return result;
     }
 
     private void processStockTransaction(Portfolio portfolio, String stockSymbol, int quantity) {

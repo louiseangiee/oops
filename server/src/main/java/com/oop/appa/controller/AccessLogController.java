@@ -61,17 +61,12 @@ public class AccessLogController {
 
     }
 
-    @Operation(summary = "Retrieve all AccessLogs by user id with pagination")
+    @Operation(summary = "Retrieve all AccessLogs by user id")
     @Parameter(name = "user_id", description = "user id")
-    @Parameter(name = "page", description = "Page number for pagination")
-    @Parameter(name = "size", description = "Number of records per page for pagination")
     @GetMapping("/user/{user_id}")
-    public ResponseEntity<?> findByUserId(@PathVariable Integer user_id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<?> findByUserId(@PathVariable Integer user_id){
         try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<AccessLog> accessLogs = accessLogService.findByUserIdPaged(user_id, pageable);
+            List<AccessLog> accessLogs = accessLogService.findByUserId(user_id);
             return ResponseEntity.ok(accessLogs);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();

@@ -27,7 +27,8 @@ const AccessLog = () => {
         const response = await getAsync("accessLogs", cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          setAccessLogData(data.content);
+          console.log(data);
+          setAccessLogData(data);
         } else {
           setAccessLogData(null);
         }
@@ -35,7 +36,8 @@ const AccessLog = () => {
         const response = await getAsync("accessLogs/user/" + userId, cookie.accessToken);
         if (response.ok) {
           const data = await response.json();
-          setAccessLogData(data.content);
+          console.log(data);
+          setAccessLogData(data);
         } else {
           setAccessLogData(null);
         }
@@ -52,11 +54,22 @@ const AccessLog = () => {
       type: "dateTime",
       headerAlign: "left",
       align: "left",
-      flex: 0.2,
+      flex: 0.3,
       valueGetter: (params) => new Date(params.value),
     },
-    { field: "action", headerName: "Action", flex: 1 },
-
+    {
+      field: "action", headerName: "Action", flex: 1, renderCell: (params) => (
+        <Box
+          sx={{
+            whiteSpace: 'normal',
+            wordWrap: 'break-word',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            maxWidth: '100%', // You can set a specific width if needed
+          }}
+        >
+          {params.value}
+        </Box> )},
   ];
 
   return (

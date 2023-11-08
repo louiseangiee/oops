@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
-import Modal from "@mui/material/Modal";
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
@@ -13,9 +16,14 @@ import MenuItem from "@mui/material/MenuItem";
 import { getAsync, postAsync } from "../utils/utils";
 import { useCookies } from "react-cookie";
 import TextField from "@mui/material/TextField";
-import { List, ListItem } from "@mui/material";
+import { List, ListItem, Snackbar, Alert } from "@mui/material";
+import loadingLight from "./lotties/loading_light.json"
+import Lottie from 'lottie-react';
 
 const RebalanceModal = ({ portfolioId }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const [cookie] = useCookies();
   const [open, setOpen] = useState(false);
   const [groupBy, setGroupBy] = useState("sector");
   const [allocationsData, setAllocationsData] = useState(null);
@@ -30,9 +38,35 @@ const RebalanceModal = ({ portfolioId }) => {
     projectedTotalPortfolioValue: null,
     finalAllocations: null,
   });
-  const [rebalanceSuccess, setRebalanceSuccess] = useState(false);
+  const [isPercentageValid, setIsPercentageValid] = useState(false);
+  const [isAllInputsFilled, setIsAllInputsFilled] = useState(false);
+  const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
+  const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
 
-  const handleOpen = () => setOpen(true);
+  // error alert handler
+  const handleOpenErrorAlert = () => {
+    setIsErrorAlertOpen(true);
+    setIsSuccessAlertOpen(false);
+  };
+  const handleCloseErrorAlert = () => {
+    setIsErrorAlertOpen(false);
+  };
+
+  // success alert handler
+  const handleOpenSuccessAlert = () => {
+    setIsSuccessAlertOpen(true);
+    setIsErrorAlertOpen(false);
+
+  };
+  const handleCloseSuccessAlert = () => {
+    setIsSuccessAlertOpen(false);
+  };
+
+
+  const handleOpen = () => {
+    setOpen(true);
+    checkAllInputsFilled();
+  };
   const handleClose = () => setOpen(false);
   const handleRebalanceSubmit = async () => {
     setLoading(true);
@@ -48,36 +82,42 @@ const RebalanceModal = ({ portfolioId }) => {
   const handleChange = (event) => {
     setGroupBy(event.target.value);
   };
-  const validateTotalPercentage = () => {
-    const total = Object.values(allocationsData.allocations).reduce(
-      (acc, { percentage }) => acc + percentage,
-      0
-    );
-    return total == 100;
+
+  // Function to check if all inputs are filled
+  const checkAllInputsFilled = (targetPercentagesParam = targetPercentages) => {
+    const allFilled = Object.values(targetPercentagesParam).every((value) => value !== "" && value !== null);
+    setIsAllInputsFilled(allFilled);
   };
+
   const handleAllocationChange = (name, value) => {
     setAllocationsChanged(true);
-    const newValue = value === "" ? "" : Number(value);
-    setAllocationsData((prevData) => ({
-      ...prevData,
-      allocations: {
-        ...prevData.allocations,
-        [name]: {
-          ...prevData.allocations[name],
-          percentage: newValue,
-        },
-      },
-    }));
+    let newValue = value === "" ? "" : Number(value);
+
+    setTargetPercentages((prevState) => {
+      const newState = {
+        ...prevState,
+        [name]: newValue,
+      };
+
+      // Check if all inputs are filled
+      checkAllInputsFilled(newState);
+
+      // Calculate the sum of percentages after state update
+      const totalPercentage = Object.values(newState).reduce((acc, percentage) => acc + percentage, 0);
+      setIsPercentageValid(totalPercentage == 100);
+
+      return newState;
+    });
   };
 
   const buildTargetPercentages = () => {
-    return Object.keys(allocationsData?.allocations).reduce((acc, key) => {
-      acc[key] = allocationsData?.allocations[key]?.percentage;
+    return Object.keys(targetPercentages).reduce((acc, key) => {
+      acc[key] = targetPercentages[key];
       return acc;
     }, {});
   };
   const submitRebalance = async () => {
-    if (page === 2 && allocationsChanged) {
+    if (page === 2) {
       const targetPercentages = buildTargetPercentages();
       setLoading(true);
       try {
@@ -88,6 +128,7 @@ const RebalanceModal = ({ portfolioId }) => {
         );
 
         const data = await response.json();
+        console.log(data);
         setResponseState({
           finalStocks: data.finalStocks,
           stockAdjustments: data.stockAdjustments,
@@ -95,6 +136,7 @@ const RebalanceModal = ({ portfolioId }) => {
           finalAllocations: data.finalAllocations,
         });
         setPage(3);
+        setLoading(false);
       } catch (error) {
         setLoading(false);
         console.error("Network error:", error);
@@ -102,9 +144,9 @@ const RebalanceModal = ({ portfolioId }) => {
     }
   };
   const handleConfirmRebalance = async () => {
-    console.log( {
-        portfolioStocks: responseState.stockAdjustments,
-      })
+    console.log({
+      portfolioStocks: responseState.stockAdjustments,
+    })
     setLoading(true);
     try {
       const response = await postAsync(
@@ -114,10 +156,19 @@ const RebalanceModal = ({ portfolioId }) => {
         }, cookie.accessToken
       );
       const data = await response.json();
-      setRebalanceSuccess(true);
-      setSuccessMessage(data.message);
-      setPage(4);
+      if (!response.ok) {
+        handleOpenErrorAlert();
+        handleClose();
+      }
+      else {
+        handleOpenSuccessAlert();
+        handleClose();
+      }
+      // setSuccessMessage(data.message);
+      // setPage(4);
     } catch (error) {
+      handleOpenErrorAlert();
+      handleClose();
       console.error("Network error:", error);
     }
     setLoading(false);
@@ -126,21 +177,6 @@ const RebalanceModal = ({ portfolioId }) => {
   const capitalizeFirstLetter = (string) =>
     string.charAt(0).toUpperCase() + string.slice(1);
   const formatNumber = (num) => num.toFixed(2);
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const [cookie] = useCookies();
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "70vw",
-    height: "70vh",
-    bgcolor: "background.paper",
-    boxShadow: 24,
-    p: 4,
-    overflowY: "auto",
-  };
 
   useEffect(() => {
     if (allocationsData) {
@@ -154,28 +190,65 @@ const RebalanceModal = ({ portfolioId }) => {
 
   return (
     <div>
+      <Snackbar
+        open={isErrorAlertOpen}
+        autoHideDuration={5000}
+        onClose={handleCloseErrorAlert}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          severity="error"
+          onClose={handleCloseErrorAlert}
+          sx={{ backgroundColor: colors.redAccent[600] }}
+        >
+          Rebalancing failed! Please try again.
+        </Alert>
+      </Snackbar>
+
+      {/* Snackbar for success message */}
+      <Snackbar
+        open={isSuccessAlertOpen}
+        autoHideDuration={5000}
+        onClose={handleCloseSuccessAlert}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          severity="success"
+          onClose={handleCloseSuccessAlert}
+          sx={{ backgroundColor: colors.greenAccent[600] }}
+        >
+          Rebalance is done successfully!
+        </Alert>
+      </Snackbar>
       <Button
         sx={{
           backgroundColor: colors.blueAccent[700],
           color: colors.grey[100],
           fontSize: "14px",
           fontWeight: "bold",
-          padding: "10px 20px",
+          padding: "8px 15px",
         }}
         onClick={handleOpen}
       >
-        Rebalance Stocks
+        Rebalance
       </Button>
-      <Modal
+      <Dialog
         open={open}
-        aria-labelledby="rebalance-modal-title"
-        aria-describedby="rebalance-modal-description"
         onClose={() => {
           handleClose();
           setPage(1);
         }}
+        maxWidth="md" // You can adjust this size according to your content
+        fullWidth
       >
-        <Box sx={style}>
+        <DialogTitle id="rebalance-modal-title" sx={{ backgroundColor: colors.primary[400] }}>
+          Rebalance Portfolio
+        </DialogTitle>
+        <DialogContent dividers sx={{ backgroundColor: colors.primary[400] }}>
           {page === 1 && (
             <div>
               <Typography
@@ -210,9 +283,22 @@ const RebalanceModal = ({ portfolioId }) => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                  <Button variant="contained" onClick={handleRebalanceSubmit}>
-                    Submit
-                  </Button>
+                  <DialogActions
+                    sx={{ backgroundColor: colors.primary[400], paddingRight: "0px" }}
+                  >
+                    <Button variant="contained" onClick={handleRebalanceSubmit} sx={{ width: "80px", height: "33px" }}>
+                      {loading ?
+                        <Lottie
+                          animationData={loadingLight}
+                          loop={true}
+                          autoplay={true}
+                          style={{ width: '60px', height: '60px' }}
+                        />
+                        :
+                        <strong>Next</strong>
+                      }
+                    </Button>
+                  </DialogActions>
                 </Grid>
               </Grid>
             </div>
@@ -234,44 +320,56 @@ const RebalanceModal = ({ portfolioId }) => {
                       <Typography>
                         Actual value: (${formatNumber(value.actualValue)})
                       </Typography>
+                      <Typography>
+                        Percentage: ({value.percentage.toFixed(2)}%)
+                      </Typography>
                     </Typography>
                     <TextField
                       fullWidth
                       variant="outlined"
-                      label="Percentage"
+                      label="Change Percentage to:"
                       type="number"
-                      inputProps={{ step: "0.01" }}
-                      value={value.percentage.toFixed(2)}
-                      onChange={(e) =>
-                        handleAllocationChange(key, e.target.value)
-                      }
-                      onBlur={(e) =>
+                      inputProps={{ step: "0.01", min: "0", max: "100" }} // Uncomment and use inputProps
+                      onBlur={(e) => {
+                        handleAllocationChange(key, e.target.value);
                         handleAllocationChange(
                           key,
                           Math.max(0, Math.min(100, Number(e.target.value)))
                         )
-                      }
+                      }}
                     />
                   </Box>
                 )
               )}
-              {!validateTotalPercentage() && (
+              {!isPercentageValid && (
                 <Typography color="error">
                   The total percentage cannot exceed or be below 100%.
                 </Typography>
               )}
-              <div>
-                <Button variant="contained" onClick={() => setPage(1)}>
-                  Back
+              <DialogActions
+                sx={{ backgroundColor: colors.primary[400], paddingRight: "0px" }}
+              >
+                <Button variant="contained" onClick={() => setPage(1)} sx={{ width: "80px", height: "33px" }}>
+                  <b>Back</b>
                 </Button>
                 <Button
                   variant="contained"
                   onClick={() => submitRebalance()}
-                  disabled={!validateTotalPercentage() && allocationsChanged}
+                  disabled={!isPercentageValid || !isAllInputsFilled}
+                  sx={{ width: "80px", height: "33px" }}
                 >
-                  Submit
+                  {loading ?
+                    <Lottie
+                      animationData={loadingLight}
+                      loop={true}
+                      autoplay={true}
+                      style={{ width: '60px', height: '60px' }}
+                    />
+                    :
+                    <strong>Next</strong>
+                  }
                 </Button>
-              </div>
+              </DialogActions>
             </Box>
           )}
           {page === 3 && (
@@ -328,32 +426,33 @@ const RebalanceModal = ({ portfolioId }) => {
                   )
                 )}
               </List>
-              <Button
-                variant="contained"
-                sx={{ position: "absolute", bottom: 20, right: 20 }}
-                onClick={handleConfirmRebalance}
+              <DialogActions
+                sx={{ backgroundColor: colors.primary[400], paddingRight: "0px" }}
               >
-                Confirm
-              </Button>
+                <Button variant="contained" onClick={() => setPage(2)}>
+                  <b>Back</b>
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleConfirmRebalance}
+                  sx={{ width: "80px", height: "33px" }}
+                >
+                  {loading ?
+                    <Lottie
+                      animationData={loadingLight}
+                      loop={true}
+                      autoplay={true}
+                      style={{ width: '60px', height: '60px' }}
+                    />
+                    :
+                    <strong>Confirm</strong>
+                  }
+                </Button>
+              </DialogActions>
             </Box>
           )}
-          {page === 4 && rebalanceSuccess && (
-           <Box
-           sx={{
-             display: 'flex',
-             justifyContent: 'center',
-             alignItems: 'center',
-             height: '100%',
-           }}
-         >
-           <Typography variant="h5" sx={{ color: "green", mb: 2, textAlign: 'center' }}>
-             {successMessage}
-           </Typography>
-         </Box>
-         
-          )}
-        </Box>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

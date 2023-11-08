@@ -324,7 +324,7 @@ const Portfolio = () => {
           </Typography>
         </Box>
 
-        <Box display="flex" gap="5px">
+        <Box display="flex" alignItems="center" gap="5px">
           <EditPortfolio portfolioId={portfolioId} />
           <DeletePortfolio />
           <RebalanceModal portfolioId={portfolioId} />

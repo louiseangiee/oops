@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.PortfolioStock;
 import com.oop.appa.entity.Stock;
 
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
@@ -535,32 +538,23 @@ public class PortfolioStockService {
         }
     }
 
+    @Cacheable(value = "portfolioVolatility", key = "#portfolioId")
     public double calculatePortfolioMonthlyVolatility(Integer portfolioId) {
-        // 1. Fetch all stocks in the portfolio
         List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
-        // 2. For each stock, calculate its monthly volatility and weight in the
-        // portfolio
         double portfolioVolatility = 0.0;
 
         for (PortfolioStock stock : allStocksInPortfolio) {
             String stockSymbol = stock.getStockSymbol();
-            // Calculate monthly volatility of the stock calculateMonthlyVolatility
             double stockMonthlyVolatility = stockService.calculateMonthlyVolatility(stockSymbol);
-            // Calculate weight of the stock in the portfolio
             double stockWeight = calculateStockWeight(portfolioId, stockSymbol);
-            // Add weighted volatility to the overall portfolio volatility
             portfolioVolatility += stockWeight * stockMonthlyVolatility;
         }
         return portfolioVolatility;
     }
 
+    // @Cacheable(value = "AnnualizedportfolioVolatility", key = "#portfolioId")
     public double calculatePortfolioAnnualizedVolatility(Integer portfolioId) {
-        // Get the monthly volatility for the portfolio
         double monthlyVolatility = calculatePortfolioMonthlyVolatility(portfolioId);
-
-        // Annualize the volatility
-        // As we're using monthly data and there are roughly 12 months in a year, we'll
-        // multiply with the square root of 12.
         double annualizedVolatility = monthlyVolatility * Math.sqrt(12);
         return annualizedVolatility;
     }

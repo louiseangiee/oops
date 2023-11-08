@@ -547,7 +547,8 @@ public class PortfolioStockService {
     }
 
     @Cacheable(value = "portfolioVolatility", key = "#portfolioId")
-    public double calculatePortfolioMonthlyVolatility(Integer portfolioId) {
+    public Map<String, Double> calculatePortfolioMonthlyVolatility(Integer portfolioId) {
+        Map<String, Double> stockVolatilities = new HashMap<>();
         List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
         double portfolioVolatility = 0.0;
 
@@ -557,14 +558,20 @@ public class PortfolioStockService {
             double stockWeight = calculateStockWeight(portfolioId, stockSymbol);
             portfolioVolatility += stockWeight * stockMonthlyVolatility;
         }
-        return portfolioVolatility;
+        stockVolatilities.put("portfolioVolatility", portfolioVolatility);
+        return stockVolatilities;
     }
 
     @Cacheable(value = "AnnualizedportfolioVolatility", key = "#portfolioId")
-    public double calculatePortfolioAnnualizedVolatility(Integer portfolioId) {
-        double monthlyVolatility = calculatePortfolioMonthlyVolatility(portfolioId);
-        double annualizedVolatility = monthlyVolatility * Math.sqrt(12);
-        return annualizedVolatility;
+    public Map<String, Double> calculatePortfolioAnnualizedVolatility(Integer portfolioId) {
+        Map<String, Double> annualizedVolatilities = new HashMap<>();
+
+        Map<String, Double> monthlyVolatilities = calculatePortfolioMonthlyVolatility(portfolioId);
+        for (Map.Entry<String, Double> entry : monthlyVolatilities.entrySet()) {
+            double annualizedVolatility = entry.getValue() * Math.sqrt(12);
+            annualizedVolatilities.put(entry.getKey(), annualizedVolatility);
+        }
+        return annualizedVolatilities;
     }
 
     public double getTotalPortfolioValue(Integer portfolioId) {

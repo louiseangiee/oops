@@ -254,9 +254,9 @@ public class PortfolioStockController {
 
     @Operation(summary = "Get the monthly volatility of a portfolio")
     @GetMapping("/{portfolioId}/volatility")
-    public ResponseEntity<Double> getPortfolioMonthlyVolatility(@PathVariable Integer portfolioId) {
+    public ResponseEntity<?> getPortfolioMonthlyVolatility(@PathVariable Integer portfolioId) {
         try {
-            double volatility = portfolioStockService.calculatePortfolioMonthlyVolatility(portfolioId);
+            Map<String, Double> volatility = portfolioStockService.calculatePortfolioMonthlyVolatility(portfolioId);
             return ResponseEntity.ok(volatility);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
@@ -267,9 +267,9 @@ public class PortfolioStockController {
 
     @Operation(summary = "Get the annualized volatility of a portfolio")
     @GetMapping("/{portfolioId}/volatility/annualized")
-    public ResponseEntity<Double> getPortfolioAnnualizedVolatility(@PathVariable Integer portfolioId) {
+    public ResponseEntity<?> getPortfolioAnnualizedVolatility(@PathVariable Integer portfolioId) {
         try {
-            double volatility = portfolioStockService.calculatePortfolioAnnualizedVolatility(portfolioId);
+            Map<String, Double> volatility = portfolioStockService.calculatePortfolioAnnualizedVolatility(portfolioId);
             return ResponseEntity.ok(volatility);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);

@@ -12,7 +12,7 @@ const OTP = () => {
     const [, setCookie] = useCookies();
     const location = useLocation();
     const navigate = useNavigate();
-    const data = location.state.data;
+    const locationData = location.state.data;
     const colors = tokens(theme.palette.mode);
     const [status, setStatus] = useState(''); // for displaying status of OTP verification
     const [otp, setOtp] = useState(['', '', '', '', '', '']); // 6 digit OTP
@@ -40,20 +40,37 @@ const OTP = () => {
     }
 
     const setRequiredCookie = async () => {
-        setCookie("accessToken", data.accessToken, { path: "/", maxAge: 86400 });
-        setCookie("email", data.email, { path: "/", maxAge: 86400 });
+        setCookie("accessToken", locationData.accessToken, { path: "/", maxAge: 86400 });
+        setCookie("email", locationData.email, { path: "/", maxAge: 86400 });
     };
+
+    const handleChangePassword = async () => {
+        const response = await getAsync('api/v1/auth/forgotpassword?email=' + locationData.email + '&password=' + locationData.password);
+        if (response.ok) {
+            const data = await response.json();
+            alert(data.message)
+            navigate('/');
+        }
+        else {
+            alert('Error changing password')
+        }
+    }
 
     const verifyOTP = async () => {
         const finalotp = otp.join('');
-        const response = await getAsync('users/verifyOTP?email=' + data.email + '&otp=' + finalotp);
+        const response = await getAsync('users/verifyOTP?email=' + locationData.email + '&otp=' + finalotp);
         if (response.ok) {
-            const data = await response.text();
-            if (data === '{"message": "OTP verified successfully"}') {
-                await setRequiredCookie();
-                navigate('/')
-            } else {
-                alert('wrong code');
+            if (locationData.password && !locationData.accessToken) {
+                handleChangePassword();
+            }
+            else {
+                const data = await response.text();
+                if (data === '{"message": "OTP verified successfully"}') {
+                    await setRequiredCookie();
+                    navigate('/')
+                } else {
+                    alert('wrong code');
+                }
             }
         }
         else {
@@ -62,7 +79,7 @@ const OTP = () => {
     }
 
     const generateOTP = async () => {
-        const response = await getAsync('users/sendOTP?email=' + data.email);
+        const response = await getAsync('users/sendOTP?email=' + locationData.email);
         if (response.ok) {
             setStatus('OTP sent');
         }

@@ -112,7 +112,7 @@ const RegisterContainer = (props) => {
                     <Typography variant="h6" mt={1} color={'black'}>
                         Login {" "}
                         <Link
-                            onClick={props.handleSignIn}
+                            onClick={props.moveSignIn}
                             sx={{ color: 'black', cursor: 'pointer' }}
                         >
                             here!

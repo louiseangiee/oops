@@ -37,7 +37,6 @@ public class UserService {
         this.templateEngine = templateEngine;
     }
 
-
     // GET
     public List<User> findAll() {
         try {
@@ -78,7 +77,7 @@ public class UserService {
             userRepository.save(user);
 
             executor.schedule(() -> {
-               deleteOtp(email);
+                deleteOtp(email);
             }, 5, TimeUnit.MINUTES);
 
         } catch (Exception e) {
@@ -140,7 +139,7 @@ public class UserService {
             helper.setSubject(subject);
             String htmlContent = templateEngine.process("otp-email.html", context);
             helper.setText(htmlContent, true);
-        
+
             mailSender.send(mimeMessage);
             System.out.println("Mail sent successfully");
         } catch (Exception e) {
@@ -173,13 +172,23 @@ public class UserService {
         }
     }
 
-    public void deleteOtp(String email){
-        try{
+    public void deleteOtp(String email) {
+        try {
             User user = findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
             user.setOtp(null);
             save(user);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error deleting OTP: " + e.getMessage());
+        }
+    }
+
+    public void changePassword(String email, String password) {
+        try {
+            User user = findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+            user.setPassword(password);
+            save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Error changing password: " + e.getMessage());
         }
     }
 }

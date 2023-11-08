@@ -1,20 +1,37 @@
 import { useState } from "react";
 import SignInContainer from "./SignInContainer";
-import { tokens } from '../../theme.js';
 import RegisterContainer from "./RegisterContainer";
-import { useTheme, Typography, Box } from "@mui/material";
+import ForgotPasswordContainer from "./ForgotPasswordContainer";
+import { Typography, Box } from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2';
 
 const Login = () => {
     const [showSignIn, setShowSignIn] = useState(true);
-    const theme = useTheme();
+    const [currentPage, setCurrentPage] = useState('signIn');
 
-    const handleSignIn = () => {
-        setShowSignIn(!showSignIn);
-    };
+    let container;
+    switch (currentPage) {
+        case 'signIn':
+            container = <SignInContainer moveRegister={() => setCurrentPage('register')} moveFP={() => setCurrentPage('forgotPassword')} />
+            break;
+        case 'register':
+            container = <RegisterContainer moveSignIn={() => setCurrentPage('signIn')} />
+            break;
+        case 'forgotPassword':
+            container = <ForgotPasswordContainer />
+            break;
+        default:
+            container = <SignInContainer moveRegister={() => setCurrentPage('register')} moveFP={() => setCurrentPage('forgotPassword')} />
+            break;
+    }
+
+    // const handleSignIn = () => {
+    //     setShowSignIn(!showSignIn);
+    // };
 
 
-    // ../../Goldman_Sachs_Logos/logos_for_screen/GS_logo_PNG/Goldman_Sachs_Signature.png
+
+
 
     return (
         <main className="content">
@@ -29,17 +46,8 @@ const Login = () => {
                             style={{ cursor: "pointer", width: "60%", height: "60%" }}
                         />
                     </Box>
-
-
-                    {/* <Typography sx={{ fontStyle: 'italic' }}>
-                        Providing sustainable growth opportunities to businesses and customers
-                    </Typography> */}
                 </Grid>
-                {showSignIn ? (
-                    <SignInContainer handleSignIn={handleSignIn} />
-                ) : (
-                    <RegisterContainer handleSignIn={handleSignIn} />
-                )}
+                {container}
             </Grid >
         </main>
     )

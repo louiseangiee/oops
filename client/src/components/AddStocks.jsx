@@ -89,24 +89,14 @@ export default function AddStocks({ portfolioId }) {
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [alert, setAlert] = useState({ open: false, type: '', message: '' });
 
-    // error alert handler
-    const handleOpenErrorAlert = () => {
-        setIsErrorAlertOpen(true);
-        setIsSuccessAlertOpen(false);
-    };
-    const handleCloseErrorAlert = () => {
-        setIsErrorAlertOpen(false);
+    const showAlert = (type, message) => {
+        setAlert({ open: true, type, message });
     };
 
-    // success alert handler
-    const handleOpenSuccessAlert = () => {
-        setIsSuccessAlertOpen(true);
-        setIsErrorAlertOpen(false);
-
-    };
-    const handleCloseSuccessAlert = () => {
-        setIsSuccessAlertOpen(false);
+    const closeAlert = () => {
+        setAlert({ open: false, type: '', message: '' });
     };
 
     const [open, setOpen] = useState(false);
@@ -161,6 +151,12 @@ export default function AddStocks({ portfolioId }) {
 
     useEffect(() => {
         setTotalPrice(stockPrice * stockQuantity);
+        if (stockQuantity <= 0) {
+            setError("Quantity must be greater than 0");
+        }
+        else {
+            setError("");
+        }
     }, [stockPrice, stockQuantity]);
 
     const handleAddClick = async () => {
@@ -172,15 +168,28 @@ export default function AddStocks({ portfolioId }) {
             "quantity": stockQuantity,
             "buyDate": date.format('YYYY-MM-DD')
         }
-        const response = await postAsync(`portfolioStocks/${portfolioId}`, data, cookie.accessToken);
-        if (response.ok) {
-            setLoading(false);
-            handleOpenSuccessAlert();
-            handleClose();
+        try {
+            const response = await postAsync(`portfolioStocks/${portfolioId}`, data, cookie.accessToken);
+            console.log(response);
+            if (response.ok) {
+                setLoading(false);
+                showAlert('success', 'Stock added successfully!');
+                handleClose();
+            }
+            else {
+                throw response;
+            }
         }
-        else {
-            handleOpenErrorAlert();
+        catch (err) {
             handleClose();
+            console.log(err);
+            err.json().then(errorDetails => {
+                const error_message = errorDetails.details?.split(":")[1];
+                showAlert('error', "Error:" + error_message);
+            }).catch(jsonError => {
+                console.log(jsonError);
+                showAlert('error', "An error occurred");
+            });
         }
     };
 
@@ -188,37 +197,37 @@ export default function AddStocks({ portfolioId }) {
         <div>
             {/* Snackbar for error message */}
             <Snackbar
-                open={isErrorAlertOpen}
-                autoHideDuration={1000}
-                onClose={handleCloseErrorAlert}
+                open={alert.open && alert.type === 'error'}
+                autoHideDuration={5000}
+                onClose={closeAlert}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
                 <Alert
                     elevation={6}
                     variant="filled"
                     severity="error"
-                    onClose={handleCloseErrorAlert}
+                    onClose={closeAlert}
                     sx={{ backgroundColor: colors.redAccent[600] }}
                 >
-                    Failed to add stock. Please try again.
+                    {alert.message}
                 </Alert>
             </Snackbar>
 
             {/* Snackbar for success message */}
             <Snackbar
-                open={isSuccessAlertOpen}
-                autoHideDuration={1000}
-                onClose={handleCloseSuccessAlert}
+                open={alert.open && alert.type === 'success'}
+                autoHideDuration={5000}
+                onClose={closeAlert}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
                 <Alert
                     elevation={6}
                     variant="filled"
                     severity="success"
-                    onClose={handleCloseSuccessAlert}
+                    onClose={closeAlert}
                     sx={{ backgroundColor: colors.greenAccent[600] }}
                 >
-                    Stock added successfully!
+                    {alert.message}
                 </Alert>
             </Snackbar>
             <Button
@@ -274,7 +283,6 @@ export default function AddStocks({ portfolioId }) {
                             onChange={(newValue) => { setDate(newValue); handleStockPriceChange(chosenStock, newValue) }}
                         />
                     </LocalizationProvider>
-                    <Typography>{error}</Typography>
                     <TextField
                         margin="dense"
                         id="price"
@@ -320,13 +328,18 @@ export default function AddStocks({ portfolioId }) {
 
                         }}
                         value={stockQuantity}
-                        onChange={(e) => setStockQuantity(e.target.value)}
+                        onChange={(e) =>
+                            setStockQuantity(e.target.value)}
                     />
-                    <Typography sx={{ color: colors.grey[100], fontSize: "12px" }}>Total Price: ${totalPrice.toFixed(2)}</Typography>
+                    <Box display="flex" justifyContent="space-between" mt="5px">
+                        <Typography sx={{ color: colors.redAccent[500], fontSize: "12px" }}>{error}</Typography>
+                        <Typography sx={{ color: colors.grey[100], fontSize: "12px" }}>Total Price: ${totalPrice.toFixed(2)}</Typography>
+                    </Box>
+
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
                     <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} disabled={stockPrice == 0 || chosenStock == null || date == null || stockQuantity == 0} onClick={handleAddClick}>{loading ? 'Loading...' : 'Add'}</Button>
+                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} disabled={stockPrice == 0 || chosenStock == null || date == null || stockQuantity <= 0} onClick={handleAddClick}>{loading ? 'Loading...' : 'Add'}</Button>
                 </DialogActions>
             </Dialog>
         </div>

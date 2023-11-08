@@ -29,6 +29,7 @@ const TableHeaderCell = ({ id, label, onRequestSort, orderDirection, orderBy }) 
   </TableCell>
 );
 
+
 const ReturnsTable = ({ stockData, stockReturns }) => {
   const [orderDirection, setOrderDirection] = useState('asc');
   const [orderBy, setOrderBy] = useState('percentage');
@@ -50,12 +51,17 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
             getAsync(`portfolioStocks/${stockData.portfolioId}/stocks/${stock.stockSymbol}/calculateAnnualisedReturn`, cookies.accessToken),
           ]);
           const [weightData, weightedReturnData, annualisedReturnData] = await Promise.all(responses.map(res => res.json()));
+            
           details[stock.stockSymbol] = {
-            weight: weightData,
-            weightedReturn: weightedReturnData,
-            annualisedReturn: annualisedReturnData,
+            weight: weightData[stock.stockSymbol], // Assuming that API response follows the same pattern
+            weightedReturn: weightedReturnData[stock.stockSymbol],
+            annualisedReturn: annualisedReturnData[stock.stockSymbol],
+
+            
           };
+          
         }
+        
         setStockDetails(details);
       } catch (error) {
         console.error('Failed to fetch stock details:', error);
@@ -64,18 +70,18 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
         setLoading(false);
       }
     };
-
+  
     if (stockData && stockData.portfolioStocks && stockData.portfolioStocks.length > 0) {
       fetchStockDetails();
     }
   }, [stockData, cookies.accessToken]);
-
+  
   const sortedStockReturns = useMemo(() => {
     return Object.entries(stockReturns || {})
       .map(([symbol, data]) => ({
         symbol,
-        ...data,
-        ...stockDetails[symbol],
+        ...data, // This spreads the return data for each stock from `stockReturns`
+        ...stockDetails[symbol], // This spreads additional details fetched in `useEffect`
       }))
       .sort((a, b) => {
         const valueA = a[orderBy] ?? Number.NEGATIVE_INFINITY;
@@ -83,12 +89,17 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
         return (orderDirection === 'asc' ? valueA - valueB : valueB - valueA);
       });
   }, [stockReturns, stockDetails, orderBy, orderDirection]);
+  
 
   const handleRequestSort = (property) => {
     const isAsc = orderBy === property && orderDirection === 'asc';
     setOrderBy(property);
     setOrderDirection(isAsc ? 'desc' : 'asc');
   };
+  // Helper function to apply styling for negative returns
+  const returnCellStyle = (value) => ({
+    color: value < 0 ? 'red' : 'green',
+  });
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center' }}><Typography>Loading...</Typography></Box>;
   if (error) return <Box sx={{ display: 'flex', justifyContent: 'center' }}><Typography color="error">{error}</Typography></Box>;
@@ -120,13 +131,14 @@ const ReturnsTable = ({ stockData, stockReturns }) => {
         </TableHead>
         <TableBody>
           {sortedStockReturns.map((row) => (
+            
             <TableRow key={row.symbol}>
               <TableCell component="th" scope="row">{row.symbol}</TableCell>
-              <TableCell align="right">{row.weight}</TableCell>
-              <TableCell align="right">{row.percentage}</TableCell>
-              <TableCell align="right">{row.absolute}</TableCell>
-              <TableCell align="right">{row.weightedReturn}</TableCell>
-              <TableCell align="right">{row.annualisedReturn}</TableCell>
+              <TableCell align="right">{(row.weight * 100).toFixed(2)}%</TableCell>
+              <TableCell style={returnCellStyle(row.percentage)} align="right">{row.percentage.toFixed(2)}%</TableCell>
+              <TableCell style={returnCellStyle(row.absolute)} align="right">{row.absolute?.toFixed(2)}</TableCell>
+              <TableCell align="right">{row.weightedReturn?.toFixed(2)}%</TableCell>
+              <TableCell align="right">{row.annualisedReturn?.toFixed(2)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

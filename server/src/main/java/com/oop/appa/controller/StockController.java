@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -300,7 +301,9 @@ public class StockController {
     public ResponseEntity<?> searchBar(@RequestParam String searchTerm) {
         try {
             List<Map<String, String>> data = stockService.searchBar(searchTerm);
-            return ResponseEntity.ok(data);
+            Map<String, List<Map<String, String>>> response = new HashMap<>();
+            response.put("data", data);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
             error.setMessage("Error in fetching search ticker data");

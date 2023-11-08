@@ -103,6 +103,9 @@ public class StockService {
                     results.add(result);
                 }
             }
+            if (results.size()==0){
+                return new ArrayList<>();
+            }
             return results;
         } catch (Exception e) {
             throw new RuntimeException("Error for search bar service: ", e);

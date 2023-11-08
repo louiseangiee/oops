@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie";
 import PortfolioSelector from "./AvailablePortfoliosDropdown";
 import ComparePortfolio from "../pages/comparePortfolio";
 import ComparePortfolioChart from "./ComparePortfolioChart";
+import ComparePortfolioSingle from "./ComparePortfolioSingle";
 import { getAsync } from "../utils/utils";
 import { useAuth } from "../context/AuthContext";
 
@@ -73,7 +74,15 @@ const ComparePortfolioComponent = () => {
                 </Box>
             </Box>
 
-            <ComparePortfolioChart chosenPortfolio1={chosenPortfolio1} chosenPortfolio2={chosenPortfolio2} />
+            <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="space-between"
+            alignItems="center"
+            >
+            <ComparePortfolioSingle chosenPortfolio={chosenPortfolio1} />
+            <ComparePortfolioSingle chosenPortfolio={chosenPortfolio2} />
+            </Box>
 
 
 

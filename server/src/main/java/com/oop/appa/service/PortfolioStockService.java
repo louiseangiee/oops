@@ -175,8 +175,10 @@ public class PortfolioStockService {
                         dto.getQuantity(), dto.getBuyDate());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
 
-                clearPortfolioVolatilityCache(dto.getPortfolioId());
-                calculatePortfolioAnnualizedVolatility(dto.getPortfolioId());
+                clearPortfolioVolatilityCache(portfolio.getPortfolioId());
+                System.out.println("Cleared cache for portfolio volatility");
+                System.out.println("Calculating portfolio volatility =" + portfolio.getPortfolioId());
+                calculatePortfolioAnnualizedVolatility(portfolio.getPortfolioId());
                 return portfolioStockRepository.save(portfolioStock);
             }
         } catch (Exception e) {

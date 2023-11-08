@@ -304,7 +304,6 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                 <Box
                   display="flex"
                   justifyContent="space-between"
-                  alignItems="center"
                   mb="20px"
                   key={index}
                 >
@@ -339,7 +338,7 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                         {stock.stockIndustry}
                       </Typography>
                       <Typography variant="h6" sx={{ color: colors.grey[100] }}>
-                        Buy price: ${stock.buyPrice} / share
+                        Buy price: ${stock.buyPrice}
                       </Typography>
                       <Typography variant="h6" sx={{ color: colors.grey[100] }}>
                         Buy date: {stock.buyDate}
@@ -355,11 +354,11 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                   >
                     {stockReturns[stock.stockSymbol] && (
                       <Typography
-                        variant="h5"
+                        variant="h4"
                         fontWeight="bold"
                         sx={{ color: colors.grey[100] }}
                       >
-                        Total Current Value: $
+                        Current Value: $
                         {stock.buyPrice && stock.quantity
                           ? (
                               stock.buyPrice * stock.quantity +
@@ -369,21 +368,23 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                       </Typography>
                     )}
                     <Typography
-                      variant="h5"
+                      variant="h4"
                       fontWeight="semibold"
                       sx={{ color: colors.grey[100] }}
                     >
-                      Total Initial Value: $
+                      Initial Value: $
                       {stock.buyPrice && stock.quantity
                         ? (stock.buyPrice * stock.quantity).toFixed(2)
                         : "N/A"}
                     </Typography>
                     <Typography>{stockReturns[stock]}</Typography>
+                    
+
                     <Typography
                       variant="h6"
                       sx={{ color: colors.greenAccent[600] }}
                     >
-                      Quantity: {stock.quantity}
+                      Qty: {stock.quantity}
                     </Typography>
                   </Box>
                 </Box>

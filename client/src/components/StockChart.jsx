@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '@mui/material/styles';
-import { ButtonGroup, Button, Table, TableContainer, TableBody, TableHead, TableCell, Paper, TableRow } from '@mui/material';
+import { ButtonGroup, Button, Typography } from '@mui/material';
 import { tokens } from "../theme";
-import { colors } from '@mui/material';
 import { getAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
 
@@ -24,11 +23,12 @@ const CustomTooltip = ({ active, payload, label }) => {
 const StockChart = ({ chosenStock }) => {
   const [chartData, setChartData] = useState([]);
   const [timeSpan, setTimeSpan] = useState("1Y");
-  
+  const [isLoading, setIsLoading] = useState(false);
+
   const [cookie] = useCookies()
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  
+
 
 
 
@@ -38,14 +38,15 @@ const StockChart = ({ chosenStock }) => {
   }, [chosenStock, timeSpan]);
 
   const fetchData = async () => {
-    console.log(timeSpan)
+    if (!chosenStock) return;
+    setIsLoading(true);
     let endpointMarket = `stocks/dailyPriceTimePeriod?symbol=${chosenStock.code}&period=year`;  // Default to 1 year data
-   
+
 
     switch (timeSpan) {
       case "1Y":
         endpointMarket = `stocks/dailyPriceTimePeriod?symbol=${chosenStock.code}&period=year`;
-        
+
         break;
       case "1Q":
         endpointMarket = `stocks/dailyPriceTimePeriod?symbol=${chosenStock.code}&period=quarter`;
@@ -62,21 +63,14 @@ const StockChart = ({ chosenStock }) => {
     }
 
     try {
-      console.log(endpointMarket)
-      console.log(chosenStock.code)
-      
-      // Create an array of promises for each API call
-      
-       
-      
-    
       // Use Promise.all to execute all requests concurrently
       const response = await getAsync(`${endpointMarket}`, cookie.accessToken)
       // Check all responses - if any request failed, throw an error
       if (!response.ok) {
+        setIsLoading(false);
         throw new Error('Network response was not ok');
       }
-    
+
       // Parse JSON for all responses
       const data = await response.json();
       const newChartData = [];
@@ -87,30 +81,25 @@ const StockChart = ({ chosenStock }) => {
           value: value
         });
       });
-
       setChartData(newChartData);
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       console.error("Failed to fetch stock data:", error);
     }
-    
+
   };
-
-
-  const [selectedPoint, setSelectedPoint] = useState(null);
-
-  // const displayedData = chartData.reverse();  // Reverse the data
-  console.log(chartData)
 
   return (
     <div>
       <ButtonGroup
         variant="outlined"
-        style={{ borderColor: "white", alignContent: "center", marginBottom:"20px"}}
+        style={{ borderColor: "white", alignContent: "center", marginBottom: "20px" }}
         width="100%"
       >
         <Button
           style={{
-            color: timeSpan === "1Y" ? colors.blueAccent[100] : colors.blueAccent[100] ,
+            color: timeSpan === "1Y" ? colors.blueAccent[100] : colors.blueAccent[100],
             backgroundColor: timeSpan === "1Y" ? colors.greenAccent[600] : "transparent"
           }}
           onClick={() => setTimeSpan("1Y")}
@@ -145,19 +134,17 @@ const StockChart = ({ chosenStock }) => {
           1 Week
         </Button>
       </ButtonGroup>
+      <Typography variant="h2" fontWeight="bold" marginBottom={2}> {isLoading ? 'Fetching data...' : chosenStock.name} </Typography>
 
-      
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart data={chartData}>
           <CartesianGrid stroke="#f5f5f5" />
           <XAxis dataKey="time" />
-          <YAxis  />
+          <YAxis />
           <Tooltip content={<CustomTooltip />} />
           <Area type="monotone" dataKey="value" stroke={colors.redAccent[400]} fill={colors.redAccent[500]} />
         </AreaChart>
       </ResponsiveContainer>
-
-      
     </div>
   );
 };

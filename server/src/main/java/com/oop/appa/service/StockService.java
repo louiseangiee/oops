@@ -14,7 +14,6 @@ import java.util.Spliterators;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,8 +27,6 @@ import com.oop.appa.dao.StockLookupRepository;
 import com.oop.appa.dao.StockRepository;
 import com.oop.appa.entity.Stock;
 import com.oop.appa.entity.StockLookup;
-
-// import lombok.experimental.var;
 
 @Service
 @Transactional // Adding @Transactional annotation to handle transactions at the service layer.
@@ -102,6 +99,9 @@ public class StockService {
                     result.put("name", name);
                     results.add(result);
                 }
+            }
+            if (results.size()==0){
+                return new ArrayList<>();
             }
             return results;
         } catch (Exception e) {
@@ -401,17 +401,15 @@ public class StockService {
         }
     }
 
-    public double calculateMonthlyVolatility(String stockSymbol) {
+    public Map<String, Double> calculateMonthlyVolatility(String stockSymbol) {
+        Map<String, Double> monthlyVolatilities = new HashMap<>();
         try {
-            // 1. Fetch the data
             List<Map<String, Object>> monthlyData = fetchOneYearData(stockSymbol);
 
-            // 2. Extract the monthly closing prices
             List<Double> monthlyClosingPrices = monthlyData.stream()
                     .map(dataPoint -> Double.parseDouble(dataPoint.get("4. close").toString()))
                     .collect(Collectors.toList());
 
-            // 3. Calculate monthly returns
             List<Double> monthlyReturns = new ArrayList<>();
             for (int i = 1; i < monthlyClosingPrices.size(); i++) {
                 double monthlyReturn = (monthlyClosingPrices.get(i) - monthlyClosingPrices.get(i - 1))
@@ -419,26 +417,26 @@ public class StockService {
                 monthlyReturns.add(monthlyReturn);
             }
 
-            // 4. Compute the monthly volatility
             double mean = monthlyReturns.stream().mapToDouble(val -> val).average().orElse(0.0);
             double variance = monthlyReturns.stream().mapToDouble(val -> Math.pow(val - mean, 2)).sum()
                     / monthlyReturns.size();
 
-            return Math.sqrt(variance);
+            double monthlyVolatility = Math.sqrt(variance);
+            monthlyVolatilities.put(stockSymbol, monthlyVolatility);
+            return monthlyVolatilities;
         } catch (Exception e) {
             throw new RuntimeException("Error calculating monthly volatility service: " + e.getMessage(), e);
         }
-
     }
 
     @Cacheable(value = "annualizedVolatility", key = "#stockSymbol")
-    public double calculateAnnualizedVolatility(String stockSymbol) {
+    public Map<String,Double> calculateAnnualizedVolatility(String stockSymbol) {
+        Map<String, Double> annualizedVolatilities = new HashMap<>();
+
         try {
             List<Map<String, Object>> monthlyData = fetchOneYearData(stockSymbol);
-
             int dataSize = monthlyData.size();
             List<Double> monthlyReturns = new ArrayList<>(dataSize);
-            
             double sum = 0.0;
             double currentClose, previousClose = Double.parseDouble((String) monthlyData.get(0).get("4. close"));
             
@@ -461,11 +459,11 @@ public class StockService {
             double monthlyVolatility = Math.sqrt(variance);
             double annualizedVolatility = monthlyVolatility * Math.sqrt(12);
 
-            return annualizedVolatility;
+            annualizedVolatilities.put(stockSymbol, annualizedVolatility);
+            return annualizedVolatilities;
         } catch (Exception e) {
             throw new RuntimeException("Error calculating annualized volatility service: " + e.getMessage(), e);
         }
-
     }
 
     // Helper functions

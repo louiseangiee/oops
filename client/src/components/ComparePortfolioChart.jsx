@@ -68,29 +68,38 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
      
   };
 
+  
+
   const fetchPortfolioSummaries = async () => {
     try {
-      if (!chosenPortfolio1 || !chosenPortfolio2) return;
-      const response1 = await getAsync(`portfolioStocks/${chosenPortfolio1.portfolioId}/summary`, cookies.accessToken);
-      const response2 = await getAsync(`portfolioStocks/${chosenPortfolio2.portfolioId}/summary`, cookies.accessToken);
-      if (!response1.ok || !response2.ok) {
-        throw new Error('Network response was not ok');
+      if (!chosenPortfolio1 || !chosenPortfolio2){
+        return;
       }
-      const data1 = await response1.json();
-      const data2 = await response2.json();
+      else{
+        const response1 = await getAsync(`portfolioStocks/${chosenPortfolio1.portfolioId}/summary`, cookies.accessToken);
+        const response2 = await getAsync(`portfolioStocks/${chosenPortfolio2.portfolioId}/summary`, cookies.accessToken);
+        if (!response1.ok || !response2.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data1 = await response1.json();
+        const data2 = await response2.json();
 
-      console.log(data1);
-      console.log(data2);
+        console.log(data1);
+        console.log(data2);
 
-      setPortfolioSummaries1(data1);
-      setPortfolioSummaries2(data2);
+        setPortfolioSummaries1(data1);
+        setPortfolioSummaries2(data2);
+      }
+      
     } catch (err) {
       console.error('There was an error fetching the portfolio details:', err);
     }
   };
+ 
 
   const fetchPortfolioVolalities = async () => {
     if (!chosenPortfolio1 || !chosenPortfolio2) return;
+
     let endpoint1 = `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility`;  // Default to monthly data
     let endpoint1Annual = `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility/annualized`;
 
@@ -112,15 +121,10 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
       const responseData1Annual = await response1Annual.json();
       const responseData2Annual = await response2Annual.json();
 
-      console.log(responseData1);
-      console.log(responseData2);
-      console.log(responseData1Annual);
-      console.log(responseData2Annual);
-
-      setPortfolioVolatility1(responseData1);
-      setPortfolioVolatility2(responseData2);
-      setPortfolioVolatility1Annual(responseData1Annual);
-      setPortfolioVolatility2Annual(responseData2Annual);
+      setPortfolioVolatility1(responseData1.portfolioVolatility);
+      setPortfolioVolatility2(responseData2.portfolioVolatility);
+      setPortfolioVolatility1Annual(responseData1Annual.portfolioVolatility);
+      setPortfolioVolatility2Annual(responseData2Annual.portfolioVolatility);
     } catch (error) {
       console.error('There was an error fetching the portfolio details:', error);
     }
@@ -260,6 +264,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
 
   // Render the chart or a loading indicator
   return (
+    console.log(summary2),
     <div>
       {/* Your chart rendering logic will go here */}
       <Box
@@ -436,7 +441,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <br />
           <Divider />
           <br />
-          <ReturnsTable stockData= {portfolioData1} stockReturns={summary2} />
+          <ReturnsTable stockData= {portfolioData2} stockReturns={summary2} />
           
           
         </Box>

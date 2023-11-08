@@ -328,4 +328,19 @@ public class StockController {
         }
     }
     
+    @Operation(summary = "Get daily stock price for a period")
+    @Parameter(name = "symbol", description = "stock symbol")
+    @Parameter(name = "period", description = "'week', 'month', 'quarter', 'year'")
+    @GetMapping("/dailyPriceTimePeriod")
+    public ResponseEntity<?> fetchDailyPriceTimePeriod(@RequestParam String symbol, @RequestParam String period) {
+        try {
+            Map<String,Double> price = stockService.fetchStockPricesUpToPeriod(symbol, period);
+            return ResponseEntity.ok(price);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error in fetching daily price for a period");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
 }

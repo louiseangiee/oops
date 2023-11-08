@@ -86,8 +86,6 @@ export default function AddStocks({ portfolioId }) {
     const [loading, setLoading] = useState(false);
     const [priceLoading, setPriceLoading] = useState(false);
     const [error, setError] = useState("");
-    const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
-    const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
     const [totalPrice, setTotalPrice] = useState(0);
     const [alert, setAlert] = useState({ open: false, type: '', message: '' });
 
@@ -336,7 +334,7 @@ export default function AddStocks({ portfolioId }) {
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
                     <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>
-                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} disabled={stockPrice == 0 || chosenStock == null || date == null || stockQuantity <= 0} onClick={handleAddClick}>{loading ? 'Loading...' : 'Add'}</Button>
+                    <Button type="submit" sx={{ backgroundColor: colors.blueAccent[700], color: colors.grey[100], fontWeight: "bold" }} disabled={stockPrice === 0 || chosenStock == null || date == null || stockQuantity <= 0 || stockQuantity % 1 !== 0} onClick={handleAddClick}>{loading ? 'Loading...' : 'Add'}</Button>
                 </DialogActions>
             </Dialog>
         </div>

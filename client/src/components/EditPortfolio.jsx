@@ -69,7 +69,7 @@ export default function EditPortfolio({ portfolioId, small }) {
         return (
             (updatedName && updatedName !== portfolioData?.name) ||
             (updatedDescription && updatedDescription !== portfolioData?.description) ||
-            (isCapitalEdited && !capitalError && updatedCapital !== portfolioData?.totalCapital.toString())
+            (isCapitalEdited && !capitalError && updatedCapital !== portfolioData?.totalCapital)
         );
     };
 

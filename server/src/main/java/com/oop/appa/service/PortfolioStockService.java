@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -177,8 +175,10 @@ public class PortfolioStockService {
                         dto.getQuantity(), dto.getBuyDate());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
 
-                clearPortfolioVolatilityCache(dto.getPortfolioId());
-                calculatePortfolioAnnualizedVolatility(dto.getPortfolioId());
+                clearPortfolioVolatilityCache(portfolio.getPortfolioId());
+                System.out.println("Cleared cache for portfolio volatility");
+                System.out.println("Calculating portfolio volatility =" + portfolio.getPortfolioId());
+                calculatePortfolioAnnualizedVolatility(portfolio.getPortfolioId());
                 return portfolioStockRepository.save(portfolioStock);
             }
         } catch (Exception e) {
@@ -558,10 +558,11 @@ public class PortfolioStockService {
 
         for (PortfolioStock stock : allStocksInPortfolio) {
             String stockSymbol = stock.getStockSymbol();
-            double stockMonthlyVolatility = stockService.calculateMonthlyVolatility(stockSymbol);
+            Map<String,Double> stockMonthlyVolatility = stockService.calculateMonthlyVolatility(stockSymbol);
+            double stockMonthlyVolatilityData = stockMonthlyVolatility.get("monthlyVolatility");
             Map<String,Double> stockWeight = calculateStockWeight(portfolioId, stockSymbol);
-            Double weight = stockWeight.get(stockSymbol);
-            portfolioVolatility += weight * stockMonthlyVolatility;
+            double stockWeightData = stockWeight.get(stockSymbol);
+            portfolioVolatility += stockWeightData * stockMonthlyVolatilityData;
         }
         stockVolatilities.put("portfolioVolatility", portfolioVolatility);
         return stockVolatilities;

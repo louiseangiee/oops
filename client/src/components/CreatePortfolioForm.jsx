@@ -42,33 +42,23 @@ export default function CreatePortfolio() {
     const handleClose = () => {
         setOpen(false);
     };
-
     useEffect(() => {
-        if (!/^\d*\.?\d*$/.test(portfolioCapital) || portfolioCapital === '') {
-            setCapitalError(true);
-            setIsButtonDisabled(true);
-            return; // Prevent form submission
-        } else {
-            setIsButtonDisabled(false);
-            setCapitalError(false);
-        }
-
-        if (portfolioName && portfolioDescription && portfolioCapital) {
-            setIsButtonDisabled(false);
-        } else {
-            setIsButtonDisabled(true);
-        }
-
+        const decimalRegex = /^\d+(\.\d{2})?$/;
+        const validCapital = decimalRegex.test(portfolioCapital) && parseFloat(portfolioCapital) > 0;
+    
+        setCapitalError(!validCapital);
+        setIsButtonDisabled(!validCapital || !portfolioName || !portfolioDescription);
+    
     }, [portfolioCapital, portfolioName, portfolioDescription]);
-
+    
     const handleCreate = () => {
         setLoading(true);
         const formData = {
             user: { id: userData.id }, // This is the user ID that we need to pass to the backend
             name: portfolioName,
             description: portfolioDescription,
-            totalCapital: parseFloat(portfolioCapital), // Convert to a number
-            remainingCapital: parseFloat(portfolioCapital), // Convert to a number
+            totalCapital: parseFloat(portfolioCapital).toFixed(2), // Convert to a number
+            remainingCapital: parseFloat(portfolioCapital).toFixed(2), // Convert to a number
         };
         setLoading(true);
         async function createPortfolio() {
@@ -88,6 +78,21 @@ export default function CreatePortfolio() {
         createPortfolio();
     };
 
+    const handleCapitalChange = (e) => {
+        let value = e.target.value;
+        // If the input is not a number, reset it to the last valid value
+        if (isNaN(value)) {
+            value = portfolioCapital;
+        }
+        // If there are more than two digits after a decimal point, fix to two
+        if (value.includes('.') && value.split('.')[1].length > 2) {
+            value = parseFloat(value).toFixed(2);
+        }
+        setPortfolioCapital(value);
+    };
+    
+
+    
     return (
         <div>
             <Button
@@ -153,15 +158,16 @@ export default function CreatePortfolio() {
                         placeholder="e.g. 1000"
                         InputProps={{
                             startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                            step: "0.01",
                         }}
                         type="number"
                         fullWidth
                         variant="standard"
                         sx={{ color: colors.grey[100] }}
                         value={portfolioCapital}
-                        onChange={(e) => setPortfolioCapital(e.target.value)}
+                        onChange={handleCapitalChange}
                         error={capitalError}
-                        helperText={capitalError ? 'Invalid capital value' : ''}
+                        helperText={capitalError ? 'Invalid capital value. Capital must be up to 2 decimal points and must be more than $0.00' : ''}
                     />
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "30px", paddingRight: "20px" }}>

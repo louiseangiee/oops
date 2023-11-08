@@ -352,21 +352,10 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                     mt="2px"
                     alignItems="flex-end"
                   >
-                    <Typography
-                      variant="h4"
-                      fontWeight="bold"
-                      sx={{ color: colors.grey[100] }}
-                    >
-                      Initial Value: $
-                      {stock.buyPrice && stock.quantity
-                        ? (stock.buyPrice * stock.quantity).toFixed(2)
-                        : "N/A"}
-                    </Typography>
-                    <Typography>{stockReturns[stock]}</Typography>
                     {stockReturns[stock.stockSymbol] && (
                       <Typography
                         variant="h4"
-                        fontWeight="semibold"
+                        fontWeight="bold"
                         sx={{ color: colors.grey[100] }}
                       >
                         Current Value: $
@@ -378,6 +367,18 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                           : "N/A"}
                       </Typography>
                     )}
+                    <Typography
+                      variant="h4"
+                      fontWeight="semibold"
+                      sx={{ color: colors.grey[100] }}
+                    >
+                      Initial Value: $
+                      {stock.buyPrice && stock.quantity
+                        ? (stock.buyPrice * stock.quantity).toFixed(2)
+                        : "N/A"}
+                    </Typography>
+                    <Typography>{stockReturns[stock]}</Typography>
+                    
 
                     <Typography
                       variant="h6"

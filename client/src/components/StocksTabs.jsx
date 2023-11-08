@@ -5,11 +5,12 @@ import Checkbox from "@mui/material/Checkbox";
 import Tab from "@mui/material/Tab";
 import { Box, Typography, useTheme, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../theme";
-import Button from "@mui/material/Button";
-import Lottie from "lottie-react";
-import AddStocks from "./AddStocks";
-import noDataDark from "./lotties/no_data_dark.json";
-import { deleteAsync } from "../utils/utils";
+import Button from '@mui/material/Button';
+import Lottie from 'lottie-react';
+import AddStocks from './AddStocks';
+import noDataDark from './lotties/no_data_dark.json';
+import StockAnalytics from './StockAnalytics';
+import { deleteAsync } from '../utils/utils';
 import { useCookies } from "react-cookie";
 import { useState, useEffect } from "react";
 
@@ -155,7 +156,7 @@ function a11yProps(index) {
   };
 }
 
-export default function StocksTabs({ stocks, portfolioId, stockReturns }) {
+export default function StocksTabs({ stocks, portfolioId, portfolioData, portfolioSummaries, stockReturns }) {
   console.log(stockReturns);
   const [value, setValue] = useState(0);
   const theme = useTheme();
@@ -406,6 +407,12 @@ export default function StocksTabs({ stocks, portfolioId, stockReturns }) {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         Stocks Analytics
+                <Box>
+                    <StockAnalytics
+                    portfolioData={portfolioData}
+                    portfolioSummaries={portfolioSummaries}
+                    ></StockAnalytics>
+                </Box>
       </CustomTabPanel>
     </Box>
   );

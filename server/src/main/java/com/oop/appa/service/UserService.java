@@ -21,6 +21,7 @@ import com.oop.appa.dao.UserRepository;
 import com.oop.appa.entity.User;
 
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -36,7 +37,6 @@ public class UserService {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
     }
-
 
     // GET
     public List<User> findAll() {
@@ -71,6 +71,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void updateOTP(String email, String otp) {
         try {
             User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
@@ -78,7 +79,7 @@ public class UserService {
             userRepository.save(user);
 
             executor.schedule(() -> {
-               deleteOtp(email);
+                deleteOtp(email);
             }, 5, TimeUnit.MINUTES);
 
         } catch (Exception e) {
@@ -88,6 +89,7 @@ public class UserService {
     }
 
     // POST and UPDATE
+    @Transactional
     public void save(User user) {
         try {
             userRepository.save(user);
@@ -98,6 +100,7 @@ public class UserService {
     }
 
     // DELETE
+    @Transactional
     public void delete(User user) {
         try {
             userRepository.delete(user);
@@ -140,7 +143,7 @@ public class UserService {
             helper.setSubject(subject);
             String htmlContent = templateEngine.process("otp-email.html", context);
             helper.setText(htmlContent, true);
-        
+
             mailSender.send(mimeMessage);
             System.out.println("Mail sent successfully");
         } catch (Exception e) {
@@ -172,14 +175,26 @@ public class UserService {
             throw new RuntimeException("Error verifying OTP service: " + e.getMessage(), e);
         }
     }
-
-    public void deleteOtp(String email){
-        try{
+    
+    @Transactional
+    public void deleteOtp(String email) {
+        try {
             User user = findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
             user.setOtp(null);
             save(user);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error deleting OTP: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void changePassword(String email, String password) {
+        try {
+            User user = findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+            user.setPassword(password);
+            save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Error changing password: " + e.getMessage());
         }
     }
 }

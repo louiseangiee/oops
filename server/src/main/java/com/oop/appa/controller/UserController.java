@@ -125,7 +125,6 @@ public class UserController {
             error.setDetails(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
-
     }
 
     @PutMapping

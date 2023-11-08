@@ -240,6 +240,7 @@ const Portfolio = () => {
 
   // State to store portfolio data
   const [portfolioData, setPortfolioData] = useState({});
+  const [portfolioSummaries, setPortfolioSummaries] = useState({});
   const [overallReturns, setOverallReturns] = useState(0);
   const [percentageReturns, setPercentageReturns] = useState(0);
   const [refreshIntervalId, setRefreshIntervalId] = useState(null);
@@ -289,6 +290,7 @@ const Portfolio = () => {
       cookie.accessToken
     );
     const portfolioSummaryData = await portfolioSummaryResponse.json();
+    setPortfolioSummaries(portfolioSummaryData);
     if (Object.keys(portfolioSummaryData.overallReturns).length === 0) {
       setOverallReturns(0);
       setPercentageReturns(0);
@@ -575,6 +577,8 @@ const Portfolio = () => {
             }
             stockReturns={stockReturns? stockReturns:null}
             portfolioId={portfolioId}
+            portfolioData={portfolioData}
+            portfolioSummaries={portfolioSummaries}
           />
         </Box>
       </Box>

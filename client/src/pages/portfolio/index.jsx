@@ -44,6 +44,15 @@ function DeletePortfolio() {
   const [portfolioData, setPortfolioData] = useState({}); // [portfolioData, setPortfolioData
   const [cookie] = useCookies();
   const [loading, setLoading] = useState(false); // Add a loading state
+  const [alert, setAlert] = useState({ open: false, type: '', message: '' });
+
+  const showAlert = (type, message) => {
+    setAlert({ open: true, type, message });
+  };
+
+  const closeAlert = () => {
+    setAlert({ open: false, type: '', message: '' });
+  };
 
   // Fetch the portfolio data based on portfolioId
   useEffect(() => {
@@ -66,89 +75,81 @@ function DeletePortfolio() {
     setOpen(false);
   };
 
-  // error alert handler
-  const handleOpenErrorAlert = () => {
-    setIsErrorAlertOpen(true);
-    setIsSuccessAlertOpen(false);
-  };
-  const handleCloseErrorAlert = () => {
-    setIsErrorAlertOpen(false);
-  };
-
-  // success alert handler
-  const handleOpenSuccessAlert = () => {
-    setIsSuccessAlertOpen(true);
-    setIsErrorAlertOpen(false);
-  };
-  const handleCloseSuccessAlert = () => {
-    setIsSuccessAlertOpen(false);
-  };
-
   const handleDelete = async () => {
     if (
       document.getElementById("confirm-deletion").value !==
       portfolioData["name"]
     ) {
-      handleOpenErrorAlert();
+      showAlert('error', "Please enter the correct portfolio name");
       setOpen(false);
       return;
     }
     setLoading(true);
-    const response = await deleteAsync(
-      "portfolios/" + portfolioData["portfolioId"],
-      cookie.accessToken
-    );
-    if (response.ok) {
-      // when deleted, navigate to home page
+    try {
+      const response = await deleteAsync(
+        "portfolios/" + portfolioData["portfolioId"],
+        cookie.accessToken
+      );
+      if (response.ok) {
+        // when deleted, navigate to home page
+        setLoading(false);
+        handleClose();
+        navigate("/");
+        showAlert('success', "Portfolio deleted successfully");
+      } else {
+        throw response;
+      }
+    } catch (err) {
       setLoading(false);
-      setOpen(false);
-      navigate("/");
-      handleOpenSuccessAlert();
-    } else {
-      setLoading(false);
-      handleOpenErrorAlert();
-      setOpen(false);
-      return;
+      handleClose();
+      err.json().then(errorDetails => {
+        const error_message = errorDetails.details?.split(":")[1];
+        showAlert('error', "Error:" + error_message);
+      }).catch(jsonError => {
+        console.log(jsonError);
+        showAlert('error', "An error occurred");
+      });
     }
+
   };
 
   return (
     <div>
       {/* Snackbar for error message */}
       <Snackbar
-        open={isErrorAlertOpen}
-        autoHideDuration={5000}
-        onClose={handleCloseErrorAlert}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          elevation={6}
-          variant="filled"
-          severity="error"
-          onClose={handleCloseErrorAlert}
-          sx={{ backgroundColor: colors.redAccent[600] }}
-        >
-          Portfolio deletion failed!
-        </Alert>
-      </Snackbar>
+                open={alert.open && alert.type === 'error'}
+                autoHideDuration={5000}
+                onClose={closeAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="error"
+                    onClose={closeAlert}
+                    sx={{ backgroundColor: colors.redAccent[600] }}
+                >
+                    {alert.message}
+                </Alert>
+            </Snackbar>
 
-      {/* Snackbar for success message */}
-      <Snackbar
-        open={isSuccessAlertOpen}
-        autoHideDuration={5000}
-        onClose={handleCloseSuccessAlert}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          elevation={6}
-          variant="filled"
-          severity="success"
-          onClose={handleCloseSuccessAlert}
-          sx={{ backgroundColor: colors.greenAccent[600] }}
-        >
-          Portfolio deletion is successful!
-        </Alert>
-      </Snackbar>
+            {/* Snackbar for success message */}
+            <Snackbar
+                open={alert.open && alert.type === 'success'}
+                autoHideDuration={5000}
+                onClose={closeAlert}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    elevation={6}
+                    variant="filled"
+                    severity="success"
+                    onClose={closeAlert}
+                    sx={{ backgroundColor: colors.greenAccent[600] }}
+                >
+                    {alert.message}
+                </Alert>
+            </Snackbar>
 
       <DeleteOutlineOutlinedIcon
         sx={{ color: colors.redAccent[600], fontSize: "35px" }}
@@ -257,7 +258,7 @@ const Portfolio = () => {
     await fetchPortfolioSummaryData();
   };
 
-  
+
 
   // Fetch portfolio data
   const fetchPortfolioData = async () => {

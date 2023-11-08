@@ -30,7 +30,7 @@ import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.PortfolioStock;
 import com.oop.appa.entity.Stock;
 
-import jakarta.persistence.Cacheable;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
@@ -504,16 +504,16 @@ public class PortfolioStockService {
             List<PortfolioStock> portfolioStocks = portfolio.getPortfolioStocks();
             if (portfolioStocks.isEmpty()) {
                 response.put("totalPortfolioValue", 0.00);
-                // response.put("stockReturns", new HashMap<>());
+                response.put("stockReturns", new HashMap<>());
                 response.put("overallReturns", new HashMap<>());
                 return response;
             }
             double totalPortfolioValue = getTotalPortfolioValue(portfolioId);
-            //Map<String, Map<String, Double>> stockReturns = calculateStockReturnsForPortfolio(portfolioId);
+            Map<String, Map<String, Double>> stockReturns = calculateStockReturnsForPortfolio(portfolioId);
             Map<String, Double> overallReturns = calculateOverallPortfolioReturns(portfolioId);
 
             response.put("totalPortfolioValue", totalPortfolioValue);
-            // response.put("stockReturns", stockReturns);
+            response.put("stockReturns", stockReturns);
             response.put("overallReturns", overallReturns);
             return response;
         } catch (Exception e) {

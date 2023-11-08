@@ -1,13 +1,7 @@
-import React, { useState } from "react";
-import { Box, Typography, useTheme, Chip, Button } from "@mui/material";
+import React from "react";
+import { Box, useTheme, Button } from "@mui/material";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import CreatePortfolio from "../../components/CreatePortfolioForm";
-import StockChart from "../../components/StockChart";
-import StockSelector from "../../components/StockSelectorDropdown";
-import StockDetailsTable from "../../components/StockDetailsTable";
-import { useCookies } from "react-cookie"; // If you decide to use cookies again in the future
-import { getAsync } from "../../utils/utils";
 import PorfolioBarChart from "../../components/OverallReturnsBarChart";
 import PortfolioBreakdown from "../../components/UserPortfoliosBreakdown";
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
@@ -17,10 +11,6 @@ const Analytics = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  
-  
-
-
   return (
     <Box m="20px">
       {/* HEADER */}
@@ -28,20 +18,20 @@ const Analytics = () => {
         <Header title="Analytics" subtitle="Overview of your Account" />
 
         <Box>
-        <a href="/compare-portfolio" style={{ textDecoration: 'none' }}>
+          <a href="/compare-portfolio" style={{ textDecoration: 'none' }}>
             <Button
-                sx={{
-                    backgroundColor: colors.blueAccent[700],
-                    color: colors.grey[100],
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    padding: "10px 20px",
-                }}
+              sx={{
+                backgroundColor: colors.blueAccent[700],
+                color: colors.grey[100],
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+              }}
             >
-                <CompareArrowsIcon sx={{ mr: "10px" }} />
-                Compare Portfolios
+              <CompareArrowsIcon sx={{ mr: "10px" }} />
+              Compare Portfolios
             </Button>
-        </a>
+          </a>
         </Box>
       </Box>
 
@@ -64,7 +54,7 @@ const Analytics = () => {
           p={5}
         >
           <OverviewPortfolioValue />
-        
+
         </Box>
 
         {/* YOUR PORTFOLIOS */}
@@ -79,11 +69,11 @@ const Analytics = () => {
           p={5}
         >
           <div className="stock-page">
-            
+
             <PorfolioBarChart />
 
             <PortfolioBreakdown />
-            
+
           </div>
         </Box>
       </Box>

@@ -12,8 +12,6 @@ import { tokens } from "../theme";
 
 const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
   const [cookies] = useCookies();
-  // const [portfolioData, setPortfolioData] = useState([]);
-  // const [portfolioSummaries, setPortfolioSummaries] = useState([]);
   const [portfolioVolatility, setPortfolioVolatility] = useState(null);
   const [portfolioVolatilityAnnual, setPortfolioVolatilityAnnual] = useState(null);
   const theme = useTheme();
@@ -130,7 +128,7 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
               Total Portfolio Value:
             </Typography>
             <Typography variant="h3" fontWeight="bold">
-              ${portfolioData.totalCapital - portfolioData.remainingCapital}
+              ${(portfolioData.totalCapital - portfolioData.remainingCapital).toFixed(2)}
             </Typography>
           </Box>
           <Box flex={1} margin={1}>
@@ -138,7 +136,7 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
               Overall Returns:
             </Typography>
             <Typography variant="h3" fontWeight="bold" style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>
-              {overallReturn} <span style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>({overallReturnPercentage}%)</span>
+              {overallReturn}({overallReturnPercentage}%)
             </Typography>
           </Box>
         </Box>
@@ -185,13 +183,8 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
       <br />
       <Divider />
       <br />
-      {!loadingTable &&
-        <ReturnsTable stockData={portfolioData} stockReturns={summary} onLoading={handleLoadingState} />}
-
-
+      <ReturnsTable stockData={portfolioData} stockReturns={summary} onLoading={handleLoadingState} />
     </Box>
-
-
   );
 };
 

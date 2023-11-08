@@ -30,7 +30,6 @@ import com.oop.appa.entity.Portfolio;
 import com.oop.appa.entity.PortfolioStock;
 import com.oop.appa.entity.Stock;
 
-import jakarta.persistence.Cacheable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 

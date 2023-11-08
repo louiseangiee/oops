@@ -21,7 +21,6 @@ import com.oop.appa.dao.UserRepository;
 import com.oop.appa.entity.User;
 
 import jakarta.mail.internet.MimeMessage;
-import jakarta.transaction.Transactional;
 
 
 @Service

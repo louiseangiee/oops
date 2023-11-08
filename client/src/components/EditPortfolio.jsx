@@ -226,7 +226,8 @@ export default function EditPortfolio({ portfolioId, small }) {
                         error={capitalError && isCapitalEdited} // Show error only if edited
                         helperText={capitalError && isCapitalEdited ? 'Invalid capital value' : ''}
                     />
-                    <style jsx>{`
+                    <style>
+                        {`
                         .portfolio-name-outline {
                             color: ${colors.greenAccent[800]} !important;
                             border-color: ${colors.greenAccent[800]} !important;

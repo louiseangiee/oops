@@ -265,11 +265,11 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
         display="flex"
         flexDirection="row"
         justifyContent="space-between"
-        alignItems="center"
+        alignItems="flex-start"
       >
         {/* This is the first half of the page for portfolioData1 */}
-        {/* This is the second half of the page for portfolioData2 */}
-        <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
+        
+        <Box flex={1} margin={2} padding={3} alignItems="flex-start" style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
           <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
             ID {portfolioData1.portfolioId}: {portfolioData1.name}
           </Typography>
@@ -282,11 +282,11 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
 
 
 
-          {/* Include description for portfolioData2 here */}
+          {/* Include description for portfolioData1 here */}
           <Box display="flex"
             flexDirection="row"
             justifyContent="space-between"
-            alignItems="center"
+            alignItems="flex-start"
             width="100%">
             <Box flex={1} margin={1}>
               <Box flex={1} margin={1}>
@@ -355,7 +355,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
         </Box>
 
         {/* This is the second half of the page for portfolioData2 */}
-        <Box flex={1} margin={2} padding={3} style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
+        <Box flex={1} margin={2} padding={3} alignItems="flex-start" style={{ backgroundColor: colors.primary[400] }} borderLeft={3}>
           <Typography variant="h2" fontWeight="bold" fontStyle="italic" style={{ color: colors.greenAccent[400] }}>
             ID {portfolioData2.portfolioId}: {portfolioData2.name}
           </Typography>
@@ -372,7 +372,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <Box display="flex"
             flexDirection="row"
             justifyContent="space-between"
-            alignItems="center"
+            alignItems="flex-start"
             width="100%">
             <Box flex={1} margin={1}>
               <Box flex={1} margin={1}>

@@ -286,7 +286,8 @@ public class PortfolioStockService {
     }
 
     // Other services
-    public double calculateWeightedStockReturn(Integer portfolioId, String stockSymbol) {
+    public Map<String,Double> calculateWeightedStockReturn(Integer portfolioId, String stockSymbol) {
+            Map<String,Double> weightedReturns = new HashMap<>();
         try {
             PortfolioStock stock = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
             double totalReturn = 0;
@@ -296,39 +297,39 @@ public class PortfolioStockService {
             double buyPrice = stock.getBuyPrice();
             double individualReturn = ((currentPrice - buyPrice) / buyPrice) * 100;
             totalReturn += (double) stock.getQuantity() / totalQuantity * individualReturn;
-            return totalReturn;
+            
+            weightedReturns.put("weightedReturn", totalReturn);
         } catch (Exception e) {
             throw new RuntimeException("Error calculating weighted stock return service: " + e.getMessage(), e);
         }
-
+        return weightedReturns;
     }
 
-    public double calculateStockWeight(Integer portfolioId, String stockSymbol) {
+    public Map<String,Double> calculateStockWeight(Integer portfolioId, String stockSymbol) {
+        Map<String,Double> stockWeightResult = new HashMap<>();
         try {
             PortfolioStock currentStock = findByPortfolioIdAndStockSymbol(portfolioId, stockSymbol);
             double currentPrice = marketDataService.fetchCurrentData(stockSymbol).path("Global Quote")
                     .path("05. price").asDouble();
             double stockMarketValue = currentStock.getQuantity() * currentPrice;
-            System.out.println(stockSymbol);
-            System.out.println(currentPrice);
-            System.out.println(stockMarketValue);
-            // You'd need a method to fetch all stocks in the portfolio to calculate the
-            // total portfolio value
-            double totalPortfolioValue = 0; // Total market value of all stocks in the portfolio
+      
+            double totalPortfolioValue = 0; 
             List<PortfolioStock> allStocksInPortfolio = findByPortfolioId(portfolioId);
             for (PortfolioStock stock : allStocksInPortfolio) {
                 double stockPrice = marketDataService.fetchCurrentData(stock.getStockSymbol()).path("Global Quote")
                         .path("05. price").asDouble();
                 totalPortfolioValue += stock.getQuantity() * stockPrice;
             }
-            return stockMarketValue / totalPortfolioValue;
+            double weight = stockMarketValue / totalPortfolioValue;
+            stockWeightResult.put(stockSymbol, weight);
         } catch (Exception e) {
             throw new RuntimeException("Error calculating stock weight service: " + e.getMessage(), e);
         }
-
+        return stockWeightResult;
     }
 
-    public double calculateAnnualisedReturn(Integer portfolioStockId, String stockSymbol) {
+    public Map<String,Double> calculateAnnualisedReturn(Integer portfolioStockId, String stockSymbol) {
+        Map<String, Double> annualisedReturnResult = new HashMap<>();
         try {
             PortfolioStock stock = portfolioStockRepository
                     .findByPortfolioPortfolioIdAndStockStockSymbol(portfolioStockId, stockSymbol).orElse(null);
@@ -340,11 +341,14 @@ public class PortfolioStockService {
                     .path("05. close price").asDouble();
             double buyPrice = stock.getBuyPrice();
             long days = getDaysHeld(portfolioStockId);
-            return ((Math.pow((currentPrice / buyPrice), (365.0 / days))) - 1) * 100;
+
+            double annualisedReturn = ((Math.pow((currentPrice / buyPrice), (365.0 / days))) - 1) * 100;
+
+            annualisedReturnResult.put("annualisedReturn", annualisedReturn);
         } catch (Exception e) {
             throw new RuntimeException("Error calculating annualised return service: " + e.getMessage(), e);
         }
-
+        return annualisedReturnResult;
     }
 
     public Map<String, Map<String, Double>> calculateStockReturnsForPortfolio(Integer portfolioId) {

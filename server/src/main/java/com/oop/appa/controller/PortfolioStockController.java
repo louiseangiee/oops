@@ -191,7 +191,7 @@ public class PortfolioStockController {
     public ResponseEntity<?> getStockWeight(@PathVariable Integer portfolioId,
             @PathVariable String stockSymbol) {
         try {
-            double stockWeight = portfolioStockService.calculateStockWeight(portfolioId, stockSymbol);
+            Map<String,Double> stockWeight = portfolioStockService.calculateStockWeight(portfolioId, stockSymbol);
             return ResponseEntity.ok(stockWeight);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
@@ -208,7 +208,7 @@ public class PortfolioStockController {
     public ResponseEntity<?> calculateWeightedStockReturn(@PathVariable Integer portfolioId,
             @PathVariable String stockSymbol) {
         try {
-            double weightedReturn = portfolioStockService.calculateWeightedStockReturn(portfolioId, stockSymbol);
+            Map<String, Double> weightedReturn = portfolioStockService.calculateWeightedStockReturn(portfolioId, stockSymbol);
             return ResponseEntity.ok(weightedReturn);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
@@ -224,7 +224,7 @@ public class PortfolioStockController {
     public ResponseEntity<?> calculateAnnualisedReturn(@PathVariable Integer portfolioId,
             @PathVariable String stockSymbol) {
         try {
-            double annualisedReturn = portfolioStockService.calculateAnnualisedReturn(portfolioId, stockSymbol);
+            Map<String,Double> annualisedReturn = portfolioStockService.calculateAnnualisedReturn(portfolioId, stockSymbol);
             return ResponseEntity.ok(annualisedReturn);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();

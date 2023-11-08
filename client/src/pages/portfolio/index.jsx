@@ -199,6 +199,7 @@ const Portfolio = () => {
   const { userData } = useAuth();
   const { portfolioId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
+  const [summaryLoading, setSummaryLoading] = useState(true);
 
   // State to store portfolio data
   const [portfolioData, setPortfolioData] = useState({});
@@ -240,10 +241,16 @@ const Portfolio = () => {
   const fetchPortfolioSummaryData = async () => {
     const portfolioSummaryResponse = await getAsync(`portfolioStocks/${portfolioId}/summary`, cookie.accessToken);
     const portfolioSummaryData = await portfolioSummaryResponse.json();
-    console.log(portfolioSummaryData.overallReturns.percentage)
-    setOverallReturns(portfolioSummaryData.overallReturns.overalReturn);
-    setPercentageReturns(portfolioSummaryData.overallReturns.percentage);
-    // TODO - set Loading State for portfolio summary
+    if (Object.keys(portfolioSummaryData.overallReturns).length === 0) {
+      setOverallReturns(0);
+      setPercentageReturns(0);
+      setSummaryLoading(false);
+    }
+    else {
+      setOverallReturns(portfolioSummaryData.overallReturns.overalReturn);
+      setPercentageReturns(portfolioSummaryData.overallReturns.percentage);
+      setSummaryLoading(false);
+    }
   }
 
   // Fetch data on initial component load
@@ -383,7 +390,7 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: overallReturns > 0 ? 'green' : overallReturns < 0 ? 'red' : colors.grey[100] }}
           >
-            {overallReturns != undefined && percentageReturns != undefined ? (
+            {!summaryLoading ? (
               `${overallReturns < 0 ? '-' : overallReturns > 0 ? '+' : ''}${Math.abs(overallReturns)}/${percentageReturns}%`
             ) : (
               "Loading..."

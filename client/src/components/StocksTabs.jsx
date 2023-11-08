@@ -156,7 +156,7 @@ function a11yProps(index) {
   };
 }
 
-export default function StocksTabs({ stocks, portfolioId, portfolioData, portfolioSummaries, stockReturns }) {
+export default function StocksTabs({ stocks: initialStocks, portfolioId, portfolioData, portfolioSummaries, stockReturns }) {
   console.log(stockReturns);
   const [value, setValue] = useState(0);
   const theme = useTheme();
@@ -164,6 +164,12 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
 
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   const [checkedItems, setCheckedItems] = useState([]);
+
+  const [stocks, setStocks] = useState(initialStocks);
+
+  const addNewStock = (newStockData) => {
+    setStocks([...stocks, newStockData]);
+  }
 
   const onStocksDeleted = (deletedStockSymbols) => {
     // Filter out the deleted stocks from the current stocks list
@@ -265,7 +271,7 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                 Stocks
               </Typography>
               <Box display="flex" gap="20px">
-                <AddStocks portfolioId={portfolioId} />
+                <AddStocks portfolioId={portfolioId} onAddNewStock={addNewStock} />
                 <DeleteStock
                   checkedItems={checkedItems}
                   portfolioId={portfolioId}

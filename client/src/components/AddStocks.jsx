@@ -73,7 +73,7 @@ function ButtonDatePicker(props) {
     );
 }
 
-export default function AddStocks({ portfolioId }) {
+export default function AddStocks({ portfolioId, onAddNewStock }) {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [cookie] = useCookies()
@@ -174,6 +174,14 @@ export default function AddStocks({ portfolioId }) {
             if (response.ok) {
                 setLoading(false);
                 showAlert('success', 'Stock added successfully!');
+                const newStockData = {
+                    "stockSymbol": chosenStock.code,
+                    "buyDate": date.format('YYYY-MM-DD'),
+                    "buyPrice": stockPrice,
+                    "quantity": stockQuantity,
+                    "stockIndustry": "Loading..."
+                };
+                onAddNewStock(newStockData);
                 handleClose();
             }
             else {

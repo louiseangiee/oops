@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,11 +176,19 @@ public class PortfolioStockService {
                         stock.getStockSymbol(), portfolio.getPortfolioId(), portfolio.getName(), dto.getBuyPrice(),
                         dto.getQuantity(), dto.getBuyDate());
                 accessLogRepository.save(new AccessLog(portfolio.getUser(), action));
+
+                clearPortfolioVolatilityCache(dto.getPortfolioId());
+                calculatePortfolioAnnualizedVolatility(dto.getPortfolioId());
                 return portfolioStockRepository.save(portfolioStock);
             }
         } catch (Exception e) {
             throw new RuntimeException("Error creating PortfolioStock service: " + e.getMessage(), e);
         }
+    }
+
+    @CacheEvict(value = "portfolioVolatility", key = "#portfolioId")
+    public void clearPortfolioVolatilityCache(Integer portfolioId) {
+        System.out.println("Clearing cache for portfolio volatility");
     }
 
     @Transactional

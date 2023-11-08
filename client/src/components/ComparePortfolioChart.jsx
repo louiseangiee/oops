@@ -23,7 +23,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
-  const [cookies] = useCookies();
+  const [cookies] = useCookies(['accessToken']);
   const [portfolioData1, setPortfolioData1] = useState([]);
   const [portfolioData2, setPortfolioData2] = useState([]);
 
@@ -32,7 +32,6 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
 
   const [portfolioVolatility1, setPortfolioVolatility1] = useState(null);
   const [portfolioVolatility2, setPortfolioVolatility2] = useState(null);
-
   const [portfolioVolatility1Annual, setPortfolioVolatility1Annual] = useState(null);
   const [portfolioVolatility2Annual, setPortfolioVolatility2Annual] = useState(null);
 
@@ -44,10 +43,10 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   // Fetch data for both portfolios
   const fetchOverallPortfolio = async () => {
     try {
-      if (!chosenPortfolio1 || !chosenPortfolio2 || chosenPortfolio1.portfolioId === undefined || chosenPortfolio2.portfolioId === undefined) {
+      if (!chosenPortfolio1 || !chosenPortfolio2) {
         return;
-      }
-      else {
+      }  
+      else{
         const response1 = await getAsync(`portfolios/${chosenPortfolio1.portfolioId}`, cookies.accessToken);
         const response2 = await getAsync(`portfolios/${chosenPortfolio2.portfolioId}`, cookies.accessToken);
         if (!response1.ok || !response2.ok) {
@@ -55,44 +54,43 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
         }
         const data1 = await response1.json();
         const data2 = await response2.json();
+  
+        console.log(data1);
+        console.log(data2);
+  
         setPortfolioData1(data1);
         setPortfolioData2(data2);
-
+     
       }
     } catch (err) {
       console.error('There was an error fetching the portfolio details:', err);
     }
-
+     
   };
-
-
 
   const fetchPortfolioSummaries = async () => {
     try {
-      if (!chosenPortfolio1 || !chosenPortfolio2 || chosenPortfolio1.portfolioId === undefined || chosenPortfolio2.portfolioId === undefined) {
-        return;
+      if (!chosenPortfolio1 || !chosenPortfolio2) return;
+      const response1 = await getAsync(`portfolioStocks/${chosenPortfolio1.portfolioId}/summary`, cookies.accessToken);
+      const response2 = await getAsync(`portfolioStocks/${chosenPortfolio2.portfolioId}/summary`, cookies.accessToken);
+      if (!response1.ok || !response2.ok) {
+        throw new Error('Network response was not ok');
       }
-      else {
-        const response1 = await getAsync(`portfolioStocks/${chosenPortfolio1.portfolioId}/summary`, cookies.accessToken);
-        const response2 = await getAsync(`portfolioStocks/${chosenPortfolio2.portfolioId}/summary`, cookies.accessToken);
-        if (!response1.ok || !response2.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data1 = await response1.json();
-        const data2 = await response2.json();
+      const data1 = await response1.json();
+      const data2 = await response2.json();
 
-        setPortfolioSummaries1(data1);
-        setPortfolioSummaries2(data2);
-      }
+      console.log(data1);
+      console.log(data2);
 
+      setPortfolioSummaries1(data1);
+      setPortfolioSummaries2(data2);
     } catch (err) {
       console.error('There was an error fetching the portfolio details:', err);
     }
   };
 
-
   const fetchPortfolioVolalities = async () => {
-    if (!chosenPortfolio1 || !chosenPortfolio2 || chosenPortfolio1.portfolioId === undefined || chosenPortfolio2.portfolioId === undefined) return;
+    if (!chosenPortfolio1 || !chosenPortfolio2) return;
     let endpoint1 = `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility`;  // Default to monthly data
     let endpoint1Annual = `portfolioStocks/${chosenPortfolio1.portfolioId}/volatility/annualized`;
 
@@ -114,23 +112,22 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
       const responseData1Annual = await response1Annual.json();
       const responseData2Annual = await response2Annual.json();
 
-      setPortfolioVolatility1(responseData1.portfolioVolatility);
-      setPortfolioVolatility2(responseData2.portfolioVolatility);
-      setPortfolioVolatility1Annual(responseData1Annual.portfolioVolatility);
-      setPortfolioVolatility2Annual(responseData2Annual.portfolioVolatility);
+      console.log(responseData1);
+      console.log(responseData2);
+      console.log(responseData1Annual);
+      console.log(responseData2Annual);
+
+      setPortfolioVolatility1(responseData1);
+      setPortfolioVolatility2(responseData2);
+      setPortfolioVolatility1Annual(responseData1Annual);
+      setPortfolioVolatility2Annual(responseData2Annual);
     } catch (error) {
       console.error('There was an error fetching the portfolio details:', error);
     }
   };
 
-  // Effect to fetch data for both portfolios
-  useEffect(() => {
-    fetchOverallPortfolio();
-    fetchPortfolioSummaries();
-    fetchPortfolioVolalities();
-
-
-  }, [chosenPortfolio1, chosenPortfolio2]);
+  
+  
 
   const mergeChartData = () => {
     // Implement your chart data merging logic here
@@ -164,36 +161,32 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
 
   function getOverallReturn(portfolioSummaries) {
     // Check if the portfolioSummaries object exists
-    // if (!portfolioSummaries) {
-    //   // console.error("Error: portfolioSummaries is not defined.");
-    //   return; // or you can return a default value or throw an error
-    // }
-
-    // // Check if the overallReturn property exists
-    // if (!portfolioSummaries.overallReturns) {
-    //   // console.error("Error: overallReturn is not defined in the portfolioSummaries object.");
-    //   return; // or you can return a default value or throw an error
-    // }
-
-    if (portfolioSummaries && portfolioSummaries.overallReturns) {
-      return portfolioSummaries.overallReturns;
+    if (!portfolioSummaries) {
+      console.error("Error: portfolioSummaries is not defined.");
+      return ''; // or you can return a default value or throw an error
     }
-    else {
-      return '';
+
+    // Check if the overallReturn property exists
+    if (!portfolioSummaries.overallReturns) {
+      console.error("Error: overallReturn is not defined in the portfolioSummaries object.");
+      return ''; // or you can return a default value or throw an error
     }
+
+    // If everything checks out, return the overallReturn value
+    return portfolioSummaries.overallReturns;
   }
 
   function getStockReturns(portfolioSummaries) {
     // Check if the portfolioSummaries object exists
     if (!portfolioSummaries) {
-      // console.error("Error: portfolioSummaries is not defined.");
-      return; // or you can return a default value or throw an error
+      console.error("Error: portfolioSummaries is not defined.");
+      return ''; // or you can return a default value or throw an error
     }
 
     // Check if the overallReturn property exists
     if (!portfolioSummaries.stockReturns) {
-      // console.error("Error: stockReturns is not defined in the portfolioSummaries object.");
-      return; // or you can return a default value or throw an error
+      console.error("Error: stockReturns is not defined in the portfolioSummaries object.");
+      return ''; // or you can return a default value or throw an error
     }
 
     // If everything checks out, return the overallReturn value
@@ -212,10 +205,19 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   const overallReturn1Percentage = getOverallReturn(portfolioSummaries1).percentage;
   const overallReturn2Percentage = getOverallReturn(portfolioSummaries2).percentage;
 
+  // Effect to fetch data for both portfolios
+  useEffect(() => {
+    fetchOverallPortfolio();
+    fetchPortfolioSummaries();
+    fetchPortfolioVolalities();
+
+    
+  }, [chosenPortfolio1, chosenPortfolio2]);
+
   // useEffect(() => {
   //   const fetchPortfolioData = async () => {
   //     if (!chosenPortfolio1 || !chosenPortfolio2) return;
-
+  
   //     // Prepare endpoints for all required data
   //     const endpoints = [
   //       `portfolios/${chosenPortfolio1.portfolioId}`,
@@ -227,16 +229,16 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   //       `portfolioStocks/${chosenPortfolio2.portfolioId}/volatility`,
   //       `portfolioStocks/${chosenPortfolio2.portfolioId}/volatility/annualized`,
   //     ];
-
+  
   //     try {
   //       const results = await fetchAllEndpoints(endpoints, cookies.accessToken);
   //       console.log(results);
-
+  
   //       // Extract the responses and set state or handle data accordingly
   //       const [portfolioData1, portfolioData2, portfolioSummaries1, portfolioSummaries2, 
   //              portfolioVolatility1, portfolioVolatility1Annual, 
   //              portfolioVolatility2, portfolioVolatility2Annual] = results;
-
+        
   //       // Update the state or perform further actions with the fetched data
   //       setPortfolioData1(portfolioData1);
   //       setPortfolioData2(portfolioData2);
@@ -251,14 +253,13 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
   //       // Handle the error by setting fallback states or showing messages
   //     }
   //   };
-
+  
   //   fetchPortfolioData();
   // }, [chosenPortfolio1, chosenPortfolio2, cookies.accessToken]); // Add dependencies for useEffect here
-
+  
 
   // Render the chart or a loading indicator
   return (
-    console.log(summary2),
     <div>
       {/* Your chart rendering logic will go here */}
       <Box
@@ -280,7 +281,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
             {portfolioData1.description}
           </Typography>
 
-
+          
 
           {/* Include description for portfolioData2 here */}
           <Box display="flex"
@@ -325,23 +326,23 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
               </Box>
             </Box>
             <Box flex={1} margin={1}>
-              <Box flex={1} margin={1}>
-                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                  Volatility (Monthly):
-                </Typography>
-                <Typography variant="h3" fontWeight="bold">
-                  {(vol1 * 100)}%
-                </Typography>
-              </Box>
-              <Box flex={1} margin={1}>
-                <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
-                  Volatility Annualized:
-                </Typography>
-                <Typography variant="h3" fontWeight="bold">
-                  {(volAnnual1 * 100)}%
-                </Typography>
-              </Box>
+            <Box flex={1} margin={1}>
+              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                Volatility (Monthly):
+              </Typography>
+              <Typography variant="h3" fontWeight="bold">
+                {vol1}
+              </Typography>
             </Box>
+            <Box flex={1} margin={1}>
+              <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
+                Volatility Annualized:
+              </Typography>
+              <Typography variant="h3" fontWeight="bold">
+                {volAnnual1}
+              </Typography>
+            </Box>
+          </Box>
           </Box>
           <Divider />
           <br />
@@ -349,9 +350,9 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <br />
           <Divider />
           <br />
-          <ReturnsTable stockData={portfolioData1} stockReturns={summary1} />
-
-
+          <ReturnsTable stockData= {portfolioData1} stockReturns={summary1} />
+          
+          
         </Box>
 
         {/* This is the second half of the page for portfolioData2 */}
@@ -416,7 +417,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
                   Volatility (Monthly):
                 </Typography>
                 <Typography variant="h3" fontWeight="bold">
-                  {(vol2 * 100)}%
+                  {vol2}
                 </Typography>
               </Box>
               <Box flex={1} margin={1}>
@@ -424,7 +425,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
                   Volatility Annualized:
                 </Typography>
                 <Typography variant="h3" fontWeight="bold">
-                  {(volAnnual2 * 100)}%
+                  {volAnnual2}
                 </Typography>
               </Box>
             </Box>
@@ -435,8 +436,9 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <br />
           <Divider />
           <br />
-          <ReturnsTable stockData={portfolioData2} stockReturns={summary2} />
-          <ReturnsTable stockData={portfolioData1} stockReturns={summary2} />
+          <ReturnsTable stockData= {portfolioData1} stockReturns={summary2} />
+          
+          
         </Box>
       </Box>
     </div>

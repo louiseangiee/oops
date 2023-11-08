@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 const BreakdownTable = ({ data, totalValue }) => {
   // Define a style for the TableContainer to make it scrollable
   const scrollableStyle = {
-    maxHeight: '250px', // Adjust the height as needed
+    maxHeight: '400px', // Adjust the height as needed
     overflow: 'auto'
   };
 

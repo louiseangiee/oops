@@ -12,7 +12,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
     returns = returns > 0 ? ("+$" + returns) : (returns === 0 || returns == null) ? "$-" : ("-$" + returns * -1);
 
     return (
-        <Box width="100%" display="flex" flexDirection="column" justifyContent='flex-start' maxHeight="300px"
+        <Box width="100%" display="flex" flexDirection="column" justifyContent='flex-start' maxHeight="300px" 
         // sx={{
         //     overflow: "hidden",
         //     overflowY: "auto",
@@ -110,38 +110,38 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                 >
                     {/* Mapping over stocks */}
                     {stocks.map((stock, index) => (
-                        <Box key={index} display="flex" justifyContent="space-between" my="10px" >
-                            <Box display="flex" gap="10px">
-                                <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">
-                                    <Typography variant="h4" fontWeight="bold" sx={{ color: colors.grey[100] }}>
-                                        {stock.stockSymbol}
-                                    </Typography>
-                                    <Typography variant="p"
-                                        sx={{
-                                            fontSize: '10px',
-                                            color: colors.grey[100],
-                                            maxWidth: '100px',
-                                            overflow: 'hidden',
-                                            whiteSpace: 'nowrap',
-                                            textOverflow: 'ellipsis',
-                                        }}>
-                                        {stock.stockIndustry}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px" alignItems="flex-end">
+                    <Box Box key={index} display="flex" justifyContent="space-between" my="10px" >
+                        <Box display="flex" gap="10px">
+                            <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px">
                                 <Typography variant="h4" fontWeight="bold" sx={{ color: colors.grey[100] }}>
-                                    ${stock.buyPrice}
+                                    {stock.stockSymbol}
                                 </Typography>
-                                <Typography variant="h6" sx={{ color: colors.greenAccent[600] }}>
-                                    Qty: {stock.quantity}
+                                <Typography variant="p"
+                                    sx={{
+                                        fontSize: '10px',
+                                        color: colors.grey[100],
+                                        maxWidth: '100px',
+                                        overflow: 'hidden',
+                                        whiteSpace: 'nowrap',
+                                        textOverflow: 'ellipsis',
+                                    }}>
+                                    {stock.stockIndustry}
                                 </Typography>
                             </Box>
                         </Box>
-                    ))
-                    }
-                </Box>
-            ) : (
+                        <Box display="flex" flexDirection="column" justifyContent="space-between" mt="2px" alignItems="flex-end">
+                            <Typography variant="h4" fontWeight="bold" sx={{ color: colors.grey[100] }}>
+                                ${stock.buyPrice}
+                            </Typography>
+                            <Typography variant="h6" sx={{ color: colors.greenAccent[600] }}>
+                                Qty: {stock.quantity}
+                            </Typography>
+                        </Box>
+                    </Box>
+                ))
+                }
+            </Box>
+            ):(
                 <Box display="flex" justifyContent="center" alignItems="center" height="150px">
                     <Typography variant="subtitle1" sx={{ color: colors.grey[300] }}>
                         No stocks yet

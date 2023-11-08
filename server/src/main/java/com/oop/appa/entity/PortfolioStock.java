@@ -40,11 +40,6 @@ public class PortfolioStock {
         return this.stock.getStockSymbol();
     }
 
-    @JsonProperty("stockExchange")
-    public String getStockExchange() {
-        return this.stock.getExchange();
-    }
-
     @JsonProperty("stockCountry")
     public String getStockCountry() {
         return this.stock.getCountry();

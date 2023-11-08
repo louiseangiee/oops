@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Typography, useTheme } from "@mui/material";
+import { tokens } from "../theme";
 import { useCookies } from "react-cookie";
 import PortfolioSelector from "./AvailablePortfoliosDropdown";
 import ComparePortfolio from "../pages/comparePortfolio";
 import ComparePortfolioChart from "./ComparePortfolioChart";
+import { useEffect } from "react";
 import { getAsync } from "../utils/utils";
 import ComparePortfolioSingle from "./ComparePortfolioSingle";
 
@@ -44,12 +46,15 @@ const useUserID = () => {
 };
 
 const ComparePortfolioComponent = () => {
-    const { userData } = useAuth();
-    const userId = userData.id
-    const [cookie] = useCookies();
 
+    const userId = useUserID();
+    console.log(userId);
+    const [cookie] = useCookies();
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    
     //FOR THE FIRST PORTFOLIO
-    const [chosenPortfolio1, setChosenPortfolio1] = useState({ name: "" });
+    const [chosenPortfolio1, setChosenPortfolio1] = useState({name: ""});
 
     const handlePortfolioChange1 = (newValue) => {
         setChosenPortfolio1(newValue || null);
@@ -58,7 +63,7 @@ const ComparePortfolioComponent = () => {
     console.log(chosenPortfolio1)
 
     //FOR THE SECOND PORTFOLIO
-    const [chosenPortfolio2, setChosenPortfolio2] = useState({ name: "" });
+    const [chosenPortfolio2, setChosenPortfolio2] = useState({name: ""});
 
     const handlePortfolioChange2 = (newValue) => {
         setChosenPortfolio2(newValue || null);
@@ -66,6 +71,7 @@ const ComparePortfolioComponent = () => {
 
     // Function to fetch portfolios by user id
     const fetchPortfolios = async (userId) => {
+        
         try {
             const response = await getAsync(`portfolios/user/${userId}`, cookie.accessToken);
 
@@ -89,24 +95,24 @@ const ComparePortfolioComponent = () => {
         if (userId) { // Only attempt to fetch portfolios if the userId is available
             fetchPortfolios(userId);
         }
-    }, []); // TODO: add back userId dependency if this breaks
+    }, [userId]); // Adding userId to the dependency array
 
-    return (
+    return(
         <>
-            <Box display="flex" flexDirection="row" justifyContent="space-between" width="100%">
-                <Box flex={1} p={2} >
-                    <Typography variant="h3" fontWeight="bold" mb={2}> Portfolio 1</Typography>
-                    <PortfolioSelector
-                        chosenPortfolio={chosenPortfolio1}
-                        handlePortfolioChange={handlePortfolioChange1} />
-                </Box>
+        <Box display="flex" flexDirection="row" justifyContent="space-between" width="100%">
+            <Box flex={1} p={2} >
+                <Typography variant="h3" fontWeight="bold" mb={2}> Portfolio 1</Typography>
+                <PortfolioSelector
+                    chosenPortfolio={chosenPortfolio1}
+                    handlePortfolioChange={handlePortfolioChange1} />
+            </Box>
 
-                <Box flex={1} p={2}>
-                    <Typography variant="h3" fontWeight="bold" mb={2}> Portfolio 2</Typography>
-                    <PortfolioSelector
-                        chosenPortfolio={chosenPortfolio2}
-                        handlePortfolioChange={handlePortfolioChange2} />
-                </Box>
+            <Box flex={1} p={2}>
+                <Typography variant="h3" fontWeight="bold" mb={2}> Portfolio 2</Typography>
+                <PortfolioSelector
+                    chosenPortfolio={chosenPortfolio2}
+                    handlePortfolioChange={handlePortfolioChange2} />
+            </Box>
             </Box>
 
 
@@ -124,7 +130,7 @@ const ComparePortfolioComponent = () => {
         
         </>
 
-
+        
 
     );
 

@@ -7,7 +7,7 @@ import BreakdownTable from './PortfolioBreakdownTable';
 
 const COLORS = ['#0088FE', '#FF5D73', '#FFC658', '#00C49F', '#AF19FF', '#FFBB28'];
 function generateHSLColor(index) {
-  const hue = index * 137.508; // use golden angle approximation2
+  const hue = index * 137.508; // use golden angle approximation
   return `hsl(${hue % 360}, 50%, 60%)`;
 }
 
@@ -51,6 +51,7 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
 
   useEffect(() => {
     if (!portfolioStockData || portfolioStockData.length === 0) {
+      console.error('Portfolio data is empty.');
       return;
     }
 
@@ -97,7 +98,7 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
     ? grouping.charAt(0).toUpperCase() + grouping.slice(1).replace(/([A-Z])/g, ' $1').trim()
     : '';
 
-
+    
 
   return (
     <Paper style={{ padding: '20px' }}>
@@ -111,10 +112,7 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
       >
         <MenuItem value="stockSector">Sector</MenuItem>
         <MenuItem value="stockIndustry">Industry</MenuItem>
-        <MenuItem value="stockCountry">Country</MenuItem>
-        <MenuItem value="stockExchange">Exchange</MenuItem> {/* Add this line */}
       </Select>
-
       <ResponsiveContainer height={500}>
         <PieChart>
           {/* Use pieChartData for the Pie chart which includes "Others" */}
@@ -122,7 +120,7 @@ const PortfolioBreakdown = ({ portfolioStockData }) => {
             data={pieChartData}
             dataKey="value"
             nameKey="name"
-          // ...  
+            // ...  
           >
             {pieChartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

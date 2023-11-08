@@ -1,81 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
 import { useCookies } from 'react-cookie';
 import { getAsync } from '../utils/utils';
-import { tokens } from '../theme';
 
 const StockSelector = ({ chosenStock, handleStockChange }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [cookie] = useCookies();
     const [stocks, setStocks] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState(null); // To handle any errors during fetch
 
-    const fetchStockData = async (search) => {
-        if (!search.trim()) {
-            setStocks([]);
-            return;
-        }
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await getAsync('stocks/stocklookup', cookie.accessToken);
 
-        setLoading(true);
-        try {
-            const response = await getAsync(`stocks/search?searchTerm=${search}`, cookie.accessToken);
-            setLoading(false);
+                if (!response.ok) { // Check if response went through
+                    throw new Error('Network response was not ok');
+                }
 
-            if (!response.ok) throw new Error('Could not load the stock data.');
+                const data = await response.json();
+                const formattedData = data
+                    .filter(stock => stock && stock.stockSymbol && stock.name)
+                    .map(stock => ({
+                        code: stock.stockSymbol,
+                        name: `${stock.name} (${stock.stockSymbol})`
+                    }));
 
-            const data = await response.json();
-            const formattedData = data.data
-                .filter(stock => stock?.symbol && stock?.name)
-                .map(stock => ({
-                    code: stock.symbol,
-                    name: `${stock.name} (${stock.symbol})`,
-                }));
+                setStocks(formattedData);
+            } catch (err) {
+                console.error('There was an error fetching the stocks:', err);
+                setError(err);
+            }
+        };
 
-            setStocks(formattedData);
-        } catch (err) {
-            setLoading(false);
-            setError('Error fetching stocks. Please try again.');
-        }
-    };
+        fetchData();
+    }, []);
 
-    const handleInputChange = (event, value, reason) => {
-        if (reason === 'input') {
-            fetchStockData(value);
-        }
-    };
+    // You can use the error state to display any error messages if needed
+    if (error) {
+        return <div>Error fetching stocks: {error.message}</div>;
+    }
 
-    const handleChange = (event, newValue) => {
-        const stockExists = stocks.some(stock => stock.code === newValue?.code);
-        handleStockChange(stockExists ? newValue : null);
-    };
-
-    return error ? (
-        <div>{error}</div>
-    ) : (
+    return (
         <Autocomplete
+            disabled={stocks.length === 0}
             value={chosenStock}
-            onInputChange={handleInputChange}
-            onChange={handleChange}
+            onChange={(event, newValue) => {
+                const stockExists = stocks.some(stock => stock.code === (newValue && newValue.code));
+                handleStockChange(stockExists ? newValue : null);
+            }}
             options={stocks}
             getOptionLabel={(option) => option.name}
             isOptionEqualToValue={(option, value) => option.code === value.code}
             style={{ minWidth: 200, marginBottom: 20 }}
-            renderInput={(params) => (
+            renderInput={(params) =>
                 <TextField
                     {...params}
                     variant="outlined"
-                    label={loading ? "Loading..." : "Select Stock"}
+                    label={stocks.length === 0 ? "Loading..." : "Select Stock"}
                     sx={{
-                        '& .MuiInputLabel-root': {
-                            color: colors.grey[100],
+                        '& .MuiOutlinedInput-root': {
+                            // Apply your input styles here
+                            border: `2px solid colors.greenAccent[400]`, // Change the border color
                         },
+                        '& .MuiInputLabel-root': {
+                            // Apply your label styles here
+                            color: colors.grey[100], // Change the label color
+                        },
+
                     }}
                 />
-            )}
+            }
         />
     );
 };

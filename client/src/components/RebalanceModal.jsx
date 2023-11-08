@@ -38,26 +38,14 @@ const RebalanceModal = ({ portfolioId }) => {
   });
   const [isPercentageValid, setIsPercentageValid] = useState(false);
   const [isAllInputsFilled, setIsAllInputsFilled] = useState(false);
-  const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
-  const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
+  const [alert, setAlert] = useState({ open: false, type: '', message: '' });
 
-  // error alert handler
-  const handleOpenErrorAlert = () => {
-    setIsErrorAlertOpen(true);
-    setIsSuccessAlertOpen(false);
-  };
-  const handleCloseErrorAlert = () => {
-    setIsErrorAlertOpen(false);
+  const showAlert = (type, message) => {
+    setAlert({ open: true, type, message });
   };
 
-  // success alert handler
-  const handleOpenSuccessAlert = () => {
-    setIsSuccessAlertOpen(true);
-    setIsErrorAlertOpen(false);
-
-  };
-  const handleCloseSuccessAlert = () => {
-    setIsSuccessAlertOpen(false);
+  const closeAlert = () => {
+    setAlert({ open: false, type: '', message: '' });
   };
 
 
@@ -68,14 +56,30 @@ const RebalanceModal = ({ portfolioId }) => {
   const handleClose = () => setOpen(false);
   const handleRebalanceSubmit = async () => {
     setLoading(true);
-    const response = await getAsync(
-      `portfolioStocks/${portfolioId}/stocks?groupBy=${groupBy}`,
-      cookie.accessToken
-    );
-    const data = await response.json();
-    setAllocationsData(data);
-    setLoading(false);
-    setPage(2);
+    try {
+      const response = await getAsync(
+        `portfolioStocks/${portfolioId}/stocks?groupBy=${groupBy}`,
+        cookie.accessToken
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setAllocationsData(data);
+        setLoading(false);
+        setPage(2);
+      } else {
+        throw response;
+      }
+    }
+    catch (err) {
+      setLoading(false);
+      err.json().then(errorDetails => {
+        const error_message = errorDetails.details?.split(":")[1];
+        showAlert('error', "Error:" + error_message);
+      }).catch(jsonError => {
+        console.log(jsonError);
+        showAlert('error', "An error occurred");
+      });
+    }
   };
   const handleChange = (event) => {
     setGroupBy(event.target.value);
@@ -123,20 +127,30 @@ const RebalanceModal = ({ portfolioId }) => {
           { targetPercentages },
           cookie.accessToken
         );
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setResponseState({
+            finalStocks: data.finalStocks,
+            stockAdjustments: data.stockAdjustments,
+            projectedTotalPortfolioValue: data.projectedTotalPortfolioValue,
+            finalAllocations: data.finalAllocations,
+          });
+          setPage(3);
+          setLoading(false);
+        } else {
+          throw response;
+        }
 
-        const data = await response.json();
-        console.log(data);
-        setResponseState({
-          finalStocks: data.finalStocks,
-          stockAdjustments: data.stockAdjustments,
-          projectedTotalPortfolioValue: data.projectedTotalPortfolioValue,
-          finalAllocations: data.finalAllocations,
+      } catch (err) {
+        setLoading(false);
+        err.json().then(errorDetails => {
+          const error_message = errorDetails.details?.split(":")[1];
+          showAlert('error', "Error:" + error_message);
+        }).catch(jsonError => {
+          console.log(jsonError);
+          showAlert('error', "An error occurred");
         });
-        setPage(3);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        console.error("Network error:", error);
       }
     }
   };
@@ -155,17 +169,23 @@ const RebalanceModal = ({ portfolioId }) => {
       );
       const data = await response.json();
       if (!response.ok) {
-        handleOpenErrorAlert();
-        handleClose();
+        throw response;
       }
       else {
-        handleOpenSuccessAlert();
+        showAlert('success', "Rebalance successful");
+        setLoading(false);
         handleClose();
       }
-    } catch (error) {
-      handleOpenErrorAlert();
+    }
+    catch (err) {
       handleClose();
-      console.error("Network error:", error);
+      err.json().then(errorDetails => {
+        const error_message = errorDetails.details?.split(":")[1];
+        showAlert('error', "Error:" + error_message);
+      }).catch(jsonError => {
+        console.log(jsonError);
+        showAlert('error', "An error occurred");
+      });
     }
     setLoading(false);
   };
@@ -186,38 +206,39 @@ const RebalanceModal = ({ portfolioId }) => {
 
   return (
     <div>
+      {/* Snackbar for error message */}
       <Snackbar
-        open={isErrorAlertOpen}
+        open={alert.open && alert.type === 'error'}
         autoHideDuration={5000}
-        onClose={handleCloseErrorAlert}
+        onClose={closeAlert}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert
           elevation={6}
           variant="filled"
           severity="error"
-          onClose={handleCloseErrorAlert}
+          onClose={closeAlert}
           sx={{ backgroundColor: colors.redAccent[600] }}
         >
-          Rebalancing failed! Please try again.
+          {alert.message}
         </Alert>
       </Snackbar>
 
       {/* Snackbar for success message */}
       <Snackbar
-        open={isSuccessAlertOpen}
+        open={alert.open && alert.type === 'success'}
         autoHideDuration={5000}
-        onClose={handleCloseSuccessAlert}
+        onClose={closeAlert}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert
           elevation={6}
           variant="filled"
           severity="success"
-          onClose={handleCloseSuccessAlert}
+          onClose={closeAlert}
           sx={{ backgroundColor: colors.greenAccent[600] }}
         >
-          Rebalance is done successfully!
+          {alert.message}
         </Alert>
       </Snackbar>
       <Button

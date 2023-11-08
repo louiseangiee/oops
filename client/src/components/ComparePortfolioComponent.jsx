@@ -74,6 +74,7 @@ const ComparePortfolioComponent = () => {
                 </Box>
             </Box>
 
+            {/* <ComparePortfolioChart chosenPortfolio1={chosenPortfolio1} chosenPortfolio2={chosenPortfolio2} /> */}
             <Box
             display="flex"
             flexDirection="row"

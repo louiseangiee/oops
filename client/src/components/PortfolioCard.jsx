@@ -68,7 +68,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                     variant="h4"
                     fontWeight="bold"
                 >
-                    {capital}
+                    ${capital}
                 </Typography>
                 {/* <Typography
                     variant="h4"
@@ -94,7 +94,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                     fontStyle="italic"
                     sx={{ color: colors.grey[300], fontSize: "10px" }}
                 >
-                    Buy Price & Quantity
+                    Buy Price / share
                 </Typography>
             </Box>
             {/* The list of stocks */}
@@ -133,7 +133,7 @@ const PortfolioCard = ({ title, subtitle, capital, returns, stocks, portfolioId 
                                     ${stock.buyPrice}
                                 </Typography>
                                 <Typography variant="h6" sx={{ color: colors.greenAccent[600] }}>
-                                    Qty: {stock.quantity}
+                                    Quantity: {stock.quantity}
                                 </Typography>
                             </Box>
                         </Box>

@@ -338,7 +338,10 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                         {stock.stockIndustry}
                       </Typography>
                       <Typography variant="h6" sx={{ color: colors.grey[100] }}>
-                        Bought on {stock.buyDate} at ${stock.buyPrice}
+                        Buy price: ${stock.buyPrice}
+                      </Typography>
+                      <Typography variant="h6" sx={{ color: colors.grey[100] }}>
+                        Buy date: {stock.buyDate}
                       </Typography>
                     </Box>
                   </Box>
@@ -363,7 +366,7 @@ export default function StocksTabs({ stocks, portfolioId, portfolioData, portfol
                     {stockReturns[stock.stockSymbol] && (
                       <Typography
                         variant="h4"
-                        fontWeight="bold"
+                        fontWeight="semibold"
                         sx={{ color: colors.grey[100] }}
                       >
                         Current Value: $

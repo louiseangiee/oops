@@ -558,9 +558,11 @@ public class PortfolioStockService {
 
         for (PortfolioStock stock : allStocksInPortfolio) {
             String stockSymbol = stock.getStockSymbol();
-            double stockMonthlyVolatility = stockService.calculateMonthlyVolatility(stockSymbol);
-            double stockWeight = calculateStockWeight(portfolioId, stockSymbol);
-            portfolioVolatility += stockWeight * stockMonthlyVolatility;
+            Map<String,Double> stockMonthlyVolatility = stockService.calculateMonthlyVolatility(stockSymbol);
+            double stockMonthlyVolatilityData = stockMonthlyVolatility.get("monthlyVolatility");
+            Map<String,Double> stockWeight = calculateStockWeight(portfolioId, stockSymbol);
+            double stockWeightData = stockWeight.get(stockSymbol);
+            portfolioVolatility += stockWeightData * stockMonthlyVolatilityData;
         }
         stockVolatilities.put("portfolioVolatility", portfolioVolatility);
         return stockVolatilities;

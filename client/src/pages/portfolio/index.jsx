@@ -383,7 +383,7 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: overallReturns > 0 ? 'green' : overallReturns < 0 ? 'red' : colors.grey[100] }}
           >
-            {overallReturns != undefined && percentageReturns != undefined ? (
+            {overallReturns !== undefined && percentageReturns !== undefined ? (
               `${overallReturns < 0 ? '-' : overallReturns > 0 ? '+' : ''}${Math.abs(overallReturns)}/${percentageReturns}%`
             ) : (
               "Loading..."

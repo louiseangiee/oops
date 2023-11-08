@@ -1,6 +1,10 @@
 package com.oop.appa.auth;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.HashMap;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.oop.appa.exception.ErrorResponse;
@@ -46,5 +50,23 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(error);
         }
 
+    }
+
+    @GetMapping("/forgotpassword")
+    @Operation(summary = "Change Password if user verified")
+    @Parameter(name = "email", description = "email of user")
+    @Parameter(name = "password", description = "password of user")
+    public ResponseEntity<?> changePassword(@RequestParam String email, String password) {
+        HashMap<String, String> response = new HashMap<>();
+        try {
+            service.changePassword(email, password);
+            response.put("message", "Password changed successfully");
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage("Error changing password");
+            error.setDetails(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
     }
 }

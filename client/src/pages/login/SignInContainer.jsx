@@ -74,13 +74,18 @@ const SignInContainer = (props) => {
                             {showPassword ? <VisibilityOffIcon style={{ color: 'black' }} /> : <VisibilityIcon style={{ color: 'black' }} />}
                         </Button>
                     </Box>
+                    <Typography variant="h6" mt={1} textAlign={'left'} sx={{ cursor: 'pointer' }}>
+                        <Link color={'#326adf'} onClick={props.moveFP}>
+                            Forgot Password?
+                        </Link>
+                    </Typography>
                 </div>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'black' }}>
                     <Typography variant="h6" mt={1} color={'black'}>Don't have an account?</Typography>
                     <Typography variant="h6" mt={1} color={'black'}>
                         Register with us {" "}
                         <Link
-                            onClick={props.handleSignIn}
+                            onClick={props.moveRegister}
                             sx={{ color: 'black', cursor: 'pointer' }}
                         >
                             here!
@@ -110,6 +115,10 @@ const SignInContainer = (props) => {
                             /> : <> Sign In </>}
                     </Button>
                 </Box>
+                <Box>
+
+                </Box>
+
             </Grid >
         </>
     );

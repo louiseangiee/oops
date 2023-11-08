@@ -16,7 +16,6 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
   // const [portfolioSummaries, setPortfolioSummaries] = useState([]);
   const [portfolioVolatility, setPortfolioVolatility] = useState(null);
   const [portfolioVolatilityAnnual, setPortfolioVolatilityAnnual] = useState(null);
-
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -77,8 +76,8 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
       console.log(responseData);
       console.log(responseDataAnnual);
 
-      setPortfolioVolatility(responseData);
-      setPortfolioVolatilityAnnual(responseDataAnnual);
+      setPortfolioVolatility(responseData.portfolioVolatility);
+      setPortfolioVolatilityAnnual(responseDataAnnual.portfolioVolatility);
     } catch (error) {
       console.error('There was an error fetching the portfolio details:', error);
     }
@@ -99,8 +98,15 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
     }
   }
 
-  const volAnnual = toFixedSafe(portfolioVolatilityAnnual.portfolioVolatility);
-  const vol = toFixedSafe(portfolioVolatility.portfolioVolatility);
+  var volAnnual = null;
+  var vol = null;
+  if (portfolioVolatilityAnnual) {
+    volAnnual = toFixedSafe(portfolioVolatilityAnnual);
+  }
+
+  if (portfolioVolatility) {
+    vol = toFixedSafe(portfolioVolatility);
+  }
   console.log(vol);
 
   function getOverallReturn(portfolioSummaries) {
@@ -132,7 +138,7 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
 
   console.log(summary);
 
-  const overallReturn = getOverallReturn(portfolioSummaries).overallReturn;
+  const overallReturn = getOverallReturn(portfolioSummaries).overalReturn;
   const overallReturnPercentage = getOverallReturn(portfolioSummaries).percentage;
 
   useEffect(() => {
@@ -203,7 +209,7 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
                 Volatility (Monthly):
               </Typography>
               <Typography variant="h3" fontWeight="bold">
-                {vol}
+                {(vol * 100).toFixed(2)}%
               </Typography>
             </Box>
             <Box flex={1} margin={1}>
@@ -211,7 +217,7 @@ const StockAnalytics = ({ portfolioData, portfolioSummaries }) => {
                 Volatility Annualized:
               </Typography>
               <Typography variant="h3" fontWeight="bold">
-                {volAnnual}
+                {(volAnnual * 100).toFixed(2)}%
               </Typography>
             </Box>
           </Box>

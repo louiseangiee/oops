@@ -78,8 +78,8 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
       console.log(responseData);
       console.log(responseDataAnnual);
 
-      setPortfolioVolatility(responseData);
-      setPortfolioVolatilityAnnual(responseDataAnnual);
+      setPortfolioVolatility(responseData.portfolioVolatility);
+      setPortfolioVolatilityAnnual(responseDataAnnual.portfolioVolatility);
     } catch (error) {
       console.error('There was an error fetching the portfolio details:', error);
     }
@@ -132,7 +132,7 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
 
   console.log(summary);
 
-  const overallReturn = getOverallReturn(portfolioSummaries).overallReturn;
+  const overallReturn = getOverallReturn(portfolioSummaries).overalReturn;
   const overallReturnPercentage = getOverallReturn(portfolioSummaries).percentage;
 
   useEffect(() => {
@@ -203,7 +203,7 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
                 Volatility (Monthly):
               </Typography>
               <Typography variant="h3" fontWeight="bold">
-                {vol}
+                {(vol * 100).toFixed(2)}%
               </Typography>
             </Box>
             <Box flex={1} margin={1}>
@@ -211,7 +211,7 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
                 Volatility Annualized:
               </Typography>
               <Typography variant="h3" fontWeight="bold">
-                {volAnnual}
+                {(volAnnual * 100).toFixed(2)}%
               </Typography>
             </Box>
           </Box>

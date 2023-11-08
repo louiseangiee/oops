@@ -27,6 +27,15 @@ export default function EditPortfolio({ portfolioId, small }) {
     const [isDescriptionEdited, setIsDescriptionEdited] = useState(false);
     const [isCapitalEdited, setIsCapitalEdited] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [alert, setAlert] = useState({ open: false, type: '', message: '' });
+
+    const showAlert = (type, message) => {
+        setAlert({ open: true, type, message });
+    };
+
+    const closeAlert = () => {
+        setAlert({ open: false, type: '', message: '' });
+    };
 
     useEffect(() => {
         // Fetch the portfolio data based on portfolioId
@@ -64,27 +73,6 @@ export default function EditPortfolio({ portfolioId, small }) {
         setIsCapitalEdited(false);
     };
 
-    // error alert handler
-    const handleOpenErrorAlert = () => {
-        setIsErrorAlertOpen(true);
-        setIsSuccessAlertOpen(false);
-    };
-    const handleCloseErrorAlert = () => {
-        setIsErrorAlertOpen(false);
-    };
-
-    // success alert handler
-    const handleOpenSuccessAlert = () => {
-        setIsSuccessAlertOpen(true);
-        setIsErrorAlertOpen(false);
-
-    };
-    const handleCloseSuccessAlert = () => {
-        setIsSuccessAlertOpen(false);
-    };
-
-
-
     const handleChanges = () => {
         // Gather the form data (e.g., portfolio name, description, capital)
         setLoading(true);
@@ -111,21 +99,26 @@ export default function EditPortfolio({ portfolioId, small }) {
         setLoading(true);
 
         async function editPortfolio() {
-            const response = await putAsync('portfolios/' + portfolioId, formData, cookie.accessToken);
-            if (response.ok) {
+            try {
+                const response = await putAsync('portfolios/' + portfolioId, formData, cookie.accessToken);
+                if (response.ok) {
+                    setLoading(false);
+                    showAlert('success', 'Porfolio is successfully edited!');
+                    handleClose();
+                } else {
+                    throw response;
+                }
+            }
+            catch (err) {
                 setLoading(false);
-                handleOpenSuccessAlert();
-                setOpen(false);
-                setUpdatedCapital('');
-                setUpdatedDescription('');
-                setUpdatedName('');
-                setIsNameEdited(false);
-                setIsDescriptionEdited(false);
-                setIsCapitalEdited(false);
-                return;
-            } else {
-                setLoading(false);
-                handleOpenErrorAlert();
+                handleClose();
+                err.json().then(errorDetails => {
+                    const error_message = errorDetails.details?.split(":")[1];
+                    showAlert('error', "Error:" + error_message);
+                }).catch(jsonError => {
+                    console.log(jsonError);
+                    showAlert('error', "An error occurred");
+                });
             }
         }
         editPortfolio();
@@ -135,37 +128,37 @@ export default function EditPortfolio({ portfolioId, small }) {
         <div>
             {/* Snackbar for error message */}
             <Snackbar
-                open={isErrorAlertOpen}
+                open={alert.open && alert.type === 'error'}
                 autoHideDuration={5000}
-                onClose={handleCloseErrorAlert}
+                onClose={closeAlert}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
                 <Alert
                     elevation={6}
                     variant="filled"
                     severity="error"
-                    onClose={handleCloseErrorAlert}
+                    onClose={closeAlert}
                     sx={{ backgroundColor: colors.redAccent[600] }}
                 >
-                    Portfolio update failed!
+                    {alert.message}
                 </Alert>
             </Snackbar>
 
             {/* Snackbar for success message */}
             <Snackbar
-                open={isSuccessAlertOpen}
+                open={alert.open && alert.type === 'success'}
                 autoHideDuration={5000}
-                onClose={handleCloseSuccessAlert}
+                onClose={closeAlert}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
                 <Alert
                     elevation={6}
                     variant="filled"
                     severity="success"
-                    onClose={handleCloseSuccessAlert}
+                    onClose={closeAlert}
                     sx={{ backgroundColor: colors.greenAccent[600] }}
                 >
-                    Portfolio updated successfully!
+                    {alert.message}
                 </Alert>
             </Snackbar>
             <EditOutlinedIcon onClick={handleClickOpen} sx={{ color: colors.greenAccent[600], fontSize: (small ? "20px" : "35px") }} />
@@ -226,7 +219,8 @@ export default function EditPortfolio({ portfolioId, small }) {
                         error={capitalError && isCapitalEdited} // Show error only if edited
                         helperText={capitalError && isCapitalEdited ? 'Invalid capital value' : ''}
                     />
-                    <style jsx>{`
+                    <style>
+                        {`
                         .portfolio-name-outline {
                             color: ${colors.greenAccent[800]} !important;
                             border-color: ${colors.greenAccent[800]} !important;

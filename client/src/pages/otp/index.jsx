@@ -91,7 +91,7 @@ const OTP = () => {
     return (
         <main className="content">
             <Grid container sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-                <Box container>
+                <Box>
                     <Typography variant="h1" sx={{ fontWeight: 'bold' }}>Enter code from your email</Typography>
                     <Typography variant="h5" sx={{ wordWrap: 'wrap' }}>We have sent an email to you. Please check your inbox and enter the code you receive to verify your email address.</Typography>
                     <Box mt={2} px={5}>

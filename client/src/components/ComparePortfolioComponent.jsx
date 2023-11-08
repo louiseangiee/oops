@@ -20,8 +20,6 @@ const ComparePortfolioComponent = () => {
         setChosenPortfolio1(newValue || null);
     };
 
-    console.log(chosenPortfolio1)
-
     //FOR THE SECOND PORTFOLIO
     const [chosenPortfolio2, setChosenPortfolio2] = useState({ name: "" });
 
@@ -76,13 +74,13 @@ const ComparePortfolioComponent = () => {
 
             {/* <ComparePortfolioChart chosenPortfolio1={chosenPortfolio1} chosenPortfolio2={chosenPortfolio2} /> */}
             <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems="center"
+                display="flex"
+                flexDirection="row"
+                justifyContent="space-between"
+                alignItems="center"
             >
-            <ComparePortfolioSingle chosenPortfolio={chosenPortfolio1} />
-            <ComparePortfolioSingle chosenPortfolio={chosenPortfolio2} />
+                <ComparePortfolioSingle chosenPortfolio={chosenPortfolio1} />
+                <ComparePortfolioSingle chosenPortfolio={chosenPortfolio2} />
             </Box>
 
 

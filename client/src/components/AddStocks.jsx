@@ -170,7 +170,6 @@ export default function AddStocks({ portfolioId }) {
         }
         try {
             const response = await postAsync(`portfolioStocks/${portfolioId}`, data, cookie.accessToken);
-            console.log(response);
             if (response.ok) {
                 setLoading(false);
                 showAlert('success', 'Stock added successfully!');
@@ -182,7 +181,6 @@ export default function AddStocks({ portfolioId }) {
         }
         catch (err) {
             handleClose();
-            console.log(err);
             err.json().then(errorDetails => {
                 const error_message = errorDetails.details?.split(":")[1];
                 showAlert('error', "Error:" + error_message);
@@ -290,7 +288,6 @@ export default function AddStocks({ portfolioId }) {
                             { readOnly: true }
                         }
                         placeholder="e.g. 20"
-                        startAdornment="$"
                         fullWidth
                         value={priceLoading ? 'Loading...' : 'Stock price: $' + stockPrice}
                         sx={{

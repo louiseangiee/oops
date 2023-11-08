@@ -1,21 +1,34 @@
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Box, Button, Typography, useTheme, Link, Snackbar, Alert } from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  Box,
+  Button,
+  Typography,
+  useTheme,
+  Link,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import { tokens } from "../../theme";
-import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Breadcrumbs from "@mui/material/Breadcrumbs";
 import EditPortfolio from "../../components/EditPortfolio";
 import StocksTabs from "../../components/StocksTabs";
-import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { deleteAsync, getAsync } from "../../utils/utils";
 import { useAuth } from "../../context/AuthContext";
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { useNavigate } from 'react-router-dom';
-import Lottie from 'lottie-react';
-import noDataAnimation from './no_data.json';
-import Loading from './fetching_data.json';
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { useNavigate } from "react-router-dom";
+import Lottie from "lottie-react";
+import noDataAnimation from "./no_data.json";
+import Loading from "./fetching_data.json";
 import loadingLight from "./loading_light.json";
 import RebalanceModal from "../../components/RebalanceModal";
-
 
 function DeletePortfolio() {
   const theme = useTheme();
@@ -33,7 +46,10 @@ function DeletePortfolio() {
   // Fetch the portfolio data based on portfolioId
   useEffect(() => {
     async function fetchData() {
-      const response = await getAsync('portfolios/' + portfolioId, cookie.accessToken);
+      const response = await getAsync(
+        "portfolios/" + portfolioId,
+        cookie.accessToken
+      );
       const data = await response.json();
       setPortfolioData(data);
     }
@@ -61,20 +77,25 @@ function DeletePortfolio() {
   const handleOpenSuccessAlert = () => {
     setIsSuccessAlertOpen(true);
     setIsErrorAlertOpen(false);
-
   };
   const handleCloseSuccessAlert = () => {
     setIsSuccessAlertOpen(false);
   };
 
   const handleDelete = async () => {
-    if (document.getElementById('confirm-deletion').value !== portfolioData['name']) {
+    if (
+      document.getElementById("confirm-deletion").value !==
+      portfolioData["name"]
+    ) {
       handleOpenErrorAlert();
       setOpen(false);
       return;
     }
     setLoading(true);
-    const response = await deleteAsync('portfolios/' + portfolioData['portfolioId'], cookie.accessToken);
+    const response = await deleteAsync(
+      "portfolios/" + portfolioData["portfolioId"],
+      cookie.accessToken
+    );
     if (response.ok) {
       // when deleted, navigate to home page
       setLoading(false);
@@ -87,8 +108,7 @@ function DeletePortfolio() {
       setOpen(false);
       return;
     }
-
-  }
+  };
 
   return (
     <div>
@@ -97,7 +117,7 @@ function DeletePortfolio() {
         open={isErrorAlertOpen}
         autoHideDuration={5000}
         onClose={handleCloseErrorAlert}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
           elevation={6}
@@ -115,7 +135,7 @@ function DeletePortfolio() {
         open={isSuccessAlertOpen}
         autoHideDuration={5000}
         onClose={handleCloseSuccessAlert}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
           elevation={6}
@@ -128,19 +148,26 @@ function DeletePortfolio() {
         </Alert>
       </Snackbar>
 
-      <DeleteOutlineOutlinedIcon sx={{ color: colors.redAccent[600], fontSize: "35px" }} onClick={handleClickOpen} />
+      <DeleteOutlineOutlinedIcon
+        sx={{ color: colors.redAccent[600], fontSize: "35px" }}
+        onClick={handleClickOpen}
+      />
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle sx={{
-          color: colors.greenAccent[600],
-          backgroundColor: colors.primary[400],
-          fontSize: "22px",
-          fontWeight: "bold"
-        }}>
+        <DialogTitle
+          sx={{
+            color: colors.greenAccent[600],
+            backgroundColor: colors.primary[400],
+            fontSize: "22px",
+            fontWeight: "bold",
+          }}
+        >
           Confirm Deletion of Portfolio
         </DialogTitle>
         <DialogContent sx={{ backgroundColor: colors.primary[400] }}>
           <DialogContentText>
-            Please confirm that you would like to delete this portfolio by entering the name of the portfolio down below. Do note that this action cannot be undone.
+            Please confirm that you would like to delete this portfolio by
+            entering the name of the portfolio down below. Do note that this
+            action cannot be undone.
           </DialogContentText>
           <TextField
             autoFocus
@@ -153,37 +180,47 @@ function DeletePortfolio() {
             sx={{ color: colors.grey[100] }}
           />
         </DialogContent>
-        <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "30px", paddingRight: "20px" }}>
+        <DialogActions
+          sx={{
+            backgroundColor: colors.primary[400],
+            paddingBottom: "30px",
+            paddingRight: "20px",
+          }}
+        >
           <Button
             onClick={handleClose}
             sx={{
               color: colors.grey[300],
-              fontWeight: "bold"
-            }}>
+              fontWeight: "bold",
+            }}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleDelete}
             sx={{
-              backgroundColor: loading ? colors.redAccent[700] : colors.redAccent[600],
+              backgroundColor: loading
+                ? colors.redAccent[700]
+                : colors.redAccent[600],
               color: colors.grey[100],
               fontWeight: "bold",
               height: "40px",
               width: "80px",
               ":hover": {
-                backgroundColor: colors.redAccent[700]
-              }
-            }}>
-            {loading ?
+                backgroundColor: colors.redAccent[700],
+              },
+            }}
+          >
+            {loading ? (
               <Lottie
                 animationData={loadingLight}
                 loop={true}
                 autoplay={true}
-                style={{ width: '80px', height: '80px' }}
+                style={{ width: "80px", height: "80px" }}
               />
-              :
+            ) : (
               "Delete"
-            }
+            )}
           </Button>
         </DialogActions>
       </Dialog>
@@ -206,12 +243,17 @@ const Portfolio = () => {
   const [overallReturns, setOverallReturns] = useState(0);
   const [percentageReturns, setPercentageReturns] = useState(0);
   const [refreshIntervalId, setRefreshIntervalId] = useState(null);
+  const [totalPortfolioValue, setTotalPortfolioValue] = useState(0);
+  const [stockReturns, setStockReturns] = useState({});
 
   // Fetch portfolio data
   const fetchPortfolioData = async () => {
     if (userData && portfolioId) {
       if (userData.role === "ROLE_ADMIN") {
-        const response = await getAsync(`portfolios/${portfolioId}`, cookie.accessToken);
+        const response = await getAsync(
+          `portfolios/${portfolioId}`,
+          cookie.accessToken
+        );
         if (!response.ok) {
           // Handle the case when the response is not OK, for example, show an error message.
           setPortfolioData(null);
@@ -222,7 +264,10 @@ const Portfolio = () => {
         setPortfolioData(data);
         setIsLoading(false); // Data is loaded, set isLoading to false
       } else if (userData.role === "ROLE_USER") {
-        const response = await getAsync(`portfolios/${userData.id}/${portfolioId}`, cookie.accessToken);
+        const response = await getAsync(
+          `portfolios/${userData.id}/${portfolioId}`,
+          cookie.accessToken
+        );
         if (!response.ok) {
           // Handle the case when the response is not OK, for example, show an error message.
           setPortfolioData(null);
@@ -231,36 +276,42 @@ const Portfolio = () => {
         }
         const data = await response.json();
         setPortfolioData(data);
+        console.log(portfolioData);
         setIsLoading(false); // Data is loaded, set isLoading to false
       }
     }
   };
 
-
   // Fetch Portfolio Returns
   const fetchPortfolioSummaryData = async () => {
-    const portfolioSummaryResponse = await getAsync(`portfolioStocks/${portfolioId}/summary`, cookie.accessToken);
+    const portfolioSummaryResponse = await getAsync(
+      `portfolioStocks/${portfolioId}/summary`,
+      cookie.accessToken
+    );
     const portfolioSummaryData = await portfolioSummaryResponse.json();
     if (Object.keys(portfolioSummaryData.overallReturns).length === 0) {
       setOverallReturns(0);
       setPercentageReturns(0);
+      setTotalPortfolioValue(0);
+      setStockReturns({});
       setSummaryLoading(false);
-    }
-    else {
+    } else {
       setOverallReturns(portfolioSummaryData.overallReturns.overalReturn);
       setPercentageReturns(portfolioSummaryData.overallReturns.percentage);
+      setTotalPortfolioValue(portfolioSummaryData.totalPortfolioValue);
+      setStockReturns(portfolioSummaryData.stockReturns);
       setSummaryLoading(false);
     }
-  }
+  };
 
   // Fetch data on initial component load
   useEffect(() => {
     const fetchData = () => {
       fetchPortfolioData();
       fetchPortfolioSummaryData();
-    }
+    };
 
-    fetchData()
+    fetchData();
     // Set up an interval to periodically fetch data (e.g., every 30 seconds)
     const intervalId = setInterval(fetchData, 30000); // Adjust the interval as needed
     setRefreshIntervalId(intervalId);
@@ -273,26 +324,49 @@ const Portfolio = () => {
   }, [portfolioId, userData]);
 
   const breadcrumbs = [
-    <Link underline="hover" key="1" color="inherit" href="/" sx={{ fontSize: "22px" }}>
+    <Link
+      underline="hover"
+      key="1"
+      color="inherit"
+      href="/"
+      sx={{ fontSize: "22px" }}
+    >
       <h1>PORTFOLIOS</h1>
     </Link>,
     <Typography key="2" color="text.primary" sx={{ fontSize: "22px" }}>
-      <h1>{portfolioData && portfolioData['name'] ? portfolioData['name'] : "Loading..."}</h1>
+      <h1>
+        {portfolioData && portfolioData["name"]
+          ? portfolioData["name"]
+          : "Loading..."}
+      </h1>
     </Typography>,
   ];
 
   //no data or no access
   if (!portfolioData) {
     return (
-      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="80%">
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        height="80%"
+      >
         <Lottie
           animationData={noDataAnimation}
           loop={true} // Set to true for looping
           autoplay={true} // Set to true to play the animation automatically
           style={{ width: 300, height: 300 }}
         />
-        <Typography variant="h4" fontWeight="600" color={colors.grey[100]} mb="20px" textAlign={"center"}>
-          Sorry, we couldn't find the portfolio you're looking for! <br />Either this portfolio doesn't exist or you don't have access to it.
+        <Typography
+          variant="h4"
+          fontWeight="600"
+          color={colors.grey[100]}
+          mb="20px"
+          textAlign={"center"}
+        >
+          Sorry, we couldn't find the portfolio you're looking for! <br />
+          Either this portfolio doesn't exist or you don't have access to it.
         </Typography>
       </Box>
     );
@@ -300,7 +374,13 @@ const Portfolio = () => {
 
   if (isLoading) {
     return (
-      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="80%">
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        height="80%"
+      >
         <Lottie
           animationData={Loading}
           loop={true}
@@ -316,11 +396,22 @@ const Portfolio = () => {
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box display="flex" flexDirection="column" alignItems="flex-start">
-          <Breadcrumbs separator="/" aria-label="breadcrumb" sx={{ height: "75px" }}>
+          <Breadcrumbs
+            separator="/"
+            aria-label="breadcrumb"
+            sx={{ height: "75px" }}
+          >
             {breadcrumbs}
           </Breadcrumbs>
-          <Typography variant="h5" fontWeight="600" color={colors.grey[100]} mb="20px">
-            {portfolioData && portfolioData['description'] ? portfolioData['description'] : 'Loading...'}
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            color={colors.grey[100]}
+            mb="20px"
+          >
+            {portfolioData && portfolioData["description"]
+              ? portfolioData["description"]
+              : "Loading..."}
           </Typography>
         </Box>
 
@@ -340,7 +431,7 @@ const Portfolio = () => {
       >
         {/* ROW 1 */}
         <Box
-          gridColumn="span 4"
+          gridColumn="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="flex-start"
@@ -362,45 +453,14 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            ${portfolioData && portfolioData['totalCapital'] ? portfolioData['totalCapital'].toFixed(2) : '-'}
+            $
+            {portfolioData && portfolioData["totalCapital"]
+              ? portfolioData["totalCapital"].toFixed(2)
+              : "-"}
           </Typography>
-
         </Box>
         <Box
-          gridColumn="span 4"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="flex-start"
-          justifyContent="center"
-          flexDirection="column"
-          gap="5px"
-          pl="20px"
-          borderRadius="10px"
-        >
-          <Typography
-            variant="h6"
-            fontStyle="italic"
-            sx={{ color: colors.grey[300] }}
-          >
-            Return
-          </Typography>
-
-          <Typography
-            variant="h1"
-            fontWeight="bold"
-            sx={{ color: overallReturns > 0 ? 'green' : overallReturns < 0 ? 'red' : colors.grey[100] }}
-          >
-            {!summaryLoading ? (
-              `${overallReturns < 0 ? '-' : overallReturns > 0 ? '+' : ''}$${Math.abs(overallReturns).toFixed(2)}/${percentageReturns.toFixed(2)}%`
-            ) : (
-              "Loading..."
-            )}
-          </Typography>
-
-
-        </Box>
-        <Box
-          gridColumn="span 4"
+          gridColumn="span 3"
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="flex-start"
@@ -422,9 +482,83 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            ${portfolioData && portfolioData['remainingCapital'] ? portfolioData['remainingCapital'].toFixed(2) : '-'}
+            $
+            {portfolioData && portfolioData["remainingCapital"]
+              ? portfolioData["remainingCapital"].toFixed(2)
+              : "0.00"}
+          </Typography>
+        </Box>
+        <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="flex-start"
+          justifyContent="center"
+          flexDirection="column"
+          gap="5px"
+          pl="20px"
+          borderRadius="10px"
+        >
+          <Typography
+            variant="h6"
+            fontStyle="italic"
+            sx={{ color: colors.grey[300] }}
+          >
+            Return
           </Typography>
 
+          <Typography
+            variant="h1"
+            fontWeight="bold"
+            sx={{
+              color:
+                overallReturns > 0
+                  ? "green"
+                  : overallReturns < 0
+                  ? "red"
+                  : colors.grey[100],
+            }}
+          >
+            {!summaryLoading
+              ? `${
+                  overallReturns < 0 ? "-" : overallReturns > 0 ? "+" : ""
+                }$${Math.abs(overallReturns).toFixed(
+                  2
+                )}/${percentageReturns.toFixed(2)}%`
+              : "Loading..."}
+          </Typography>
+        </Box>
+
+        <Box
+          gridColumn="span 3"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="flex-start"
+          justifyContent="center"
+          flexDirection="column"
+          gap="5px"
+          pl="20px"
+          borderRadius="10px"
+        >
+          <Typography
+            variant="h6"
+            fontStyle="italic"
+            sx={{ color: colors.grey[300] }}
+          >
+            Overall Portfolio Value
+          </Typography>
+          <Typography
+            variant="h1"
+            fontWeight="bold"
+            sx={{ color: colors.grey[100] }}
+          >
+            $
+            {!summaryLoading
+              ? `${Math.abs(totalPortfolioValue).toFixed(
+                  2
+                )}`
+              : "Loading..."}
+          </Typography>
         </Box>
 
         {/* ROW 2 */}
@@ -434,7 +568,12 @@ const Portfolio = () => {
           backgroundColor={colors.primary[400]}
         >
           <StocksTabs
-            stocks={portfolioData['portfolioStocks'] ? portfolioData['portfolioStocks'] : null}
+            stocks={
+              portfolioData["portfolioStocks"]
+                ? portfolioData["portfolioStocks"]
+                : null
+            }
+            stockReturns={stockReturns? stockReturns:null}
             portfolioId={portfolioId}
           />
         </Box>

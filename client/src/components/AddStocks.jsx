@@ -16,6 +16,7 @@ import { getAsync, postAsync } from '../utils/utils';
 import { useCookies } from 'react-cookie';
 import { isAHoliday } from '@18f/us-federal-holidays';
 import dayjs from 'dayjs';
+import { useEffect } from 'react';
 
 
 
@@ -87,6 +88,7 @@ export default function AddStocks({ portfolioId }) {
     const [error, setError] = useState("");
     const [isErrorAlertOpen, setIsErrorAlertOpen] = useState(false);
     const [isSuccessAlertOpen, setIsSuccessAlertOpen] = useState(false);
+    const [totalPrice, setTotalPrice] = useState(0);
 
     // error alert handler
     const handleOpenErrorAlert = () => {
@@ -121,6 +123,7 @@ export default function AddStocks({ portfolioId }) {
         setStockPrice(0);
         setError("");
         setLoading(false);
+        setTotalPrice(0);
     };
 
     const handleStockChange = async (newValue) => {
@@ -156,6 +159,9 @@ export default function AddStocks({ portfolioId }) {
         }
     }
 
+    useEffect(() => {
+        setTotalPrice(stockPrice * stockQuantity);
+    }, [stockPrice, stockQuantity]);
 
     const handleAddClick = async () => {
         setLoading(true);
@@ -316,6 +322,7 @@ export default function AddStocks({ portfolioId }) {
                         value={stockQuantity}
                         onChange={(e) => setStockQuantity(e.target.value)}
                     />
+                    <Typography sx={{ color: colors.grey[100], fontSize: "12px" }}>Total Price: ${totalPrice.toFixed(2)}</Typography>
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: colors.primary[400], paddingBottom: "20px", paddingRight: "20px" }}>
                     <Button onClick={handleClose} sx={{ color: colors.grey[300], fontWeight: "bold" }}>Cancel</Button>

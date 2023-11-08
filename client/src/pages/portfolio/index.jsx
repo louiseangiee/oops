@@ -589,6 +589,9 @@ const Portfolio = () => {
               <Typography
                 variant="h2"
                 fontWeight="bold"
+                position='absolute'
+                bottom='10px'
+                left='15px'
                 sx={{
                   color:
                     overallReturns > 0

@@ -15,6 +15,7 @@ public class CacheConfig {
             "oneYearData", 
             "portfolioVolatility", 
             "annualizedVolatility",
-            "AnnualizedportfolioVolatility");
+            "AnnualizedportfolioVolatility",
+            "portfolioList");
     }
 }

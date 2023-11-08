@@ -255,7 +255,7 @@ public class StockController {
     @GetMapping("/calculateMonthlyVolatility")
     public ResponseEntity<?> calculateMonthlyVolatility(@RequestParam String symbol) {
         try {
-            double volatility = stockService.calculateMonthlyVolatility(symbol);
+            Map<String,Double> volatility = stockService.calculateMonthlyVolatility(symbol);
             return ResponseEntity.ok(volatility);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
@@ -270,7 +270,7 @@ public class StockController {
     @GetMapping("/calculateAnnualizedVolatility")
     public ResponseEntity<?> calculateAnnualizedVolatility(@RequestParam String symbol) {
         try {
-            double annualizedVolatility = stockService.calculateAnnualizedVolatility(symbol);
+            Map<String,Double> annualizedVolatility = stockService.calculateAnnualizedVolatility(symbol);
             return ResponseEntity.ok(annualizedVolatility);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();

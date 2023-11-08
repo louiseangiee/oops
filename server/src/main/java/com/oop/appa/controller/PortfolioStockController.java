@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -191,7 +189,7 @@ public class PortfolioStockController {
     public ResponseEntity<?> getStockWeight(@PathVariable Integer portfolioId,
             @PathVariable String stockSymbol) {
         try {
-            double stockWeight = portfolioStockService.calculateStockWeight(portfolioId, stockSymbol);
+            Map<String,Double> stockWeight = portfolioStockService.calculateStockWeight(portfolioId, stockSymbol);
             return ResponseEntity.ok(stockWeight);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
@@ -208,7 +206,7 @@ public class PortfolioStockController {
     public ResponseEntity<?> calculateWeightedStockReturn(@PathVariable Integer portfolioId,
             @PathVariable String stockSymbol) {
         try {
-            double weightedReturn = portfolioStockService.calculateWeightedStockReturn(portfolioId, stockSymbol);
+            Map<String, Double> weightedReturn = portfolioStockService.calculateWeightedStockReturn(portfolioId, stockSymbol);
             return ResponseEntity.ok(weightedReturn);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
@@ -224,7 +222,7 @@ public class PortfolioStockController {
     public ResponseEntity<?> calculateAnnualisedReturn(@PathVariable Integer portfolioId,
             @PathVariable String stockSymbol) {
         try {
-            double annualisedReturn = portfolioStockService.calculateAnnualisedReturn(portfolioId, stockSymbol);
+            Map<String,Double> annualisedReturn = portfolioStockService.calculateAnnualisedReturn(portfolioId, stockSymbol);
             return ResponseEntity.ok(annualisedReturn);
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse();
@@ -254,9 +252,9 @@ public class PortfolioStockController {
 
     @Operation(summary = "Get the monthly volatility of a portfolio")
     @GetMapping("/{portfolioId}/volatility")
-    public ResponseEntity<Double> getPortfolioMonthlyVolatility(@PathVariable Integer portfolioId) {
+    public ResponseEntity<?> getPortfolioMonthlyVolatility(@PathVariable Integer portfolioId) {
         try {
-            double volatility = portfolioStockService.calculatePortfolioMonthlyVolatility(portfolioId);
+            Map<String, Double> volatility = portfolioStockService.calculatePortfolioMonthlyVolatility(portfolioId);
             return ResponseEntity.ok(volatility);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
@@ -267,9 +265,9 @@ public class PortfolioStockController {
 
     @Operation(summary = "Get the annualized volatility of a portfolio")
     @GetMapping("/{portfolioId}/volatility/annualized")
-    public ResponseEntity<Double> getPortfolioAnnualizedVolatility(@PathVariable Integer portfolioId) {
+    public ResponseEntity<?> getPortfolioAnnualizedVolatility(@PathVariable Integer portfolioId) {
         try {
-            double volatility = portfolioStockService.calculatePortfolioAnnualizedVolatility(portfolioId);
+            Map<String, Double> volatility = portfolioStockService.calculatePortfolioAnnualizedVolatility(portfolioId);
             return ResponseEntity.ok(volatility);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '@mui/material/styles';
-import { ButtonGroup, Button } from '@mui/material';
+import { ButtonGroup, Button, Table, TableContainer, TableBody, TableHead, TableCell, Paper, TableRow } from '@mui/material';
 import { tokens } from "../theme";
 import { colors } from '@mui/material';
 import { getAsync } from '../utils/utils';
@@ -24,9 +24,11 @@ const CustomTooltip = ({ active, payload, label }) => {
 const StockChart = ({ chosenStock }) => {
   const [chartData, setChartData] = useState([]);
   const [timeSpan, setTimeSpan] = useState("1Y");
+  
   const [cookie] = useCookies()
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  
 
 
 
@@ -36,65 +38,63 @@ const StockChart = ({ chosenStock }) => {
   }, [chosenStock, timeSpan]);
 
   const fetchData = async () => {
-    let endpoint = 'stocks/oneYearData';  // Default to 1 year data
+    console.log(timeSpan)
+    let endpointMarket = `stocks/dailyPriceTimePeriod?symbol=${chosenStock.code}&period=year`;  // Default to 1 year data
+   
 
     switch (timeSpan) {
       case "1Y":
-        endpoint = 'stocks/oneYearData';
+        endpointMarket = `stocks/dailyPriceTimePeriod?symbol=${chosenStock.code}&period=year`;
+        
         break;
       case "1Q":
-        endpoint = 'stocks/oneQuarterData';
+        endpointMarket = `stocks/dailyPriceTimePeriod?symbol=${chosenStock.code}&period=quarter`;
+
         break;
       case "1M":
-        endpoint = 'stocks/oneMonthData';
+        endpointMarket = `stocks/dailyPriceTimePeriod?symbol=${chosenStock.code}&period=month`;
         break;
       case "1W":
-        endpoint = 'stocks/oneWeekData';
+        endpointMarket = `stocks/dailyPriceTimePeriod?symbol=${chosenStock.code}&period=week`;
         break;
       default:
-        endpoint = 'stocks';
+        endpointMarket = 'stocks';
     }
 
     try {
-      console.log(endpoint)
+      console.log(endpointMarket)
       console.log(chosenStock.code)
       
-      const response = await getAsync(`${endpoint}?symbol=${chosenStock.code}`, cookie.accessToken); // Use the accessToken from cookies
-      console.log(response)
+      // Create an array of promises for each API call
+      
+       
+      
+    
+      // Use Promise.all to execute all requests concurrently
+      const response = await getAsync(`${endpointMarket}`, cookie.accessToken)
+      // Check all responses - if any request failed, throw an error
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      const responseData = await response.json();
-      console.log(responseData)
+    
+      // Parse JSON for all responses
+      const data = await response.json();
+      const newChartData = [];
+      // Assuming the first response is the one with the data we need to map for the chart
+      Object.entries(data).forEach(([key, value]) => {
+        newChartData.push({
+          time: key,
+          value: value
+        });
+      });
 
-      const data = responseData.map(item => ({
-        time: item.date,
-        value: parseFloat(item["4. close"])
-      }));
-      
-      setChartData(data.reverse());
+      setChartData(newChartData);
     } catch (error) {
       console.error("Failed to fetch stock data:", error);
     }
+    
   };
 
-  // const getTicks = (data) => {
-  //   const values = data.map(item => item.value);
-  //   const dataMin = Math.max(0,Math.min(...values) - 10);
-  //   const dataMax = Math.max(...values) + 10;
-  //   const interval = (dataMax - dataMin) / 5;
-
-  //   const ticks = [];
-  //   for (let i = 0; i <= 5; i++) {
-  //     ticks.push(Math.round(dataMin + interval * i));
-  //   }
-
-  //   return ticks;
-  // };
-
-  // const ticks = getTicks(chartData);
-  // const domainMin = Math.max(0,Math.min(...ticks) - 10);
-  // const domainMax = Math.max(...ticks) + 10;
 
   const [selectedPoint, setSelectedPoint] = useState(null);
 
@@ -156,6 +156,8 @@ const StockChart = ({ chosenStock }) => {
           <Area type="monotone" dataKey="value" stroke={colors.redAccent[400]} fill={colors.redAccent[500]} />
         </AreaChart>
       </ResponsiveContainer>
+
+      
     </div>
   );
 };

@@ -552,7 +552,7 @@ public class PortfolioStockService {
         return portfolioVolatility;
     }
 
-    // @Cacheable(value = "AnnualizedportfolioVolatility", key = "#portfolioId")
+    @Cacheable(value = "AnnualizedportfolioVolatility", key = "#portfolioId")
     public double calculatePortfolioAnnualizedVolatility(Integer portfolioId) {
         double monthlyVolatility = calculatePortfolioMonthlyVolatility(portfolioId);
         double annualizedVolatility = monthlyVolatility * Math.sqrt(12);

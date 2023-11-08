@@ -15,6 +15,7 @@ public class CacheConfig {
         return new ConcurrentMapCacheManager(
             "oneYearData", 
             "portfolioVolatility", 
-            "annualizedVolatility");
+            "annualizedVolatility",
+            "AnnualizedportfolioVolatility");
     }
 }

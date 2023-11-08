@@ -92,6 +92,7 @@ public class PortfolioStockService {
     }
 
     // POST
+    @Transactional
     public PortfolioStock createPortfolioStock(PortfolioStockCreationDTO dto) {
         try {
             // Validate DTO

@@ -362,7 +362,7 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            ${portfolioData && portfolioData['totalCapital'] ? portfolioData['totalCapital'] : '-'}
+            ${portfolioData && portfolioData['totalCapital'] ? portfolioData['totalCapital'].toFixed(2) : '-'}
           </Typography>
 
         </Box>
@@ -391,7 +391,7 @@ const Portfolio = () => {
             sx={{ color: overallReturns > 0 ? 'green' : overallReturns < 0 ? 'red' : colors.grey[100] }}
           >
             {!summaryLoading ? (
-              `${overallReturns < 0 ? '-' : overallReturns > 0 ? '+' : ''}${Math.abs(overallReturns)}/${percentageReturns}%`
+              `${overallReturns < 0 ? '-' : overallReturns > 0 ? '+' : ''}$${Math.abs(overallReturns).toFixed(2)}/${percentageReturns.toFixed(2)}%`
             ) : (
               "Loading..."
             )}
@@ -422,7 +422,7 @@ const Portfolio = () => {
             fontWeight="bold"
             sx={{ color: colors.grey[100] }}
           >
-            ${portfolioData && portfolioData['remainingCapital'] ? portfolioData['remainingCapital'] : '-'}
+            ${portfolioData && portfolioData['remainingCapital'] ? portfolioData['remainingCapital'].toFixed(2) : '-'}
           </Typography>
 
         </Box>

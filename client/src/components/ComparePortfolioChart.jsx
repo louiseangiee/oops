@@ -435,7 +435,7 @@ const ComparePortfolioChart = ({ chosenPortfolio1, chosenPortfolio2 }) => {
           <br />
           <Divider />
           <br />
-          <ReturnsTable stockData={portfolioData2} stockReturns={summary2} />
+          {/* <ReturnsTable stockData={portfolioData2} stockReturns={summary2} /> */}
           <ReturnsTable stockData={portfolioData1} stockReturns={summary2} />
         </Box>
       </Box>

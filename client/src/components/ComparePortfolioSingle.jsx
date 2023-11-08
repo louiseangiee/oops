@@ -72,7 +72,7 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setOverallReturn(data?.overallReturns?.overallReturn ? data.overallReturns.overallReturn : 0);
+      setOverallReturn(data?.overallReturns?.overalReturn ? data.overallReturns.overalReturn : 0);
       setOverallReturnPercentage(data?.overallReturns?.percentage ? data.overallReturns.percentage : 0);
       setStockReturns(data?.stockReturns ? data.stockReturns : {});
       setLoadingSummary(false);
@@ -148,9 +148,9 @@ const ComparePortfolioSingle = ({ chosenPortfolio }) => {
                 <Typography mt={1} variant="h5" fontWeight="bold" fontStyle="italic" style={{ color: colors.blueAccent[400] }}>
                   Overall Returns:
                 </Typography>
-                <Typography variant="h3" fontWeight="bold" style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300] }}>
-                  {loadingSummary ? 'Calculating data...' :
-                    `$ ${overallReturn}(${overallReturnPercentage}%)`
+                <Typography variant="h3" fontWeight="bold" style={{ color: overallReturn < 0 ? colors.redAccent[300] : colors.greenAccent[300], wordWrap: 'break-word' }}>
+                  {loadingSummary ? 'Calculating...' :
+                    `$${overallReturn}(${overallReturnPercentage}%)`
                   }
                 </Typography>
               </Box>
